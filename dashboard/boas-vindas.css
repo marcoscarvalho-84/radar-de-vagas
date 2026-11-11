@@ -93,13 +93,14 @@
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: var(--space-xxl);
+  margin-block: var(--space-xxl);
 }
+/* sem respiro em cima e embaixo: a divisória tem a altura do conteúdo */
 .topicos li {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  padding: var(--space-lg) var(--space-lg) var(--space-lg) 0;
+  padding: 0 var(--space-lg) 0 0;
 }
 .topicos li + li {
   padding-left: var(--space-lg);
@@ -210,13 +211,17 @@
   list-style: none;
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
+  /* número, título, texto e decisão: quatro linhas que os seis passos dividem
+     (subgrid), então a frase "Você..." começa na mesma altura em todos */
+  grid-template-rows: repeat(4, auto);
   padding-top: var(--space-md);
 }
 .funcoes:focus-visible { outline-offset: 8px; }
 .funcoes li {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
   gap: var(--space-xs);
   padding: var(--space-xl) var(--space-lg) 0 0;
 }
@@ -258,6 +263,7 @@
   font-size: var(--text-lead);
   line-height: var(--leading-heading);
   letter-spacing: -0.01em;
+  color: var(--azul);
 }
 .funcoes p {
   font-size: var(--text-small);
@@ -266,7 +272,8 @@
 }
 /* cada passo termina onde você decide: é a regra do projeto, dita em cada passo */
 .funcoes__voce {
-  margin-top: auto;
+  align-self: start;
+  margin-top: var(--space-sm);
   padding-top: var(--space-sm);
   border-top: var(--fio);
   font-size: var(--text-small);
@@ -651,17 +658,16 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
   .passo { grid-template-columns: 1fr; gap: var(--space-xl); }
   /* a linha do tempo continua horizontal: desliza para o lado, sem empurrar a página */
   .funcoes {
-    display: flex;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(76vw, 280px);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: var(--gutter);
     margin-inline: calc(-1 * var(--gutter));
     padding: var(--space-md) var(--gutter) var(--space-lg);
   }
-  .funcoes li {
-    flex: 0 0 min(76vw, 280px);
-    scroll-snap-align: start;
-  }
+  .funcoes li { scroll-snap-align: start; }
 }
 
 @media (max-width: 768px) {
@@ -673,6 +679,8 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
   .topicos { grid-template-columns: 1fr; }
   .topicos li { flex-direction: row; align-items: flex-start; gap: var(--space-md); padding: var(--space-md) 0; }
   .topicos li + li { padding-left: 0; border-left: 0; border-top: var(--fio-forte); }
+  .topicos li:first-child { padding-top: 0; }
+  .topicos li:last-child { padding-bottom: 0; }
   .abre__acoes > * { flex: 1 1 100%; }
   .radar { max-width: 300px; justify-self: center; }
   .header .btn-fio { padding: 8px 14px; }

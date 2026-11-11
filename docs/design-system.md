@@ -26,9 +26,9 @@ acentos de cor da Cerol e uma fonte escolhida pela leitura.
 - **Magenta `#EC008C`, interferência:** alertas (aprovação parada, triagem vencendo, erro de
   campo). Nunca cor de botão. Texto em tinta por cima passa AA (4,8:1).
 - **Azul vibrante `#263AF5`, pausa:** a faixa de números, "Já aplicada", a zona de arquivo
-  quando você arrasta, a varredura do radar e os títulos dos combinados da abertura. Como fundo,
-  **só texto em papel por cima** (6,3:1); tinta no azul não passa (2,9:1). Como texto no papel,
-  passa (6,3:1).
+  quando você arrasta, a varredura do radar e, na abertura, os títulos dos combinados e do
+  "Como funciona". Como fundo, **só texto em papel por cima** (6,3:1); tinta no azul não passa
+  (2,9:1). Como texto no papel, passa (6,3:1).
 - **Fita:** faixa de tinta com texto amarelo em marquee. Para no hover e com movimento reduzido.
 - **A marca é só texto:** "Radar de Vagas", sem caixa atrás de nenhuma palavra.
 
