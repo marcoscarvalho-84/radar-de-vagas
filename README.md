@@ -41,7 +41,7 @@ aprovar, ajustar ou descartar.
 ## Ver em 3 minutos (sem configurar nada)
 
 ```bash
-git clone https://github.com/marcos666carv/radar-de-vagas.git
+git clone https://github.com/marcoscarvalho-84/radar-de-vagas.git
 cd radar-de-vagas
 bin/radar demo
 ```
