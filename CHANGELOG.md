@@ -17,7 +17,9 @@
 - Anexos sem tipo de arquivo: cada arquivo da lista ganha um comentário (o que é e quando
   usar), que o `/radar-aplicar` usa para escolher o anexo certo.
 - Radar 3D em Three.js na abertura (pinos na altura do fit, varredura que acende cada vaga,
-  arrastar para girar), com o SVG de reserva sem WebGL.
+  arrastar para girar), com o SVG de reserva sem WebGL. O painel ganha o mesmo radar, menor,
+  ao lado da manchete em duas linhas; o aviso de config incompleta vai em amarelo embaixo de
+  "Hoje".
 - Visual: base do DS do portfólio do autor (papel quente, linha fina, caixa baixa, grão),
   acentos mantidos, azul vibrante `#263AF5` no lugar do céu e fonte Atkinson Hyperlegible
   Next empacotada (OFL).

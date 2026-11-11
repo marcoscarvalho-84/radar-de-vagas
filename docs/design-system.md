@@ -20,9 +20,9 @@ acentos de cor da Cerol e uma fonte escolhida pela leitura.
 ## Acentos
 
 - **Amarelo `#F7F00C`, a única cor de ação:** botão primário, passo atual, barras de fit, estado
-  aprovado, o bloco atrás de "Aplicar bem / é raro." e a vaga certa no radar. Nunca como texto
-  sobre papel (1,1:1): é sempre o fundo atrás da tinta. No hover, o primário inverte para tinta
-  com texto amarelo.
+  aprovado, o bloco atrás de "Aplicar bem / é raro.", a vaga certa no radar e o aviso do topo
+  do painel quando falta algo na config. Nunca como texto sobre papel (1,1:1): é sempre o
+  fundo atrás da tinta. No hover, o primário inverte para tinta com texto amarelo.
 - **Magenta `#EC008C`, interferência:** alertas (aprovação parada, triagem vencendo, erro de
   campo). Nunca cor de botão. Texto em tinta por cima passa AA (4,8:1).
 - **Azul vibrante `#263AF5`, pausa:** a faixa de números, "Já aplicada", a zona de arquivo
@@ -50,7 +50,8 @@ sombra e zero gradiente: o que precisa subir ganha fio, inverte de cor ou troca 
 
 ## Radar 3D
 
-A tela de abertura troca o radar em SVG por um radar em Three.js (`dashboard/radar-3d.js`,
+A tela de abertura e o topo do painel (menor, ao lado da manchete) trocam o radar em SVG
+por um radar em Three.js (`dashboard/radar-3d.js`,
 biblioteca em `dashboard/vendor/`, MIT). Continua chapado: só `MeshBasicMaterial`, sem luz e
 sem sombra; as cores são lidas dos tokens do `:root`. Sem WebGL, ou com o painel aberto por
 duplo clique, o SVG fica.

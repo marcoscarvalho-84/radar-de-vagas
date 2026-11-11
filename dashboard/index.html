@@ -7,6 +7,8 @@
   <title>Radar de Vagas</title>
   <!-- Dashboard auto-contido: dados injetados por radar/gerar_dados.py -->
   <link rel="stylesheet" href="styles.css?v=1794355612" />
+  <!-- Three.js vem junto com o projeto (dashboard/vendor, MIT) para o radar do topo -->
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
 </head>
 <body>
 
@@ -25,10 +27,39 @@
 
   <main>
     <section class="hero wrap" id="topo">
-      <p class="meta">Busca diária —</p>
-      <h1>Aplicar é fácil.<br /><span class="accent">Aplicar bem</span><br /><span class="accent">é raro.</span></h1>
-      <p>Varredura de vagas, triagem com nota de fit, pesquisa da empresa, CV sob medida e mapa de quem contatar. Nada sai daqui sem o seu ok.</p>
-      <span class="aviso-exemplo" id="aviso-config" hidden>Config sem pretensão salarial: a rotina vai perguntar antes de aplicar</span>
+      <div>
+        <h1>Aplicar é fácil.<br /><span class="accent">Aplicar bem é raro.</span></h1>
+        <p>Varredura de vagas, triagem com nota de fit, pesquisa da empresa, CV sob medida e mapa de quem contatar. Nada sai daqui sem o seu ok.</p>
+      </div>
+      <figure class="radar" role="img" aria-label="Ilustração de um radar varrendo vagas; cada vaga é um pino da altura da sua nota de fit, e a mais alta, em amarelo, tem fit 86">
+        <svg viewBox="0 0 400 400" aria-hidden="true">
+          <line class="radar__eixo" x1="4" y1="200" x2="396" y2="200" />
+          <line class="radar__eixo" x1="200" y1="4" x2="200" y2="396" />
+          <g class="radar__varredura">
+            <path class="radar__cunha" d="M200 200 L396 200 A196 196 0 0 0 350.15 74.01 Z" />
+            <line class="radar__ponteiro" x1="200" y1="200" x2="396" y2="200" />
+          </g>
+          <circle class="radar__anel" cx="200" cy="200" r="50" />
+          <circle class="radar__anel" cx="200" cy="200" r="100" />
+          <circle class="radar__anel" cx="200" cy="200" r="150" />
+          <circle class="radar__anel" cx="200" cy="200" r="196" />
+          <circle class="radar__ponto radar__ponto--fora" cx="64" cy="296" r="4" />
+          <circle class="radar__ponto radar__ponto--fora" cx="338" cy="292" r="4" />
+          <circle class="radar__ponto radar__ponto--fora" cx="96" cy="96" r="4" />
+          <circle class="radar__ponto" cx="140" cy="122" r="4" />
+          <circle class="radar__ponto" cx="112" cy="248" r="4" />
+          <circle class="radar__ponto" cx="296" cy="262" r="4" />
+          <circle class="radar__ponto" cx="182" cy="324" r="4" />
+          <circle class="radar__ponto" cx="322" cy="184" r="4" />
+          <circle class="radar__ponto" cx="234" cy="236" r="4" />
+          <circle class="radar__ponto" cx="200" cy="200" r="3" />
+          <circle class="radar__alvo" cx="266" cy="140" r="10" />
+          <g class="radar__selo">
+            <rect x="284" y="102" width="82" height="28" rx="14" />
+            <text x="325" y="121" text-anchor="middle">FIT 86</text>
+          </g>
+        </svg>
+      </figure>
     </section>
 
     <section class="faixa-calma" aria-label="Números do Radar">
@@ -37,6 +68,7 @@
 
     <section id="hoje" class="secao wrap">
       <h2 class="h2">Hoje<small id="hoje-sub"></small></h2>
+      <span class="aviso-exemplo" id="aviso-config" hidden>Config sem pretensão salarial: a rotina vai perguntar antes de aplicar</span>
       <div class="alternar" id="alternar-visao" role="group" aria-label="Visão">
         <button class="btn-decisao" type="button" data-visao="cards">Cards</button>
         <button class="btn-decisao" type="button" data-visao="tabela">Listagem</button>
@@ -1153,6 +1185,15 @@
       }
       avisar("Decisões copiadas, cole na conversa do Claude");
     });
+  </script>
+  <script>
+    // radar 3D só com o servidor: aberto por duplo clique (file://) o módulo não carrega e o SVG fica
+    if (location.protocol !== "file:") {
+      const radar = document.createElement("script");
+      radar.type = "module";
+      radar.src = "radar-3d.js";
+      document.body.append(radar);
+    }
   </script>
 </body>
 </html>

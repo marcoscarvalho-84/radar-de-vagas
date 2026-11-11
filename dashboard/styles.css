@@ -346,27 +346,104 @@ body::after {
   font-variant-numeric: tabular-nums;
 }
 
-/* ============ HERO ============ */
-.hero { padding-block: var(--space-section) var(--space-xxl); }
-.hero .meta { margin-bottom: var(--space-lg); }
+/* ============ HERO ============
+   Igual à abertura, mais baixo: manchete à esquerda e o radar menor à direita. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-xxl);
+  align-items: center;
+  padding-block: var(--space-xxl);
+}
+.hero .radar { width: min(300px, 30vw); }
+@media (max-width: 768px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero .radar { display: none; } /* no celular o painel vai direto aos números */
+}
+/* no painel a manchete cabe em duas linhas: a segunda frase nunca quebra */
 .hero h1 {
-  font-size: var(--text-display);
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-caps);
 }
 /* amarelo nunca é texto sobre branco: aqui ele é o bloco atrás da tinta */
 .hero h1 .accent {
+  white-space: nowrap;
   background: var(--primary);
   padding-inline: 0.06em;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.hero > p:not(.meta) {
+.hero h1 + p {
   max-width: 40rem;
   margin-top: var(--space-xl);
   font-size: var(--text-lead);
   line-height: var(--leading-body);
 }
+
+/* ============ RADAR ============
+   O elemento da abertura e do topo do painel: anéis de linha, a varredura em azul e a
+   vaga certa invertida. O SVG é a reserva; o radar-3d.js troca por WebGL quando pode. */
+.radar {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  justify-self: end;
+}
+.radar svg { display: block; width: 100%; height: auto; overflow: visible; }
+.radar__anel { fill: none; stroke: var(--ink); stroke-width: 1; }
+.radar__eixo { stroke: var(--g300); stroke-width: 1; }
+.radar__varredura {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: varrer 7s linear infinite;
+}
+.radar__cunha { fill: var(--azul); }
+.radar__ponteiro { stroke: var(--ink); stroke-width: 1.5; }
+.radar__ponto { fill: var(--ink); }
+.radar__ponto--fora { fill: var(--g300); }
+.radar__alvo { fill: var(--primary); stroke: var(--ink); stroke-width: 1.5; }
+.radar__selo rect { fill: var(--ink); }
+.radar__selo text {
+  fill: var(--primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: var(--peso-semi);
+  letter-spacing: 0.06em;
+}
+@keyframes varrer { to { transform: rotate(360deg); } }
+
+/* radar 3D (radar-3d.js): o canvas assume quando o WebGL sobe, o SVG fica de reserva */
+.radar--3d svg { display: none; }
+.radar canvas {
+  display: block;
+  touch-action: pan-y; /* arrastar na horizontal gira; na vertical, a página rola */
+  cursor: grab;
+}
+.radar canvas:active { cursor: grabbing; }
+.radar__selo3d {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--primary);
+  font-size: var(--text-small);
+  font-weight: var(--peso-semi);
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+  will-change: transform;
+}
+.radar__dica {
+  margin-top: var(--space-xs);
+  text-align: center;
+  transition: opacity var(--dur-slow) var(--ease-padrao);
+}
+.radar__dica.usada { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .radar__varredura { animation: none; } }
 
 /* ============ ALERTAS ============
    Magenta é interferência: carimbo chapado com texto preto (4,5:1). Reto,
@@ -386,9 +463,13 @@ body::after {
   font-size: var(--text-micro);
   line-height: var(--leading-small);
 }
+/* o aviso de config incompleta é lembrete, não interferência: amarelo, embaixo de "Hoje" */
 .aviso-exemplo {
-  margin-top: var(--space-lg);
+  display: block;
+  width: fit-content;
+  margin-bottom: var(--space-lg);
   padding: 8px 12px;
+  background: var(--primary);
   font-size: var(--text-small);
   line-height: var(--leading-small);
 }
@@ -445,6 +526,9 @@ body::after {
   line-height: var(--leading-heading);
   letter-spacing: var(--tracking-caps);
 }
+/* logo depois da faixa azul a seção não precisa de respiro nem de linha: a faixa já separa */
+.faixa-calma + .secao { padding-top: 0; }
+.faixa-calma + .secao > .h2 { padding-top: var(--space-xl); border-top: 0; }
 .secao > .h2 small {
   display: block;
   margin-top: var(--space-sm);
