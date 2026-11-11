@@ -1,5 +1,5 @@
 /* Tela de abertura: a primeira coisa que alguém vê ao rodar bin/radar.
-   Duas telas: a apresentação (o que o Radar faz, como funciona, os combinados)
+   Duas telas: a apresentação (o que o Radar faz, os combinados, como funciona)
    e, depois de "Montar meu contexto", o passo a passo (#contexto).
    Herda de styles.css os tokens, a fonte, a base, o cabeçalho, a fita e o
    rodapé; aqui mora só o que é da abertura. Mesmas regras do painel: amarelo
@@ -70,7 +70,7 @@
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: var(--space-xxl);
   align-items: center;
-  padding-block: var(--space-section);
+  padding-block: var(--space-section) var(--space-xxl);
 }
 .abre .meta { margin-bottom: var(--space-lg); }
 /* a manchete em três linhas fixas (as quebras são do texto): "Aplicar é fácil." /
@@ -274,13 +274,14 @@
   color: var(--ink);
 }
 
-/* ---- os combinados: faixa azul (o fundo vem de .faixa-calma) ---- */
-.promessas { margin-top: var(--space-section); }
+/* ---- os combinados: logo abaixo da abertura, em tom de nota (sem faixa, texto pequeno) ---- */
+.promessas { padding-bottom: var(--space-section); }
 .promessas__grade {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-xl);
-  padding-block: var(--space-xxl);
+  padding-top: var(--space-lg);
+  border-top: var(--fio);
 }
 .promessas p,
 .funcoes p,
@@ -289,11 +290,18 @@
 .proximos p { text-wrap: pretty; }
 .promessas strong {
   display: block;
-  margin-bottom: var(--space-sm);
-  font-size: var(--text-h3);
-  line-height: var(--leading-heading);
-  letter-spacing: -0.01em;
+  margin-bottom: var(--space-xxs);
+  font-size: var(--text-small);
+  font-weight: var(--peso-semi);
+  line-height: var(--leading-small);
+  color: var(--azul);
 }
+.promessas p {
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+  color: var(--muted);
+}
+.promessas b { font-weight: var(--peso-medio); color: var(--ink); }
 
 /* ============ TELA 2 · SEU CONTEXTO ============ */
 .tela-contexto { padding-top: var(--space-xxl); }
@@ -661,7 +669,7 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
 }
 
 @media (max-width: 600px) {
-  .abre { padding-block: var(--space-xxl) var(--space-section); gap: var(--space-xl); }
+  .abre { padding-block: var(--space-xxl); gap: var(--space-xl); }
   .topicos { grid-template-columns: 1fr; }
   .topicos li { flex-direction: row; align-items: flex-start; gap: var(--space-md); padding: var(--space-md) 0; }
   .topicos li + li { padding-left: 0; border-left: 0; border-top: var(--fio-forte); }

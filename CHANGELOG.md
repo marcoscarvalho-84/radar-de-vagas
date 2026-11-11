@@ -9,8 +9,9 @@
 - Upload pelo servidor local com as mesmas travas das decisões (Origin, Host, Content-Type),
   nome de arquivo refeito, assinatura dos bytes conferida e arquivos gravados só para o
   seu usuário. O ZIP do LinkedIn é lido e apagado: conexões e mensagens nunca ficam.
-- A abertura tem duas telas: a apresentação (manchete, três ações, como funciona em linha do
-  tempo horizontal, combinados) e "Seu contexto", aberta por "Montar meu contexto".
+- A abertura tem duas telas: a apresentação (manchete, três ações, os combinados em tom de
+  nota logo abaixo, como funciona em linha do tempo horizontal) e "Seu contexto", aberta por
+  "Montar meu contexto".
 - Radar 3D em Three.js na abertura (pinos na altura do fit, varredura que acende cada vaga,
   arrastar para girar), com o SVG de reserva sem WebGL.
 - Visual: base do DS do portfólio do autor (papel quente, linha fina, caixa baixa, grão),
