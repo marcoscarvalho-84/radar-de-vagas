@@ -66,6 +66,8 @@ def gerar() -> str:
     destino.mkdir(parents=True, exist_ok=True)
     estilos = caminhos.DASHBOARD / "styles.css"
     shutil.copyfile(estilos, destino / "styles.css")
+    # a fonte vai junto: aberto por duplo clique (file://) o painel também a acha
+    shutil.copytree(caminhos.DASHBOARD / "fonts", destino / "fonts", dirs_exist_ok=True)
     # cache-busting do CSS: sem isso o navegador segura a folha antiga e um ajuste de
     # estilo simplesmente não aparece, o que engana na conferência
     versao = int(estilos.stat().st_mtime)

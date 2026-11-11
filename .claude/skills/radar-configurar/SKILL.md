@@ -12,8 +12,10 @@ conduzir.
 ## Antes da primeira pergunta
 
 1. Se `meus-dados/` não existe, rode `bin/radar init`.
-2. Leia `meus-dados/config.json`, `meus-dados/buscas.json`, `meus-dados/perfil.json` e
-   `meus-dados/fatos.md`. Descubra o primeiro bloco ainda vazio e comece por ele (ou pelo
+2. Leia `meus-dados/config.json`, `meus-dados/buscas.json`, `meus-dados/perfil.json`,
+   `meus-dados/fatos.md` e `meus-dados/contexto.json` (o que a tela de abertura já trouxe:
+   LinkedIn, CV atual, e-mail, portfólio, anexos). Não pergunte de novo o que já está lá;
+   passo pulado na tela vira pergunta aqui. Descubra o primeiro bloco ainda vazio e comece por ele (ou pelo
    bloco que a pessoa pediu no argumento).
 3. Diga em uma linha quantos blocos faltam e quanto tempo leva, e que dá para parar a
    qualquer momento.

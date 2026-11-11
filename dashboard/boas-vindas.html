@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Radar de Vagas · Boas-vindas</title>
+  <!-- Tela de abertura: servida pelo bin/radar direto do modelo, sem dado nenhum dentro.
+       O estado dos passos vem de GET /api/contexto. -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="boas-vindas.css" />
+  <!-- Three.js vem junto com o projeto (dashboard/vendor, MIT): a tela abre sem internet -->
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+
+  <a class="pular-para" href="#contexto">Ir para o passo a passo</a>
+
+  <p class="aviso-servidor" id="sem-servidor" hidden>
+    Esta tela precisa do servidor local para guardar o que você enviar. No terminal, rode <code>bin/radar</code>.
+  </p>
+
+  <header class="header">
+    <a class="logo" href="#topo">Radar de <em>Vagas</em></a>
+    <nav class="nav" aria-label="Telas">
+      <a href="#topo" data-tela="abertura">Apresentação</a>
+      <a href="#contexto" data-tela="contexto">Seu contexto</a>
+    </nav>
+    <button class="btn-fio" id="ir-painel" type="button" data-precisa-servidor>Ir para o painel</button>
+  </header>
+
+  <!-- Duas telas na mesma página: a apresentação e, ao clicar em "Montar meu
+       contexto", o passo a passo (#contexto). O voltar do navegador funciona. -->
+  <main id="tela-abertura">
+    <!-- ============ ABERTURA ============ -->
+    <section class="abre wrap" id="topo">
+      <div>
+        <p class="meta">Sua rotina de busca de emprego · no seu computador</p>
+        <h1>Aplicar é fácil.<br /><span class="accent">Aplicar bem</span><br /><span class="accent">é raro.</span></h1>
+        <!-- o que o Radar faz, em três ações: ícone + texto, separados por linha -->
+        <ul class="topicos">
+          <li>
+            <svg class="topicos__ico" viewBox="0 0 32 32" aria-hidden="true">
+              <circle cx="16" cy="16" r="13" />
+              <circle cx="16" cy="16" r="6.5" />
+              <path d="M16 16 L26.5 8.5" />
+              <circle class="cheio" cx="21" cy="21.5" r="2" />
+            </svg>
+            <div>
+              <strong>Varre as vagas</strong>
+              <span>Toda vaga nova ganha uma nota de fit honesta, de 0 a 100.</span>
+            </div>
+          </li>
+          <li>
+            <svg class="topicos__ico" viewBox="0 0 32 32" aria-hidden="true">
+              <path d="M8 3.5 H19.5 L25 9 V28.5 H8 Z" />
+              <path d="M19.5 3.5 V9 H25" />
+              <path d="M12 15 H21 M12 19.5 H21 M12 24 H17.5" />
+            </svg>
+            <div>
+              <strong>Prepara as melhores</strong>
+              <span>Empresa, salário com fonte, CV sob medida e quem contatar.</span>
+            </div>
+          </li>
+          <li>
+            <svg class="topicos__ico" viewBox="0 0 32 32" aria-hidden="true">
+              <circle cx="16" cy="16" r="13" />
+              <path d="M10.5 16.5 L14.5 20.5 L22 12" />
+            </svg>
+            <div>
+              <strong>Você aprova</strong>
+              <span>Candidatura, convite e mensagem só saem com o seu ok.</span>
+            </div>
+          </li>
+        </ul>
+        <div class="abre__acoes">
+          <a class="btn-primario" href="#contexto">Montar meu contexto</a>
+          <a class="btn-fio" href="#como">Como funciona</a>
+        </div>
+        <p class="abre__tempo">São 5 passos: LinkedIn, CV, e-mail, portfólio e anexos. Todos podem ser pulados e retomados.</p>
+      </div>
+
+      <!-- radar-3d.js troca o SVG por um radar 3D; sem WebGL, o SVG fica -->
+      <figure class="radar" role="img" aria-label="Ilustração de um radar varrendo vagas; cada vaga é um pino da altura da sua nota de fit, e a mais alta, em amarelo, tem fit 86">
+        <svg viewBox="0 0 400 400" aria-hidden="true">
+          <line class="radar__eixo" x1="4" y1="200" x2="396" y2="200" />
+          <line class="radar__eixo" x1="200" y1="4" x2="200" y2="396" />
+          <g class="radar__varredura">
+            <path class="radar__cunha" d="M200 200 L396 200 A196 196 0 0 0 350.15 74.01 Z" />
+            <line class="radar__ponteiro" x1="200" y1="200" x2="396" y2="200" />
+          </g>
+          <circle class="radar__anel" cx="200" cy="200" r="50" />
+          <circle class="radar__anel" cx="200" cy="200" r="100" />
+          <circle class="radar__anel" cx="200" cy="200" r="150" />
+          <circle class="radar__anel" cx="200" cy="200" r="196" />
+          <circle class="radar__ponto radar__ponto--fora" cx="64" cy="296" r="4" />
+          <circle class="radar__ponto radar__ponto--fora" cx="338" cy="292" r="4" />
+          <circle class="radar__ponto radar__ponto--fora" cx="96" cy="96" r="4" />
+          <circle class="radar__ponto" cx="140" cy="122" r="4" />
+          <circle class="radar__ponto" cx="112" cy="248" r="4" />
+          <circle class="radar__ponto" cx="296" cy="262" r="4" />
+          <circle class="radar__ponto" cx="182" cy="324" r="4" />
+          <circle class="radar__ponto" cx="322" cy="184" r="4" />
+          <circle class="radar__ponto" cx="234" cy="236" r="4" />
+          <circle class="radar__ponto" cx="200" cy="200" r="3" />
+          <circle class="radar__alvo" cx="266" cy="140" r="10" />
+          <g class="radar__selo">
+            <rect x="284" y="102" width="82" height="28" rx="14" />
+            <text x="325" y="121" text-anchor="middle">FIT 86</text>
+          </g>
+        </svg>
+      </figure>
+    </section>
+
+
+    <div class="fita" aria-hidden="true">
+      <div class="fita__trilho">
+        <span class="fita__grupo">Varre · Tria · Aprofunda · Escreve · Mapeia · Você decide · Varre · Tria · Aprofunda · Escreve · Mapeia · Você decide · Varre · Tria · Aprofunda · Escreve · Mapeia · Você decide ·&nbsp;</span>
+        <span class="fita__grupo">Varre · Tria · Aprofunda · Escreve · Mapeia · Você decide · Varre · Tria · Aprofunda · Escreve · Mapeia · Você decide · Varre · Tria · Aprofunda · Escreve · Mapeia · Você decide ·&nbsp;</span>
+      </div>
+    </div>
+
+    <!-- ============ COMO FUNCIONA ============ -->
+    <section class="secao wrap" id="como">
+      <h2 class="h2">Como funciona<small>Seis passos, em ordem. Em cada um, a última palavra é sua.</small></h2>
+      <!-- linha do tempo: um trilho liga os seis passos; no celular ela desliza para o lado -->
+      <ol class="funcoes" tabindex="0" aria-label="Como funciona, em seis passos">
+        <li>
+          <span class="funcoes__num">01</span>
+          <h3>Perfil</h3>
+          <p>Lê o export oficial do seu LinkedIn e o seu CV atual. Daí sai a fonte de fatos: o Radar não inventa nem arredonda para cima.</p>
+          <span class="funcoes__voce">Você confirma cada fato.</span>
+        </li>
+        <li>
+          <span class="funcoes__num">02</span>
+          <h3>Contexto</h3>
+          <p>Um questionário curto põe o Radar nas suas regras: cargos, cidade, regime, pretensão, o que evitar. Resposta vazia vira pergunta na hora certa.</p>
+          <span class="funcoes__voce">Você define as regras.</span>
+        </li>
+        <li>
+          <span class="funcoes__num">03</span>
+          <h3>Fit</h3>
+          <p>Toda vaga nova ganha nota de 0 a 100, com uma frase honesta e os red flags. As melhores são aprofundadas: empresa, salário com fonte, forças e lacunas.</p>
+          <span class="funcoes__voce">Você escolhe o que aprofundar.</span>
+        </li>
+        <li>
+          <span class="funcoes__num">04</span>
+          <h3>Pessoas</h3>
+          <p>Para cada vaga trabalhada, três nomes: quem recruta, quem provavelmente contrata e um terceiro da área, com o porquê de cada um.</p>
+          <span class="funcoes__voce">Você decide quem contatar e o que dizer.</span>
+        </li>
+        <li>
+          <span class="funcoes__num">05</span>
+          <h3>CV e carta</h3>
+          <p>Um PDF de uma página sob medida para cada vaga, com preview e o racional de cada mudança. A carta só quando o formulário pede.</p>
+          <span class="funcoes__voce">Você aprova ou pede ajuste.</span>
+        </li>
+        <li>
+          <span class="funcoes__num">06</span>
+          <h3>Aplicação</h3>
+          <p>O formulário é preenchido no seu navegador e para num checkpoint com todas as respostas e um print, antes de enviar.</p>
+          <span class="funcoes__voce">Você dá o ok final.</span>
+        </li>
+      </ol>
+    </section>
+
+    <section class="faixa-calma promessas" aria-label="Combinados">
+      <div class="wrap promessas__grade">
+        <div>
+          <strong>Nada sai sem o seu ok.</strong>
+          <p>Candidatura, convite e mensagem esperam a sua aprovação. Não existe modo automático.</p>
+        </div>
+        <div>
+          <strong>Seus dados ficam aqui.</strong>
+          <p>Tudo mora em <b>meus-dados/</b>, no seu computador, fora do git. Este painel só atende no próprio computador.</p>
+        </div>
+        <div>
+          <strong>Nada é inventado.</strong>
+          <p>CV, carta e formulário só afirmam o que você confirmou. Na dúvida, o Radar pergunta.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ TELA 2 · SEU CONTEXTO ============ -->
+  <main id="contexto" class="tela-contexto" hidden>
+    <section class="wrap" id="passos">
+      <a class="voltar" href="#topo">← Apresentação</a>
+      <h1 class="tela-titulo" id="titulo-contexto" tabindex="-1">Seu contexto</h1>
+      <p class="tela-lead">Cinco passos para o Radar trabalhar com a sua história. Tudo fica guardado assim que você envia, e qualquer passo pode ser pulado.</p>
+
+      <ol class="trilha" aria-label="Passos">
+        <li><button type="button" data-ir="linkedin"><span class="trilha__n">1</span>LinkedIn</button></li>
+        <li><button type="button" data-ir="cv"><span class="trilha__n">2</span>CV</button></li>
+        <li><button type="button" data-ir="email"><span class="trilha__n">3</span>E-mail</button></li>
+        <li><button type="button" data-ir="portfolio"><span class="trilha__n">4</span>Portfólio</button></li>
+        <li><button type="button" data-ir="anexos"><span class="trilha__n">5</span>Anexos</button></li>
+        <li><button type="button" data-ir="pronto"><span class="trilha__n">✓</span>Pronto</button></li>
+      </ol>
+      <div class="progresso">
+        <div class="progresso__trilho" aria-hidden="true"><span id="progresso-barra"></span></div>
+        <span class="progresso__texto" id="progresso-texto" aria-live="polite">Carregando</span>
+      </div>
+
+      <!-- 1 · LinkedIn -->
+      <section class="passo" data-passo="linkedin" id="passo-linkedin" aria-labelledby="t-linkedin" hidden>
+        <div class="passo__lado">
+          <span class="passo__num" aria-hidden="true">01</span>
+          <h3 id="t-linkedin" tabindex="-1">Seu LinkedIn</h3>
+          <p class="passo__porque">É de onde o Radar tira a sua trajetória: cargos, datas, formação e competências. Vira um rascunho, e você confirma cada fato depois.</p>
+          <p class="passo__nota"><span class="meta">Privacidade</span>Do export, só os arquivos do perfil são lidos. Conexões, mensagens e convites nunca são abertos, e o ZIP é apagado assim que a leitura termina.</p>
+        </div>
+        <div class="passo__corpo">
+          <label class="campo">
+            <span class="campo__rotulo">Endereço do seu perfil</span>
+            <input id="linkedin-url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="linkedin.com/in/seu-nome" aria-describedby="ajuda-linkedin erro-linkedin" />
+            <span class="campo__ajuda" id="ajuda-linkedin">Vai no cabeçalho de cada CV.</span>
+          </label>
+
+          <div class="soltar" data-tipo="linkedin">
+            <input type="file" accept=".zip,.pdf" hidden />
+            <span class="soltar__titulo">Solte aqui o export do LinkedIn</span>
+            <span class="soltar__sub">O ZIP de “Obter uma cópia dos seus dados” (recomendado) ou o PDF de “Salvar em PDF” do seu perfil.</span>
+            <div class="soltar__linha">
+              <button class="btn-fio" type="button" data-escolher data-precisa-servidor>Escolher arquivo</button>
+              <span class="soltar__estado" role="status"></span>
+            </div>
+            <div class="soltar__barra" aria-hidden="true"><span></span></div>
+          </div>
+
+          <div class="recibo" id="recibo-linkedin" hidden>
+            <span class="recibo__marca" aria-hidden="true">✓</span>
+            <div><strong></strong><span></span></div>
+          </div>
+
+          <details class="como-baixar">
+            <summary>Como baixar o export (2 minutos)</summary>
+            <ol>
+              <li>No LinkedIn, clique na sua foto (Eu) e em Configurações e privacidade.</li>
+              <li>Entre em Privacidade dos dados e depois em Obter uma cópia dos seus dados.</li>
+              <li>Marque os dados do perfil (Perfil, Cargos, Formação acadêmica, Competências, Idiomas) e solicite o arquivo.</li>
+              <li>O LinkedIn manda o link por e-mail, em geral em poucos minutos. Baixe o ZIP e solte aqui.</li>
+            </ol>
+            <p>Com pressa? No seu perfil, Mais e depois Salvar em PDF. Solte o PDF agora e o export fica para depois.</p>
+          </details>
+
+          <p class="erro" id="erro-linkedin" role="alert"></p>
+          <div class="passo__acoes">
+            <button class="btn-primario" type="button" data-salvar="linkedin" data-precisa-servidor>Salvar e continuar</button>
+            <button class="btn-texto" type="button" data-pular="linkedin" data-precisa-servidor>Pular por agora</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 · CV -->
+      <section class="passo" data-passo="cv" id="passo-cv" aria-labelledby="t-cv" hidden>
+        <div class="passo__lado">
+          <span class="passo__num" aria-hidden="true">02</span>
+          <h3 id="t-cv" tabindex="-1">Seu CV atual</h3>
+          <p class="passo__porque">Ele mostra como você já conta a sua história. O texto vira fonte de fatos a confirmar e referência de tom; os CVs novos saem no layout do Radar, um por vaga.</p>
+          <p class="passo__nota"><span class="meta">Privacidade</span>O seu CV atual não é enviado a ninguém. Ele fica em meus-dados/anexos.</p>
+        </div>
+        <div class="passo__corpo">
+          <div class="soltar" data-tipo="cv">
+            <input type="file" accept=".pdf,.docx" hidden />
+            <span class="soltar__titulo">Solte aqui o seu CV</span>
+            <span class="soltar__sub">PDF ou DOCX, até 30 MB. Um CV novo substitui o anterior.</span>
+            <div class="soltar__linha">
+              <button class="btn-fio" type="button" data-escolher data-precisa-servidor>Escolher arquivo</button>
+              <span class="soltar__estado" role="status"></span>
+            </div>
+            <div class="soltar__barra" aria-hidden="true"><span></span></div>
+          </div>
+
+          <div class="recibo" id="recibo-cv" hidden>
+            <span class="recibo__marca" aria-hidden="true">✓</span>
+            <div><strong></strong><span></span></div>
+          </div>
+
+          <p class="erro" id="erro-cv" role="alert"></p>
+          <div class="passo__acoes">
+            <button class="btn-primario" type="button" data-salvar="cv" data-precisa-servidor>Continuar</button>
+            <button class="btn-texto" type="button" data-pular="cv" data-precisa-servidor>Pular por agora</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 · E-mail -->
+      <section class="passo" data-passo="email" id="passo-email" aria-labelledby="t-email" hidden>
+        <div class="passo__lado">
+          <span class="passo__num" aria-hidden="true">03</span>
+          <h3 id="t-email" tabindex="-1">Seu e-mail</h3>
+          <p class="passo__porque">O endereço que vai no cabeçalho de cada CV e nos formulários de candidatura. Use o que você confere todo dia: é por ele que a resposta chega.</p>
+          <p class="passo__nota"><span class="meta">Privacidade</span>Ele só aparece no CV e nos formulários que você aprovar.</p>
+        </div>
+        <div class="passo__corpo">
+          <label class="campo">
+            <span class="campo__rotulo">E-mail profissional</span>
+            <input id="email" type="email" autocomplete="email" spellcheck="false" placeholder="voce@exemplo.com" aria-describedby="erro-email" />
+          </label>
+          <span class="sugestao" id="sugestao-email" hidden>Veio do seu LinkedIn. Confira e salve.</span>
+
+          <p class="erro" id="erro-email" role="alert"></p>
+          <div class="passo__acoes">
+            <button class="btn-primario" type="button" data-salvar="email" data-precisa-servidor>Salvar e continuar</button>
+            <button class="btn-texto" type="button" data-pular="email" data-precisa-servidor>Pular por agora</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 · Portfólio -->
+      <section class="passo" data-passo="portfolio" id="passo-portfolio" aria-labelledby="t-portfolio" hidden>
+        <div class="passo__lado">
+          <span class="passo__num" aria-hidden="true">04</span>
+          <h3 id="t-portfolio" tabindex="-1">Seu portfólio</h3>
+          <p class="passo__porque">O link que prova o que o CV afirma. Vai no cabeçalho do CV e nos campos de portfólio dos formulários.</p>
+          <p class="passo__nota"><span class="meta">Senha</span>Portfólio com senha? A senha não fica aqui. Quando um formulário pedir, o Radar pergunta a você na hora.</p>
+        </div>
+        <div class="passo__corpo">
+          <label class="campo">
+            <span class="campo__rotulo">Link do portfólio</span>
+            <input id="portfolio" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="seunome.com" aria-describedby="erro-portfolio" />
+          </label>
+          <span class="sugestao" id="sugestao-portfolio" hidden>Veio do seu LinkedIn. Confira e salve.</span>
+          <fieldset class="campo">
+            <legend class="campo__rotulo">Outros links <span class="campo__ajuda">(opcional, até 3)</span></legend>
+            <div class="campos-extras">
+              <input class="link-extra" type="text" inputmode="url" spellcheck="false" placeholder="github.com/voce" aria-label="Outro link 1" />
+              <input class="link-extra" type="text" inputmode="url" spellcheck="false" placeholder="behance.net/voce" aria-label="Outro link 2" />
+              <input class="link-extra" type="text" inputmode="url" spellcheck="false" placeholder="seu site, Medium ou Dribbble" aria-label="Outro link 3" />
+            </div>
+          </fieldset>
+
+          <p class="erro" id="erro-portfolio" role="alert"></p>
+          <div class="passo__acoes">
+            <button class="btn-primario" type="button" data-salvar="portfolio" data-precisa-servidor>Salvar e continuar</button>
+            <button class="btn-texto" type="button" data-pular="portfolio" data-precisa-servidor>Pular por agora</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 · Anexos -->
+      <section class="passo" data-passo="anexos" id="passo-anexos" aria-labelledby="t-anexos" hidden>
+        <div class="passo__lado">
+          <span class="passo__num" aria-hidden="true">05</span>
+          <h3 id="t-anexos" tabindex="-1">Anexos</h3>
+          <p class="passo__porque">O que alguns formulários pedem além do CV: portfólio em PDF, estudo de caso, certificado, carta de recomendação. Ficam prontos para quando a vaga pedir.</p>
+          <p class="passo__nota"><span class="meta">Na candidatura</span>Nenhum anexo sai sem o seu ok. Antes de enviar, o Radar mostra qual arquivo vai em qual campo.</p>
+        </div>
+        <div class="passo__corpo">
+          <label class="campo">
+            <span class="campo__rotulo">Que tipo de arquivo é?</span>
+            <select id="anexo-categoria"></select>
+          </label>
+          <div class="soltar" data-tipo="anexo">
+            <input type="file" accept=".pdf,.docx,.pptx,.png,.jpg,.jpeg,.webp,.txt,.md" multiple hidden />
+            <span class="soltar__titulo">Solte aqui os seus anexos</span>
+            <span class="soltar__sub">PDF, DOCX, PPTX, PNG, JPG, WEBP, TXT ou MD, até 30 MB cada. Pode soltar vários de uma vez.</span>
+            <div class="soltar__linha">
+              <button class="btn-fio" type="button" data-escolher data-precisa-servidor>Escolher arquivos</button>
+              <span class="soltar__estado" role="status"></span>
+            </div>
+            <div class="soltar__barra" aria-hidden="true"><span></span></div>
+          </div>
+          <ul class="lista-anexos" id="lista-anexos" aria-label="Anexos guardados"></ul>
+
+          <p class="erro" id="erro-anexos" role="alert"></p>
+          <div class="passo__acoes">
+            <button class="btn-primario" type="button" data-salvar="anexos" data-precisa-servidor>Continuar</button>
+            <button class="btn-texto" type="button" data-pular="anexos" data-precisa-servidor>Pular por agora</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pronto -->
+      <section class="passo" data-passo="pronto" id="passo-pronto" aria-labelledby="t-pronto" hidden>
+        <div class="passo__lado">
+          <span class="passo__num" id="pronto-contagem" aria-hidden="true">0/5</span>
+          <h3 id="t-pronto" tabindex="-1">Quase lá</h3>
+          <p class="passo__porque" id="pronto-porque"></p>
+        </div>
+        <div class="passo__corpo">
+          <ul class="checklist" id="checklist" aria-label="Resumo do seu contexto"></ul>
+
+          <ol class="proximos" aria-label="Próximos passos">
+            <li>
+              <span class="proximos__n">1</span>
+              <div>
+                <strong>Responda o questionário</strong>
+                <p>Abra o Claude Code nesta pasta e rode <code>/radar-configurar</code>. São 12 blocos curtos: cargos, cidade, regime, pretensão, o que evitar. Ele já sabe o que você pôs aqui.</p>
+              </div>
+            </li>
+            <li>
+              <span class="proximos__n">2</span>
+              <div>
+                <strong>Rode a primeira varredura</strong>
+                <p><code>/radar-triagem</code> busca as vagas novas e traz as melhores para o painel, cada uma com nota de fit.</p>
+              </div>
+            </li>
+            <li>
+              <span class="proximos__n">3</span>
+              <div>
+                <strong>Decida no painel</strong>
+                <p>Aprofundar, aprovar, ajustar ou pular, com um clique. Nada sai sem o seu ok.</p>
+              </div>
+            </li>
+          </ol>
+
+          <p class="erro" id="erro-pronto" role="alert"></p>
+          <div class="passo__acoes">
+            <button class="btn-primario" type="button" id="concluir" data-precisa-servidor>Ir para o painel</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="fita" aria-hidden="true">
+    <div class="fita__trilho">
+      <span class="fita__grupo">Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok · Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok · Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok ·&nbsp;</span>
+      <span class="fita__grupo">Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok · Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok · Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok ·&nbsp;</span>
+    </div>
+  </div>
+  <footer class="footer">
+    <div class="wrap footer__grade">
+      <div class="footer__marca">
+        <strong>Radar de Vagas</strong>
+        <span>Código aberto, licença MIT. O que é seu fica em meus-dados/.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  (() => {
+    "use strict";
+    const PASSOS = ["linkedin", "cv", "email", "portfolio", "anexos", "pronto"];
+    const NOMES = { linkedin: "LinkedIn", cv: "CV", email: "E-mail", portfolio: "Portfólio", anexos: "Anexos" };
+    const DO_TIPO = { linkedin: "linkedin", cv: "cv", anexo: "anexos" };
+    const LIMITE = 30 * 1024 * 1024;
+    const REDUZIDO = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const $ = (s, el = document) => el.querySelector(s);
+    const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+    let estado = null;
+    let atual = null;
+
+    // ---------- as duas telas: apresentação e #contexto ----------
+    // a troca só acontece quando a TELA muda; âncora dentro da mesma tela
+    // (o "Como funciona") fica com o navegador
+    const TITULO = document.title;
+    let telaAtual = null;
+    function mostrarTela() {
+      const contexto = location.hash === "#contexto";
+      const tela = contexto ? "contexto" : "abertura";
+      if (tela === telaAtual) return;
+      const primeira = telaAtual === null;
+      telaAtual = tela;
+      $("#tela-abertura").hidden = contexto;
+      $("#contexto").hidden = !contexto;
+      document.title = contexto ? "Radar de Vagas · Seu contexto" : TITULO;
+      $$(".nav [data-tela]").forEach(a => {
+        if (a.dataset.tela === tela) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      });
+      if (contexto) {
+        const t = $("#contexto");
+        t.classList.remove("entrando");
+        void t.offsetWidth;
+        t.classList.add("entrando");
+      }
+      if (primeira) return;
+      const alvo = !contexto && location.hash.length > 1 && document.getElementById(location.hash.slice(1));
+      if (alvo) alvo.scrollIntoView();
+      else scrollTo(0, 0);
+      if (contexto) $("#titulo-contexto").focus({ preventScroll: true });
+    }
+    addEventListener("hashchange", mostrarTela);
+    mostrarTela();
+
+    // aberta por duplo clique: nada para gravar, então tudo que grava fica desligado
+    if (!/^https?:$/.test(location.protocol)) {
+      $("#sem-servidor").hidden = false;
+      $$("[data-precisa-servidor]").forEach(b => { b.disabled = true; });
+      ir("linkedin", false);
+      $("#progresso-texto").textContent = "Sem servidor";
+      return;
+    }
+
+    // ---------- conversa com o servidor ----------
+    async function pedir(corpo) {
+      let r;
+      try {
+        r = await fetch("/api/contexto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(corpo),
+        });
+      } catch {
+        throw new Error("O servidor não respondeu. Ele ainda está rodando no terminal?");
+      }
+      const j = await r.json().catch(() => ({ ok: false, erro: "Resposta estranha do servidor." }));
+      if (!j.ok) throw new Error(j.erro || "Não deu certo.");
+      return j;
+    }
+
+    // XHR e não fetch: só ele conta o progresso do envio
+    function enviar(tipo, arquivo, categoria, aoAndar) {
+      return new Promise((resolve, reject) => {
+        const x = new XMLHttpRequest();
+        x.open("POST", "/api/arquivo");
+        x.setRequestHeader("Content-Type", "application/octet-stream");
+        x.setRequestHeader("X-Radar-Tipo", tipo);
+        x.setRequestHeader("X-Radar-Nome", encodeURIComponent(arquivo.name));
+        if (categoria) x.setRequestHeader("X-Radar-Categoria", categoria);
+        x.upload.onprogress = e => { if (e.lengthComputable) aoAndar(Math.round(e.loaded / e.total * 100)); };
+        x.onload = () => {
+          let j;
+          try { j = JSON.parse(x.responseText); } catch { j = { ok: false, erro: "Resposta estranha do servidor." }; }
+          j.ok ? resolve(j) : reject(new Error(j.erro || "Não deu certo."));
+        };
+        x.onerror = () => reject(new Error("O servidor não respondeu. Ele ainda está rodando no terminal?"));
+        x.send(arquivo);
+      });
+    }
+
+    // ---------- navegação entre passos ----------
+    const feito = p => p !== "pronto" && !!estado.feitos[p];
+    const pulado = p => estado.pulados.includes(p);
+    const pendente = p => p === "pronto" || (!feito(p) && !pulado(p));
+
+    function ir(p, focar = true) {
+      atual = p;
+      $$(".passo").forEach(s => {
+        const ativo = s.dataset.passo === p;
+        s.hidden = !ativo;
+        if (ativo) {
+          s.classList.remove("entrando");
+          void s.offsetWidth; // reinicia a animação de entrada
+          s.classList.add("entrando");
+        }
+      });
+      if (estado) {
+        desenharTrilha();
+        if (p === "pronto") desenharPronto();
+      }
+      if (focar) {
+        $("#passos").scrollIntoView({ behavior: REDUZIDO ? "auto" : "smooth", block: "start" });
+        $(`#passo-${p} h3`).focus({ preventScroll: true });
+      }
+    }
+
+    function seguir() {
+      ir(PASSOS[Math.min(PASSOS.indexOf(atual) + 1, PASSOS.length - 1)]);
+    }
+
+    function desenharTrilha() {
+      $$(".trilha button").forEach(b => {
+        const p = b.dataset.ir;
+        b.classList.toggle("feito", feito(p));
+        b.classList.toggle("pulado", pulado(p) && !feito(p));
+        if (p === atual) b.setAttribute("aria-current", "step");
+        else b.removeAttribute("aria-current");
+        if (p !== "pronto") $(".trilha__n", b).textContent = feito(p) ? "✓" : String(PASSOS.indexOf(p) + 1);
+      });
+      const n = PASSOS.slice(0, 5).filter(feito).length;
+      $("#progresso-barra").style.width = `${n * 20}%`;
+      $("#progresso-texto").textContent = atual === "pronto"
+        ? `${n} de 5 feitos`
+        : `Passo ${PASSOS.indexOf(atual) + 1} de 5 · ${n} feito${n === 1 ? "" : "s"}`;
+    }
+
+    // ---------- preencher a tela com o que já está guardado ----------
+    function recibo(id, titulo, detalhe) {
+      const el = $(id);
+      el.hidden = !titulo;
+      if (!titulo) return;
+      $(":scope > div > strong", el).textContent = titulo;
+      $(":scope > div > span", el).textContent = detalhe || "";
+    }
+
+    function semProtocolo(url) {
+      return (url || "").replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
+    }
+
+    function plural(n, um, varios) { return `${n} ${n === 1 ? um : varios}`; }
+
+    function tamanho(bytes) {
+      if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+      return `${(bytes / 1024 / 1024).toFixed(1).replace(".", ",")} MB`;
+    }
+
+    function preencher() {
+      const li = estado.linkedin;
+      const url = $("#linkedin-url");
+      if (document.activeElement !== url) url.value = semProtocolo(li.url);
+      if (li.fonte === "export") {
+        recibo("#recibo-linkedin", li.nome ? `Perfil de ${li.nome} importado` : "Perfil importado",
+          `${plural(li.experiencias, "experiência", "experiências")} · ${plural(li.competencias, "competência", "competências")}. Vira rascunho: você confirma cada fato no /radar-perfil.`);
+      } else if (li.fonte === "pdf") {
+        recibo("#recibo-linkedin", "PDF do perfil guardado", "O texto vira rascunho para o /radar-perfil estruturar com você.");
+      } else {
+        recibo("#recibo-linkedin", "");
+      }
+
+      const cv = estado.cv;
+      recibo("#recibo-cv", cv.arquivo ? `CV guardado (${cv.arquivo.split(".").pop().toUpperCase()})` : "",
+        cv.palavras ? `${plural(cv.palavras, "palavra lida", "palavras lidas")}. O texto vira fonte de fatos a confirmar.`
+                    : "O texto não foi lido. Tudo bem: o questionário cobre.");
+
+      const sug = estado.sugestoes || {};
+      const email = $("#email");
+      if (document.activeElement !== email) email.value = estado.email || sug.email || "";
+      $("#sugestao-email").hidden = !!estado.email || !sug.email;
+
+      const port = $("#portfolio");
+      if (document.activeElement !== port) port.value = semProtocolo(estado.portfolio.url || sug.portfolio || "");
+      $("#sugestao-portfolio").hidden = !!estado.portfolio.url || !sug.portfolio;
+      const extras = $$(".link-extra");
+      extras.forEach((el, i) => { if (document.activeElement !== el) el.value = semProtocolo(estado.portfolio.outros[i] || ""); });
+
+      const sel = $("#anexo-categoria");
+      if (!sel.options.length) {
+        for (const [valor, rotulo] of Object.entries(estado.categorias)) sel.add(new Option(rotulo, valor));
+      }
+      const lista = $("#lista-anexos");
+      lista.replaceChildren(...estado.anexos.map(a => {
+        const item = document.createElement("li");
+        const info = document.createElement("div");
+        const nome = document.createElement("span");
+        nome.className = "lista-anexos__nome";
+        nome.textContent = a.nome_original || a.arquivo;
+        const meta = document.createElement("span");
+        meta.className = "lista-anexos__meta";
+        meta.textContent = tamanho(a.tamanho);
+        info.append(nome, meta);
+        const tag = document.createElement("span");
+        tag.className = "etiqueta";
+        tag.textContent = estado.categorias[a.categoria] || a.categoria;
+        const tirar = document.createElement("button");
+        tirar.type = "button";
+        tirar.className = "btn-texto";
+        tirar.textContent = "Remover";
+        tirar.setAttribute("aria-label", `Remover ${nome.textContent}`);
+        tirar.addEventListener("click", () => remover(a.arquivo));
+        item.append(info, tag, tirar);
+        return item;
+      }));
+    }
+
+    function desenharPronto() {
+      const n = PASSOS.slice(0, 5).filter(feito).length;
+      $("#pronto-contagem").textContent = `${n}/5`;
+      $("#t-pronto").textContent = n === 5 ? "Seu contexto está de pé" : n >= 3 ? "Quase lá" : "Dá para seguir assim";
+      $("#pronto-porque").textContent = n === 5
+        ? "Com isso o Radar já monta o cabeçalho do CV, conhece a sua trajetória e tem os anexos à mão. As preferências vêm do questionário."
+        : "O que faltou não trava nada: o questionário pergunta na hora certa. Dá para voltar aqui quando quiser, pelo link Seu contexto no painel.";
+      const detalhe = {
+        linkedin: () => [semProtocolo(estado.linkedin.url), estado.linkedin.fonte === "export" ? "export importado" : estado.linkedin.fonte === "pdf" ? "PDF do perfil" : ""].filter(Boolean).join(" · "),
+        cv: () => estado.cv.arquivo ? estado.cv.arquivo.replace("anexos/", "") : "",
+        email: () => estado.email,
+        portfolio: () => [semProtocolo(estado.portfolio.url), estado.portfolio.outros.length ? `+ ${plural(estado.portfolio.outros.length, "link", "links")}` : ""].filter(Boolean).join(" "),
+        anexos: () => estado.anexos.length ? plural(estado.anexos.length, "arquivo", "arquivos") : "",
+      };
+      $("#checklist").replaceChildren(...PASSOS.slice(0, 5).map(p => {
+        const item = document.createElement("li");
+        const marca = document.createElement("span");
+        marca.className = "checklist__marca" + (feito(p) ? "" : " pendente");
+        marca.setAttribute("aria-hidden", "true");
+        marca.textContent = feito(p) ? "✓" : "–";
+        const texto = document.createElement("div");
+        const t = document.createElement("strong");
+        t.textContent = NOMES[p];
+        const d = document.createElement("span");
+        d.textContent = feito(p) ? detalhe[p]() : pulado(p) ? "Pulado. O questionário pergunta depois." : "Ainda não.";
+        texto.append(t, d);
+        const editar = document.createElement("button");
+        editar.type = "button";
+        editar.className = "btn-texto";
+        editar.textContent = feito(p) ? "Editar" : "Fazer agora";
+        editar.setAttribute("aria-label", `${editar.textContent}: ${NOMES[p]}`);
+        editar.addEventListener("click", () => ir(p));
+        item.append(marca, texto, editar);
+        return item;
+      }));
+    }
+
+    // ---------- erros ----------
+    function erro(p, mensagem, campo) {
+      $(`#erro-${p}`).textContent = mensagem;
+      if (campo) {
+        campo.setAttribute("aria-invalid", "true");
+        campo.focus();
+      }
+    }
+    function limpar(p) {
+      $(`#erro-${p}`).textContent = "";
+      $$(`#passo-${p} [aria-invalid]`).forEach(el => el.removeAttribute("aria-invalid"));
+    }
+
+    // ---------- salvar, pular, remover ----------
+    async function salvar(p, botao) {
+      limpar(p);
+      botao.disabled = true;
+      try {
+        if (p === "linkedin") {
+          const campo = $("#linkedin-url");
+          const url = campo.value.trim();
+          if (!url && !estado.linkedin.fonte) {
+            return erro(p, "Cole o endereço do seu perfil ou solte o export. Ou pule por agora.", campo);
+          }
+          if (url !== semProtocolo(estado.linkedin.url)) {
+            try { estado = await pedir({ acao: "salvar", campos: { linkedin_url: url } }); }
+            catch (e) { return erro(p, e.message, campo); }
+          }
+        } else if (p === "cv") {
+          if (!estado.cv.arquivo) return erro(p, "Solte o seu CV atual, ou pule por agora.");
+        } else if (p === "email") {
+          const campo = $("#email");
+          if (!campo.value.trim()) return erro(p, "Escreva o seu e-mail, ou pule por agora.", campo);
+          try { estado = await pedir({ acao: "salvar", campos: { email: campo.value } }); }
+          catch (e) { return erro(p, e.message, campo); }
+        } else if (p === "portfolio") {
+          const campo = $("#portfolio");
+          if (!campo.value.trim()) return erro(p, "Cole o link do portfólio, ou pule por agora.", campo);
+          const outros = $$(".link-extra").map(el => el.value.trim()).filter(Boolean);
+          try { estado = await pedir({ acao: "salvar", campos: { portfolio: campo.value, outros_links: outros } }); }
+          catch (e) { return erro(p, e.message, campo); }
+        } else if (p === "anexos") {
+          if (!estado.anexos.length) return erro(p, "Solte um anexo, ou pule por agora: dá para pôr depois.");
+        }
+        preencher();
+        seguir();
+      } finally {
+        botao.disabled = false;
+      }
+    }
+
+    async function pular(p) {
+      limpar(p);
+      try {
+        estado = await pedir({ acao: "pular", passo: p });
+        seguir();
+      } catch (e) { erro(p, e.message); }
+    }
+
+    async function remover(arquivo) {
+      limpar("anexos");
+      try {
+        estado = await pedir({ acao: "remover", arquivo });
+        preencher();
+        desenharTrilha();
+      } catch (e) { erro("anexos", e.message); }
+    }
+
+    async function concluir(botao) {
+      botao.disabled = true;
+      try {
+        await pedir({ acao: "concluir" });
+        location.href = "/";
+      } catch (e) {
+        botao.disabled = false;
+        ir("pronto");
+        erro("pronto", e.message);
+      }
+    }
+
+    // ---------- arquivos ----------
+    async function receber(tipo, zona, arquivos) {
+      const p = DO_TIPO[tipo];
+      limpar(p);
+      if (!arquivos.length) return;
+      if (tipo !== "anexo") arquivos = arquivos.slice(0, 1);
+      const aceitos = estado.aceitos[tipo];
+      const status = $(".soltar__estado", zona);
+      const barra = $(".soltar__barra span", zona);
+      for (const arq of arquivos) {
+        const ext = arq.name.includes(".") ? arq.name.split(".").pop().toLowerCase() : "";
+        if (!aceitos.includes(ext)) {
+          erro(p, `${arq.name}: este formato não entra aqui. Aceitos: ${aceitos.map(x => x.toUpperCase()).join(", ")}.`);
+          continue;
+        }
+        if (arq.size > LIMITE) {
+          erro(p, `${arq.name} passa de 30 MB.${tipo === "linkedin" ? " Peça o export só com os dados do perfil." : ""}`);
+          continue;
+        }
+        zona.classList.add("enviando");
+        status.textContent = `Enviando ${arq.name}`;
+        try {
+          const categoria = tipo === "anexo" ? $("#anexo-categoria").value : "";
+          const r = await enviar(tipo, arq, categoria, pct => {
+            barra.style.width = `${pct}%`;
+            status.textContent = pct < 100 ? `Enviando ${arq.name} · ${pct}%` : `Lendo ${arq.name}`;
+          });
+          estado = r;
+          preencher();
+          desenharTrilha();
+          status.textContent = r.aviso || `${arq.name} guardado.`;
+        } catch (e) {
+          status.textContent = "";
+          erro(p, `${arq.name}: ${e.message}`);
+        } finally {
+          zona.classList.remove("enviando");
+          barra.style.width = "0";
+        }
+      }
+    }
+
+    $$(".soltar").forEach(zona => {
+      const input = $("input[type=file]", zona);
+      const tipo = zona.dataset.tipo;
+      $("[data-escolher]", zona).addEventListener("click", () => input.click());
+      input.addEventListener("change", () => { receber(tipo, zona, [...input.files]); input.value = ""; });
+      zona.addEventListener("dragover", e => { e.preventDefault(); zona.classList.add("arrastando"); });
+      zona.addEventListener("dragleave", e => { if (!zona.contains(e.relatedTarget)) zona.classList.remove("arrastando"); });
+      zona.addEventListener("drop", e => {
+        e.preventDefault();
+        zona.classList.remove("arrastando");
+        receber(tipo, zona, [...e.dataTransfer.files]);
+      });
+    });
+    // arquivo solto fora da zona abriria no navegador e a tela se perderia
+    addEventListener("dragover", e => e.preventDefault());
+    addEventListener("drop", e => e.preventDefault());
+
+    $$("[data-salvar]").forEach(b => b.addEventListener("click", () => salvar(b.dataset.salvar, b)));
+    $$("[data-pular]").forEach(b => b.addEventListener("click", () => pular(b.dataset.pular)));
+    $$(".trilha button").forEach(b => b.addEventListener("click", () => ir(b.dataset.ir)));
+    $("#concluir").addEventListener("click", e => concluir(e.currentTarget));
+    $("#ir-painel").addEventListener("click", e => concluir(e.currentTarget));
+    // Enter num campo de texto salva o passo, como num formulário
+    $$(".passo input:not([type=file])").forEach(el => el.addEventListener("keydown", e => {
+      if (e.key === "Enter") $(`#passo-${atual} [data-salvar]`)?.click();
+    }));
+
+    // ---------- começo: retoma do primeiro passo pendente ----------
+    fetch("/api/contexto")
+      .then(r => r.json())
+      .then(j => {
+        estado = j;
+        preencher();
+        ir(PASSOS.find(pendente), false);
+      })
+      .catch(() => {
+        $("#progresso-texto").textContent = "Servidor fora do ar";
+        $("#sem-servidor").hidden = false;
+      });
+  })();
+  </script>
+  <script type="module" src="radar-3d.js"></script>
+</body>
+</html>

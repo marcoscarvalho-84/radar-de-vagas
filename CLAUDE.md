@@ -19,7 +19,8 @@ Se `meus-dados/config.json` não existe ou está vazio: não rode a rotina. Ofer
 ## A rotina diária (ordem obrigatória)
 
 1. **Preparar.** Ler `docs/padroes.md`, `meus-dados/perfil.json`, `meus-dados/fatos.md`,
-   `meus-dados/config.json` e `meus-dados/registro.json`. Esvaziar decisões de dias
+   `meus-dados/config.json`, `meus-dados/contexto.json` (anexos disponíveis) e
+   `meus-dados/registro.json`. Esvaziar decisões de dias
    anteriores em `meus-dados/decisoes.json`: decisão velha não vale para plano novo. Se
    `vagas.json` foi alterado há menos de 1 hora, outra sessão pode estar rodando: pergunte
    antes de continuar.

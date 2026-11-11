@@ -1,5 +1,22 @@
 # Mudanças
 
+## Ainda não lançado
+
+- Tela de abertura: `bin/radar` na primeira vez abre no navegador uma apresentação do projeto
+  e um passo a passo de contexto em 5 passos (LinkedIn, CV, e-mail, portfólio, anexos),
+  todos opcionais e retomáveis pelo link "Seu contexto" do painel.
+- `bin/radar` sem argumento (ou `bin/radar abrir`) sobe o painel e abre o navegador.
+- Upload pelo servidor local com as mesmas travas das decisões (Origin, Host, Content-Type),
+  nome de arquivo refeito, assinatura dos bytes conferida e arquivos gravados só para o
+  seu usuário. O ZIP do LinkedIn é lido e apagado: conexões e mensagens nunca ficam.
+- A abertura tem duas telas: a apresentação (manchete, três ações, como funciona em linha do
+  tempo horizontal, combinados) e "Seu contexto", aberta por "Montar meu contexto".
+- Radar 3D em Three.js na abertura (pinos na altura do fit, varredura que acende cada vaga,
+  arrastar para girar), com o SVG de reserva sem WebGL.
+- Visual: base do DS do portfólio do autor (papel quente, linha fina, caixa baixa, grão),
+  acentos mantidos, azul vibrante `#263AF5` no lugar do céu e fonte Atkinson Hyperlegible
+  Next empacotada (OFL).
+
 ## 0.1.0 · primeira versão pública
 
 - Questionário de configuração em 12 blocos (`/radar-configurar`, `docs/questionario.md`).

@@ -36,6 +36,9 @@ para que nada saia sem a pessoa ver.
    exatamente como estão no formulário, mais um screenshot da revisão. Espere o ok. Ajuste
    pedido: edite, reapresente, espere de novo. Easy Apply: checkpoint na última tela.
 4. Logo antes de enviar, confira que o anexo ainda é o CV certo.
+   Formulário pedindo outro arquivo (portfólio em PDF, estudo de caso, certificado): use os
+   anexos de `meus-dados/contexto.json`, pela categoria, e diga no checkpoint qual arquivo
+   vai em qual campo. Nenhum anexo sem o ok; sem anexo adequado, pergunte.
 5. Envie. Screenshot da confirmação.
 
 ## Depois

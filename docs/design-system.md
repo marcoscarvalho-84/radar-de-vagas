@@ -1,43 +1,62 @@
 # Design system do painel
 
-O painel usa o **design system da Cerol**, com uma exceção deliberada: a fonte.
+O painel e a tela de abertura usam a **base do design system do portfólio do autor**, com os
+acentos de cor da Cerol e uma fonte escolhida pela leitura.
 
-## O que vem da Cerol
+## Base (do portfólio)
 
-- **Base editorial:** papel branco `#FFFFFF`, tinta preta quente `#100F0D`, fios de 1px como
-  estrutura.
-- **Uma cor de ação:** o amarelo `#F7F00C` carrega todo botão primário e nada mais. Nunca
-  como texto sobre branco (1,2:1).
-- **Magenta `#EC008C` como interferência:** alertas (aprovação parada, triagem vencendo,
-  follow-up). Nunca cor de botão.
-- **Céu `#79AAC3` como pausa:** superfície de respiro, só com texto preto.
-- **Rampa neutra quente** de `#F7F6F4` a `#100F0D`.
-- **Flat absoluto:** nenhuma sombra, nenhum gradiente. Profundidade vem de fio, inversão e
-  sobreposição.
-- **Gramática de forma:** conteúdo é reto (raio 0), ação é pílula (999px), input tem 8px,
-  avatar é círculo. Nenhum raio intermediário.
-- **Botão primário:** pílula amarela com borda tinta; no hover inverte (fundo tinta, texto
-  amarelo) com `scale(1.04)` e easing com overshoot.
-- **Fita:** os links "Ver a vaga" e "Abrir o perfil" são a fita da Cerol (faixa tinta, texto
-  amarelo, marquee). Param com `prefers-reduced-motion`.
-- **Pesos 300, 400 e 700**, nada no meio.
-- **Motion:** 150ms (hover), 240ms (padrão), 480ms (entradas), easing
-  `cubic-bezier(0.2, 0.7, 0.2, 1)`.
+- **Papel quente `#F5F4F0` e tinta `#050505`.** Rampa neutra quente de `#EFEEE9` a `#050505`.
+- **Linha fina como estrutura:** `1px` de tinta a 16% (`--linha`, `--fio`) em seções, cards e
+  listas. Campo, botão, pílula e marcador levam o fio de tinta cheio (`--fio-forte`), porque
+  componente de interface precisa de 3:1.
+- **Tipo grande em caixa baixa,** peso 600, espaçamento `-0.02em`, entrelinha 1.06. Rótulos
+  pequenos em caixa-alta com espaçamento `0.09em`, no cinza `#6A6A66` (4,9:1 no papel).
+- **Pílula de ação** em caixa-alta espaçada (`0.08em`), 13px.
+- **Números finos** (peso 200) nos contadores e na numeração dos passos.
+- **Grão de filme** a 5% por cima de tudo, sem pegar clique.
+- **Motion:** curva `cubic-bezier(0.16, 0.84, 0.36, 1)` nas entradas, `cubic-bezier(0.4, 0, 0.2, 1)`
+  nas trocas de cor. Tudo respeita `prefers-reduced-motion`.
 
-Referência completa dos tokens e regras: o DESIGN.md da Cerol (tokens reproduzidos em
-`dashboard/styles.css`, no `:root`).
+## Acentos
 
-## O que fica do projeto original
+- **Amarelo `#F7F00C`, a única cor de ação:** botão primário, passo atual, barras de fit, estado
+  aprovado, o bloco atrás de "Aplicar bem / é raro." e a vaga certa no radar. Nunca como texto
+  sobre papel (1,1:1): é sempre o fundo atrás da tinta. No hover, o primário inverte para tinta
+  com texto amarelo.
+- **Magenta `#EC008C`, interferência:** alertas (aprovação parada, triagem vencendo, erro de
+  campo). Nunca cor de botão. Texto em tinta por cima passa AA (4,8:1).
+- **Azul vibrante `#263AF5`, pausa:** a faixa de números, os combinados da abertura, "Já
+  aplicada", a zona de arquivo quando você arrasta, e a varredura do radar. **Só texto em papel
+  por cima** (6,3:1); tinta no azul não passa (2,9:1).
+- **Fita:** faixa de tinta com texto amarelo em marquee. Para no hover e com movimento reduzido.
+- **A marca é só texto:** "Radar de Vagas", sem caixa atrás de nenhuma palavra.
 
-- **Fonte do painel:** a pilha `"Helvetica Now Display", "Neue Haas Grotesk Display",
-  "Helvetica Neue", Helvetica, Arial, sans-serif`. Quem não tem as duas primeiras (comerciais)
-  vê Helvetica Neue ou Arial. A Pacaembu da Cerol é comercial e não é distribuída aqui.
-- **Fonte e layout do CV e da carta:** Figtree (SIL Open Font License, empacotada em
-  `templates/fonts/`), no layout neutro do CV. O CV é um documento seu, não do painel: não
-  leva as cores da Cerol.
+## Fonte
+
+**Atkinson Hyperlegible Next**, do Braille Institute, desenhada para a máxima distinção entre
+letras parecidas (I, l, 1; O, 0). Vem com o projeto em `dashboard/fonts/` (SIL Open Font
+License, ver `dashboard/fonts/OFL.txt`), variável de 200 a 800: o painel abre sem internet e
+não pede nada a servidor de fonte. O `bin/radar gerar` copia a pasta para junto do painel
+gerado.
+
+O CV e a carta continuam na **Figtree** (`templates/fonts/`, OFL), no layout neutro: o CV é um
+documento seu, não do painel.
+
+## Forma
+
+Conteúdo e campo são retos (0), ação é pílula (999px), avatar e marcador são círculo. Zero
+sombra e zero gradiente: o que precisa subir ganha fio, inverte de cor ou troca de superfície.
+
+## Radar 3D
+
+A tela de abertura troca o radar em SVG por um radar em Three.js (`dashboard/radar-3d.js`,
+biblioteca em `dashboard/vendor/`, MIT). Continua chapado: só `MeshBasicMaterial`, sem luz e
+sem sombra; as cores são lidas dos tokens do `:root`. Sem WebGL, ou com o painel aberto por
+duplo clique, o SVG fica.
 
 ## Contribuindo com o visual
 
 Tokens novos entram no `:root` de `dashboard/styles.css`. Antes de abrir PR, confira: zero
-`box-shadow`, zero gradiente, nenhum peso 500/600, nenhum raio fora de 0/8px/pílula/círculo,
-contraste AA, e o painel a 375px de largura sem rolagem horizontal.
+`box-shadow`, zero gradiente, pesos só 200/400/500/600/700, nenhum raio fora de
+0/8px/pílula/círculo, amarelo nunca como texto sobre papel, nada em tinta sobre o azul,
+contraste AA, e o painel e a abertura a 375px de largura sem rolagem horizontal.

@@ -22,5 +22,9 @@ SOFTWARE.
 
 ---
 
-The fonts in templates/fonts/ (Figtree) are licensed separately under the
-SIL Open Font License 1.1. See templates/fonts/OFL.txt.
+The fonts in templates/fonts/ (Figtree) and dashboard/fonts/ (Atkinson
+Hyperlegible Next) are licensed separately under the SIL Open Font License 1.1.
+See templates/fonts/OFL.txt and dashboard/fonts/OFL.txt.
+
+dashboard/vendor/three.module.min.js (Three.js 0.170.0) is licensed separately
+under the MIT License. See dashboard/vendor/three.LICENSE.

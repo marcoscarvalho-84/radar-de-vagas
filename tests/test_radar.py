@@ -282,5 +282,190 @@ class TestPainel(ComDados):
         self.assertTrue(recorte["pretensao_definida"])
 
 
+def export_linkedin(com_conexoes=True) -> bytes:
+    """Um export mínimo do LinkedIn, com um CSV de terceiros que nunca pode ser lido."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("Profile.csv", "First Name,Last Name,Headline,Summary,Geo Location,Websites\n"
+                                  "Bia,Costa,Senior PD,Resumo,Recife,https://bia.example.com\n")
+        z.writestr("Positions.csv", "Company Name,Title,Description,Location,Started On,Finished On\n"
+                                    "Empresa X,Designer,Fez coisas,Recife,Mar 2021,\n")
+        z.writestr("Email Addresses.csv", "Email Address,Confirmed,Primary\nBia@Example.com,Yes,Yes\n")
+        if com_conexoes:
+            z.writestr("Connections.csv", "First Name,Last Name\nFulano,De Tal\n")
+    return buf.getvalue()
+
+
+class TestContexto(ComDados):
+    """Os 5 passos da tela de abertura, sem servidor."""
+
+    def setUp(self):
+        super().setUp()
+        for nome in ("contexto.json", "perfil.json"):  # pessoa nova: sem contexto nem perfil
+            (self.pasta / nome).unlink()
+
+    def test_primeira_vez_ate_concluir(self):
+        from radar import contexto
+        self.assertTrue(contexto.primeira_vez())
+        contexto.concluir()
+        self.assertFalse(contexto.primeira_vez())
+
+    def test_contatos_vao_para_o_perfil_sem_protocolo(self):
+        from radar import contexto
+        contexto.salvar({"linkedin_url": "https://www.linkedin.com/in/bia-costa/", "email": " Bia@Example.com ",
+                         "portfolio": "bia.example.com", "outros_links": ["github.com/bia"]})
+        p = self.ler("perfil.json")
+        self.assertEqual(p["contatos"]["linkedin"], "linkedin.com/in/bia-costa")
+        self.assertEqual(p["contatos"]["email"], "bia@example.com")
+        self.assertEqual(p["contatos"]["portfolio"], "bia.example.com")
+        ctx = self.ler("contexto.json")
+        self.assertEqual(ctx["portfolio"]["outros"], ["https://github.com/bia"])
+        self.assertTrue(all(contexto.estado()["feitos"][k] for k in ("linkedin", "email", "portfolio")))
+
+    def test_recusa_entrada_invalida_sem_gravar_nada(self):
+        from radar import contexto
+        for campos in ({"linkedin_url": "linkedin.com/company/acme"}, {"email": "bia@"},
+                       {"portfolio": "linkedin.com/in/bia"}, {"outros_links": ["a.com", "b.com", "c.com", "d.com"]}):
+            with self.assertRaises(contexto.ContextoInvalido, msg=campos):
+                contexto.salvar(campos)
+        self.assertFalse((self.pasta / "perfil.json").exists())
+
+    def test_nome_de_arquivo_nao_escapa_da_pasta(self):
+        from radar import contexto
+        r = contexto.receber("anexo", "../../../etc/Meu Caso (final).PDF", b"%PDF-1.4 teste", "case")
+        arquivo = r["anexos"][0]["arquivo"]
+        self.assertEqual(arquivo, "anexos/meu-caso-final.pdf")
+        self.assertTrue((self.pasta / arquivo).exists())
+        r = contexto.receber("anexo", "meu caso final.pdf", b"%PDF-1.4 outro", "case")
+        self.assertEqual(r["anexos"][1]["arquivo"], "anexos/meu-caso-final-2.pdf")
+
+    def test_confere_os_bytes_e_nao_so_a_extensao(self):
+        from radar import contexto
+        with self.assertRaises(contexto.ContextoInvalido):
+            contexto.receber("cv", "cv.pdf", b"<html>nada de pdf</html>")
+        with self.assertRaises(contexto.ContextoInvalido):
+            contexto.receber("anexo", "script.sh", b"#!/bin/sh")
+        with self.assertRaises(contexto.ContextoInvalido):
+            contexto.receber("cv", "cv.pdf", b"")
+
+    def test_remover_so_mexe_dentro_de_anexos(self):
+        from radar import contexto
+        contexto.receber("anexo", "a.txt", "certificado".encode(), "certificado")
+        alvo = self.pasta / "config.json"
+        with self.assertRaises(contexto.ContextoInvalido):
+            contexto.remover("../config.json")
+        self.assertTrue(alvo.exists())
+        r = contexto.remover("anexos/a.txt")
+        self.assertEqual(r["anexos"], [])
+        self.assertFalse((self.pasta / "anexos" / "a.txt").exists())
+
+    def test_export_completa_o_perfil_minimo_e_some_do_disco(self):
+        from radar import contexto
+        contexto.salvar({"linkedin_url": "linkedin.com/in/bia-costa", "email": "bia@trabalho.com"})
+        r = contexto.receber("linkedin", "Basic_LinkedInDataExport.zip", export_linkedin())
+        p = self.ler("perfil.json")
+        self.assertEqual(p["nome"], "Bia Costa")
+        self.assertEqual(p["contatos"]["linkedin"], "linkedin.com/in/bia-costa")
+        self.assertEqual(p["contatos"]["email"], "bia@trabalho.com")  # o digitado vence o do export
+        self.assertEqual(r["sugestoes"]["portfolio"], "https://bia.example.com")
+        self.assertEqual(r["linkedin"]["fonte"], "export")
+        restos = [f.name for f in self.pasta.rglob("*") if f.suffix == ".zip"]
+        self.assertEqual(restos, [])
+        self.assertNotIn("Fulano", "".join(f.read_text(encoding="utf-8", errors="ignore")
+                                         for f in self.pasta.rglob("*") if f.is_file()))
+
+    def test_export_nao_atropela_perfil_de_verdade(self):
+        from radar import contexto
+        shutil.copy(EXEMPLOS / "perfil.json", self.pasta / "perfil.json")
+        r = contexto.receber("linkedin", "export.zip", export_linkedin())
+        self.assertEqual(self.ler("perfil.json")["nome"], "Ana Souza")
+        self.assertTrue((self.pasta / "perfil.importado.json").exists())
+        self.assertIn("perfil.importado.json", r["aviso"])
+
+    def test_cv_docx_vira_texto_e_substitui_o_anterior(self):
+        from radar import contexto
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as z:
+            z.writestr("word/document.xml", "<w:document><w:p><w:t>Bia Costa</w:t></w:p>"
+                                            "<w:p><w:t>Designer &amp; pesquisadora</w:t></w:p></w:document>")
+        contexto.receber("cv", "cv-velho.docx", buf.getvalue())
+        r = contexto.receber("cv", "cv-novo.docx", buf.getvalue())
+        self.assertEqual(r["cv"]["arquivo"], "anexos/cv-atual.docx")
+        self.assertEqual(r["cv"]["palavras"], 5)
+        self.assertIn("Designer & pesquisadora", (self.pasta / "anexos" / "cv-atual.txt").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(f.name for f in (self.pasta / "anexos").iterdir()), ["cv-atual.docx", "cv-atual.txt"])
+
+
+class TestAbertura(TestServidor):
+    """A tela de abertura pelo servidor: redireciona na primeira vez e recebe arquivos."""
+
+    def setUp(self):
+        super().setUp()
+        (self.pasta / "contexto.json").unlink()
+
+    def pedir(self, metodo, rota, corpo=b"", cabecalhos=None):
+        c = http.client.HTTPConnection("127.0.0.1", self.porta, timeout=10)
+        h = {"Host": f"localhost:{self.porta}", **(cabecalhos or {})}
+        c.request(metodo, rota, body=corpo, headers=h)
+        r = c.getresponse()
+        return r.status, r.read(), {k.lower(): v for k, v in r.getheaders()}
+
+    def arquivo(self, conteudo, nome="caso.pdf", tipo="anexo", **extra):
+        h = {"Content-Type": "application/octet-stream", "X-Radar-Tipo": tipo, "X-Radar-Nome": nome, **extra}
+        st, corpo, _ = self.pedir("POST", "/api/arquivo", conteudo, h)
+        return st, json.loads(corpo or b"{}")
+
+    def test_primeira_vez_vai_para_a_abertura_e_depois_para_o_painel(self):
+        st, _, cab = self.pedir("GET", "/")
+        self.assertEqual((st, cab.get("location")), (302, "/boas-vindas"))
+        st, corpo, cab = self.pedir("GET", "/boas-vindas")
+        self.assertEqual(st, 200)
+        self.assertIn("text/html", cab["content-type"])
+        self.assertIn(b"Seu contexto", corpo)
+        self.assertEqual(self.pedir("GET", "/boas-vindas.css")[0], 200)
+        for js in ("/radar-3d.js", "/vendor/three.module.min.js"):
+            st, _, cab = self.pedir("GET", js)
+            self.assertEqual(st, 200, js)
+            self.assertIn("javascript", cab["content-type"])  # módulo ES exige tipo JS
+        st, corpo, _ = self.pedir("POST", "/api/contexto", json.dumps({"acao": "concluir"}).encode(),
+                                  {"Content-Type": "application/json"})
+        self.assertEqual(st, 200, corpo)
+        self.assertEqual(self.pedir("GET", "/")[0], 200)
+
+    def test_recebe_anexo_com_nome_codificado(self):
+        st, r = self.arquivo(b"%PDF-1.4 caso", nome="Estudo%20de%20caso%20%C3%A1.pdf", **{"X-Radar-Categoria": "case"})
+        self.assertEqual(st, 200, r)
+        self.assertEqual(r["anexos"][0]["arquivo"], "anexos/estudo-de-caso-a.pdf")
+        self.assertEqual(r["anexos"][0]["nome_original"], "Estudo de caso á.pdf")
+        self.assertEqual(r["anexos"][0]["categoria"], "case")
+
+    def test_arquivo_de_outro_site_ou_sem_octet_stream_e_recusado(self):
+        st, _ = self.arquivo(b"%PDF-1.4", **{"Origin": "https://site-qualquer.com"})
+        self.assertEqual(st, 403)
+        st, _, _ = self.pedir("POST", "/api/arquivo", b"%PDF-1.4",
+                              {"Content-Type": "text/plain", "X-Radar-Tipo": "anexo", "X-Radar-Nome": "a.pdf"})
+        self.assertEqual(st, 415)
+        self.assertFalse((self.pasta / "anexos").exists())
+
+    def test_arquivo_falso_volta_com_mensagem(self):
+        st, r = self.arquivo(b"MZ executavel", nome="foto.png")
+        self.assertEqual(st, 400)
+        self.assertIn(".png", r["erro"])
+
+    def test_anexos_nao_sao_servidos(self):
+        self.arquivo(b"%PDF-1.4 caso", nome="caso.pdf")
+        self.assertEqual(self.pedir("GET", "/anexos/caso.pdf")[0], 404)
+        self.assertEqual(self.pedir("GET", "/../anexos/caso.pdf")[0], 404)
+
+    def test_contexto_salva_pela_api(self):
+        st, corpo, _ = self.pedir("POST", "/api/contexto",
+                                  json.dumps({"acao": "salvar", "campos": {"email": "nada"}}).encode(),
+                                  {"Content-Type": "application/json"})
+        self.assertEqual(st, 400)
+        self.assertIn("e-mail", json.loads(corpo)["erro"])
+        st, corpo, _ = self.pedir("GET", "/api/contexto")
+        self.assertEqual(json.loads(corpo)["feitos"]["email"], False)
+
+
 if __name__ == "__main__":
     unittest.main()

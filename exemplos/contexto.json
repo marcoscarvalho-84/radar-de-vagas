@@ -1,0 +1,11 @@
+{
+  "_leia": "Contexto FICTÍCIO da demonstração. O seu nasce na tela de abertura, na primeira vez que você roda bin/radar.",
+  "abertura": {"iniciada_em": "2026-11-03T09:12:00-03:00", "concluida_em": "2026-11-03T09:19:00-03:00"},
+  "linkedin": {"url": "https://www.linkedin.com/in/exemplo-ana-souza", "fonte": "export", "importado_em": "2026-11-03T09:13:00-03:00"},
+  "cv": {"arquivo": "", "texto": "", "enviado_em": ""},
+  "email": "ana.souza@example.com",
+  "portfolio": {"url": "https://anasouza.example.com", "outros": []},
+  "anexos": [],
+  "pulados": ["cv", "anexos"],
+  "sugestoes": {}
+}

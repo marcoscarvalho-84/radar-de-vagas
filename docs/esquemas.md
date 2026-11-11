@@ -71,6 +71,31 @@ que foi aprovado E executado.
 `{"decisoes": [{"id": "vaga-1", "acao": "aprovar|aprofundar|ajustar|pular|nova_busca", "nota": "", "em": "ISO"}]}`.
 Consumida e esvaziada pela rotina.
 
+## contexto.json: a tela de abertura
+
+O que a pessoa entregou no passo a passo de `bin/radar` (primeira vez). Gravado por
+`radar/contexto.py`, nunca à mão.
+
+```json
+{
+  "abertura": {"iniciada_em": "ISO", "concluida_em": "ISO ou vazio (vazio = abre a tela de novo)"},
+  "linkedin": {"url": "https://www.linkedin.com/in/...", "fonte": "export|pdf|", "importado_em": "ISO"},
+  "cv": {"arquivo": "anexos/cv-atual.pdf", "texto": "anexos/cv-atual.txt", "palavras": 412, "enviado_em": "ISO"},
+  "email": "voce@exemplo.com",
+  "portfolio": {"url": "https://...", "outros": ["https://github.com/..."]},
+  "anexos": [{"arquivo": "anexos/estudo-de-caso.pdf", "nome_original": "Estudo de caso.pdf",
+              "categoria": "portfolio|case|certificado|recomendacao|outro", "descricao": "",
+              "tamanho": 123456, "enviado_em": "ISO"}],
+  "pulados": ["cv"],
+  "sugestoes": {"email": "do export do LinkedIn, para a pessoa confirmar", "portfolio": "idem"}
+}
+```
+
+E-mail, LinkedIn e portfólio também vão para `perfil.json > contatos`, sem `https://` (é de lá
+que o CV lê). Sem perfil ainda, nasce um perfil mínimo que o import do export completa.
+Texto lido do CV atual (`anexos/cv-atual.txt`) e do PDF do perfil (`perfil-bruto.txt`) é
+RASCUNHO: só vira fato depois de confirmado no `/radar-perfil`.
+
 ## config.json, buscas.json, perfil.json, fatos.md
 
 Ver `exemplos/` e `docs/questionario.md` (cada pergunta diz o campo que preenche). Regra
@@ -81,6 +106,7 @@ geral do config: **campo vazio significa perguntar**.
 | Pasta | Conteúdo |
 |---|---|
 | `meus-dados/cvs/` | PDFs, previews PNG, JSONs de conteúdo dos CVs e cartas |
+| `meus-dados/anexos/` | CV atual, PDF do perfil e anexos da tela de abertura (só o seu usuário lê) |
 | `meus-dados/painel/` | o painel gerado (HTML com os dados dentro) |
 | `meus-dados/varredura/AAAA-MM-DD/` | coleta, candidatas, descrições |
 | `meus-dados/arquivo/leva-N/` | levas fechadas: valem para duplicata |

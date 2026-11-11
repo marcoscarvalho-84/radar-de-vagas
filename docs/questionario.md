@@ -24,7 +24,9 @@ Legenda: **→** onde a resposta é gravada · *padrão* o que vale se você nã
 
 ## Bloco 1 · Perfil: a sua fonte de fatos (5 a 10 min)
 
-Ver `/radar-perfil`. As perguntas de confirmação:
+Ver `/radar-perfil`. Se você passou pela tela de abertura (`bin/radar`, primeira vez), o
+LinkedIn, o CV atual, o e-mail e o portfólio já estão lá: este bloco só confirma. As
+perguntas de confirmação:
 
 1. Como importar: export oficial do LinkedIn (recomendado), "Salvar em PDF" do perfil, ou
    leitura do perfil pelo navegador?

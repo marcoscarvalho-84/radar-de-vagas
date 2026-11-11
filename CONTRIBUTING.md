@@ -7,7 +7,8 @@ Obrigado por querer melhorar o Radar. Algumas combinações para a gente andar j
 1. **Nunca suba dados reais.** Nem os seus, nem de recrutadores, nem de empresas com vaga
    real. Exemplos são sempre fictícios (`exemplos/`), com links `linkedin.com/in/exemplo-...`.
 2. Rode os testes: `python3 -m unittest discover tests` (sem weasyprint, o teste de PDF pula).
-3. Rode a demo (`bin/radar demo`) e confira o painel a 1280px e a 375px.
+3. Rode a demo (`bin/radar demo`) e confira o painel a 1280px e a 375px. Mexeu na tela de
+   abertura? Rode `RADAR_DADOS=/tmp/radar-novo bin/radar` para vê-la como uma pessoa nova.
 4. Mudou regra de conteúdo? Atualize `docs/padroes.md`. Mudou formato de dado? Atualize
    `docs/esquemas.md`, `radar/validar.py` e os exemplos.
 
@@ -19,8 +20,8 @@ Obrigado por querer melhorar o Radar. Algumas combinações para a gente andar j
 - **Português do Brasil** em código, comentários e docs, no tom dos arquivos existentes:
   comentário explica o PORQUÊ, não o quê.
 - **Toda escrita em `meus-dados/` passa por `radar/arquivos.py`** (trava e gravação atômica).
-- **Visual:** as regras de `docs/design-system.md` (zero sombra, zero gradiente, pesos 300,
-  400 e 700, raio 0/8px/pílula).
+- **Visual:** as regras de `docs/design-system.md` (zero sombra, zero gradiente, pesos 200 a
+  700, raio 0/8px/pílula, amarelo só na ação, nada em tinta sobre o azul).
 
 ## Boas primeiras contribuições
 

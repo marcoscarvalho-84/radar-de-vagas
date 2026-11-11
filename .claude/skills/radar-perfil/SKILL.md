@@ -9,6 +9,20 @@ Tudo que o Radar escreve em nome da pessoa sai daqui. Por isso o perfil tem duas
 `perfil.json` (estrutura: nome, contatos, experiências, formação) e `fatos.md` (as provas
 confirmadas, com data). Importado não é confirmado: nada vira fato citável sem o ok dela.
 
+## 0. O que a tela de abertura já trouxe
+
+Antes de pedir qualquer coisa, leia `meus-dados/contexto.json`. A tela de abertura
+(`bin/radar`, primeira vez) pode já ter:
+
+- importado o export do LinkedIn para `perfil.json` (`linkedin.fonte: "export"`);
+- guardado o PDF do perfil, com o texto em `meus-dados/perfil-bruto.txt` (`fonte: "pdf"`);
+- guardado o CV atual em `meus-dados/anexos/`, com o texto em `anexos/cv-atual.txt`;
+- gravado e-mail, LinkedIn e portfólio em `perfil.json > contatos`.
+
+Use o que existir e pule o passo correspondente abaixo. O texto do CV atual é a melhor fonte
+para as perguntas de prova (seção 2): traga cada número que aparece nele e pergunte se a
+pessoa sustenta numa entrevista. Nada do CV antigo vira fato sem esse ok.
+
 ## 1. Importar (escolher UM caminho, nesta ordem de preferência)
 
 **a) Export oficial do LinkedIn (recomendado).** Explique o passo a passo:

@@ -18,6 +18,7 @@
       <a href="#hoje">Hoje</a>
       <a href="#pipeline">Pipeline</a>
       <a href="#historico">Histórico</a>
+      <a href="/boas-vindas#contexto" id="nav-contexto" hidden>Seu contexto</a>
     </nav>
     <span class="badge-atualizado" id="atualizado">—</span>
   </header>
@@ -25,7 +26,7 @@
   <main>
     <section class="hero wrap" id="topo">
       <p class="meta">Busca diária —</p>
-      <h1>Aplicar é fácil.<br /><span class="accent">Aplicar bem é raro.</span></h1>
+      <h1>Aplicar é fácil.<br /><span class="accent">Aplicar bem</span><br /><span class="accent">é raro.</span></h1>
       <p>Varredura de vagas, triagem com nota de fit, pesquisa da empresa, CV sob medida e mapa de quem contatar. Nada sai daqui sem o seu ok.</p>
       <span class="aviso-exemplo" id="aviso-config" hidden>Config sem pretensão salarial: a rotina vai perguntar antes de aplicar</span>
     </section>
@@ -59,6 +60,7 @@
     <button class="btn-copiar" id="btn-copiar" type="button">Copiar para o chat</button>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite">Decisões copiadas, cole na conversa do Claude</div>
+
 
   <!-- fita de fechamento: decorativa, para no hover e com movimento reduzido.
        Dois grupos iguais para o trilho andar metade de si sem emenda -->
@@ -236,6 +238,8 @@
     // HOJE: triagem e vagas trabalhadas aguardando decisão
     // ============================================================
     const MODO_SERVIDOR = location.protocol === "http:" || location.protocol === "https:";
+    // a tela de abertura grava pelo servidor: aberto por duplo clique, o link não teria onde ir
+    if (MODO_SERVIDOR) document.getElementById("nav-contexto").hidden = false;
     const ativos = (l) => (l || []).filter((x) => !["recusado", "executado"].includes(x.status));
     const gVagas = ativos(V.vagas), gPessoas = ativos(V.pessoas);
     const completas = gVagas.filter((v) => v.profundidade === "completa");

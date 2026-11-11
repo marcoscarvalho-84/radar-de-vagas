@@ -6,7 +6,7 @@
 # - cria a venv em ~/.cache/radar-de-vagas/venv (fora de pastas sincronizadas)
 # - instala weasyprint e pypdf (requirements.txt)
 # - confere pango e poppler (macOS: Homebrew; Linux: o gerenciador da distro)
-# - roda bin/radar init
+# - roda bin/radar init (a tela de abertura vem no primeiro bin/radar)
 set -euo pipefail
 
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -39,4 +39,4 @@ fi
 "$RAIZ/bin/radar" init
 echo
 echo "Pronto. Para ver sem configurar nada: bin/radar demo"
-echo "Para começar de verdade: abra o Claude Code nesta pasta e rode /radar-configurar"
+echo "Para começar de verdade: bin/radar (abre a tela de abertura no navegador)"

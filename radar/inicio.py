@@ -1,5 +1,7 @@
-"""Prepara a pasta de dados e roda a demonstração.
+"""Prepara a pasta de dados, recebe quem chega e roda a demonstração.
 
+    bin/radar         primeira vez: cria meus-dados/, mostra a abertura no terminal e abre
+                      a tela de boas-vindas no navegador; depois disso, abre o painel
     bin/radar init    cria meus-dados/ com os arquivos vazios que o questionário preenche
     bin/radar demo    sobe o painel em cima de uma CÓPIA dos exemplos, com as datas
                       trazidas para hoje (os exemplos não envelhecem)
@@ -9,6 +11,7 @@ import json
 import os
 import re
 import shutil
+import sys
 import tempfile
 from datetime import date, timedelta
 from pathlib import Path
@@ -56,7 +59,7 @@ confirmado) aparece como fato em seu nome. Cada fato leva a data em que você co
 """
 
 
-def init() -> Path:
+def init(silencioso: bool = False) -> Path:
     pasta = caminhos.dados()
     pasta.mkdir(parents=True, exist_ok=True)
     criados = []
@@ -75,12 +78,37 @@ def init() -> Path:
     if not caminhos.fatos().exists():
         caminhos.fatos().write_text(FATOS_MODELO, encoding="utf-8")
         criados.append("fatos.md")
-    for sub in (caminhos.cvs(), caminhos.arquivo(), caminhos.varredura()):
+    for sub in (caminhos.cvs(), caminhos.arquivo(), caminhos.varredura(), pasta / "anexos"):
         sub.mkdir(exist_ok=True)
+    if silencioso:
+        return pasta
     print(f"Pasta de dados: {pasta}")
     print("Criados: " + (", ".join(criados) if criados else "nada (já existia tudo)"))
-    print("Próximo passo: abra o Claude Code nesta pasta e rode /radar-configurar")
+    print("Próximo passo: rode bin/radar para abrir a tela de abertura no navegador")
     return pasta
+
+
+def abertura_terminal(porta: int) -> None:
+    """O que aparece no terminal na primeira vez, antes do navegador abrir."""
+    cor = sys.stdout.isatty()
+    negrito = (lambda t: f"\033[1m{t}\033[0m") if cor else (lambda t: t)
+    marca = (lambda t: f"\033[1;30;103m {t} \033[0m") if cor else (lambda t: t)
+    linhas = [
+        "",
+        f"  {negrito('RADAR DE')} {marca('VAGAS')}",
+        "  Aplicar é fácil. Aplicar bem é raro.",
+        "",
+        "  Varre vagas novas, dá a cada uma uma nota de fit honesta, aprofunda as",
+        "  melhores, gera o CV sob medida e mapeia quem contatar. Nada sai sem o seu ok.",
+        "",
+        f"  {negrito('Primeira vez aqui.')} A tela de abertura vai abrir no seu navegador:",
+        "  5 passos (LinkedIn, CV, e-mail, portfólio e anexos), uns 5 minutos.",
+        f"  Tudo fica em {caminhos.dados()}, no seu computador.",
+        "",
+        f"  → http://localhost:{porta}/boas-vindas",
+        "",
+    ]
+    print("\n".join(linhas), flush=True)
 
 
 DATA_ISO = re.compile(r"^(\d{4}-\d{2}-\d{2})")
@@ -110,7 +138,7 @@ def preparar_demo() -> Path:
     destino.mkdir()
     base = date.fromisoformat(ler_json(caminhos.EXEMPLOS / "vagas.json")["data"])
     dias = (date.today() - base).days
-    for nome in ("vagas.json", "registro.json", "config.json", "perfil.json", "buscas.json"):
+    for nome in ("vagas.json", "registro.json", "config.json", "perfil.json", "buscas.json", "contexto.json"):
         dados = json.loads((caminhos.EXEMPLOS / nome).read_text(encoding="utf-8"))
         gravar_json(destino / nome, _deslocar(dados, dias))
     gravar_json(destino / "decisoes.json", {"decisoes": []})

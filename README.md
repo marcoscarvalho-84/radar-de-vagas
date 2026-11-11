@@ -65,12 +65,34 @@ a sua pasta `meus-dados/`. No macOS: `brew install pango poppler`.
 
 ## Começar
 
-1. Abra o Claude Code na pasta do projeto.
-2. Rode `/radar-configurar`. São 12 blocos curtos (25 a 40 minutos na primeira vez): perfil,
+```bash
+bin/radar
+```
+
+Na primeira vez abre a **tela de abertura** no navegador: o que o Radar faz, os combinados
+(nada sai sem o seu ok, seus dados ficam no seu computador, nada é inventado) e um passo a
+passo de 5 minutos para pôr a sua história no contexto:
+
+| Passo | O que você entrega | Para que serve |
+|---|---|---|
+| 1. LinkedIn | o endereço do perfil e o export oficial (ZIP) ou o "Salvar em PDF" | trajetória, datas, formação e competências, como rascunho a confirmar |
+| 2. CV | o seu CV atual (PDF ou DOCX) | fonte de fatos a confirmar e referência de tom |
+| 3. E-mail | o endereço profissional | cabeçalho do CV e formulários |
+| 4. Portfólio | o link principal e até 3 outros | cabeçalho do CV e campos de portfólio |
+| 5. Anexos | portfólio em PDF, estudos de caso, certificados, cartas | o que um formulário pedir além do CV |
+
+Todo passo pode ser pulado e retomado (link **Seu contexto** no painel). Do export do LinkedIn
+só os arquivos de perfil são lidos, e o ZIP é apagado logo depois. Depois disso, `bin/radar`
+abre direto o painel.
+
+Em seguida, no Claude Code:
+
+1. Rode `/radar-configurar`. São 12 blocos curtos (25 a 40 minutos na primeira vez): perfil,
    provas, objetivo, restrições, remuneração, formulários, fit, busca, CV, voz, pessoas e
-   rotina. As perguntas estão em [docs/questionario.md](docs/questionario.md).
-3. Rode `/radar-triagem` para a primeira varredura e `bin/radar painel` para abrir o painel.
-4. Opcional: agende a rotina diária no Claude Code (o `CLAUDE.md` descreve a ordem).
+   rotina. Ele já parte do que você pôs na tela de abertura. As perguntas estão em
+   [docs/questionario.md](docs/questionario.md).
+2. Rode `/radar-triagem` para a primeira varredura.
+3. Opcional: agende a rotina diária no Claude Code (o `CLAUDE.md` descreve a ordem).
 
 ## Como ele pensa
 
@@ -84,7 +106,7 @@ a sua pasta `meus-dados/`. No macOS: `brew install pango poppler`.
 ## Seus dados
 
 Tudo que é seu fica em `meus-dados/`, que o `.gitignore` exclui: perfil, fatos, pretensão,
-vagas, histórico, CVs. Nada é enviado a lugar nenhum além do que você aprovar (uma
+vagas, histórico, CVs, anexos (gravados só para o seu usuário ler). Nada é enviado a lugar nenhum além do que você aprovar (uma
 candidatura, por exemplo). O painel é um arquivo local servido só em `127.0.0.1`.
 
 O importador de perfil lê apenas os arquivos de perfil do export do LinkedIn; conexões,
@@ -108,10 +130,15 @@ Issues e PRs são bem-vindos: veja [CONTRIBUTING.md](CONTRIBUTING.md). Os testes
 ## Créditos
 
 - Rotina, padrões e código: Marcos Carvalho.
-- Visual do painel: design system da [Cerol](https://cerol.co).
+- Visual do painel: base do design system do portfólio de Marcos Carvalho, com os acentos
+  da [Cerol](https://cerol.co).
+- Fonte do painel: [Atkinson Hyperlegible Next](https://github.com/googlefonts/atkinson-hyperlegible-next),
+  do Braille Institute, SIL Open Font License.
 - Fonte do CV: [Figtree](https://github.com/erikdkennedy/figtree), SIL Open Font License.
+- Radar 3D da abertura: [Three.js](https://threejs.org), licença MIT.
 
-Licença MIT (código). A Figtree segue a OFL (ver `templates/fonts/OFL.txt`).
+Licença MIT (código). As fontes seguem a OFL (`templates/fonts/OFL.txt` e
+`dashboard/fonts/OFL.txt`) e o Three.js a MIT (`dashboard/vendor/three.LICENSE`).
 
 ---
 
@@ -122,6 +149,8 @@ new LinkedIn postings through the public guest endpoint, scores fit from 0 to 10
 honest one-line rationale, researches the best matches (company, salary with sources,
 strengths and honest gaps), generates a tailored one-page PDF résumé and cover letter, maps
 who to contact at the company (without writing messages), and fills applications in your
-browser, always stopping for your explicit approval before anything goes out. All your data
-stays in `meus-dados/`, which is git-ignored. Try it with `bin/radar demo`. Docs are in
+browser, always stopping for your explicit approval before anything goes out. Run `bin/radar`
+the first time and a welcome screen walks you through five steps of context (LinkedIn, CV,
+e-mail, portfolio, attachments). All your data stays in `meus-dados/`, which is git-ignored.
+Try it with `bin/radar demo`. Docs are in
 Portuguese; contributions in English are welcome.

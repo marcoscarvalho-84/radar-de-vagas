@@ -1,6 +1,8 @@
 """Linha de comando do Radar de Vagas. Use pelo wrapper: bin/radar <comando>.
 
 Comandos:
+  (nenhum) ou abrir [--porta N] abre o Radar no navegador; na primeira vez, a tela de
+                                abertura com o passo a passo de contexto
   init                          cria meus-dados/ (rode uma vez)
   demo [--porta 8323]           painel com dados fictícios, sem configurar nada
   perfil importar <zip|pasta>   importa o export oficial do LinkedIn
@@ -30,8 +32,11 @@ from pathlib import Path
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="radar", description="Radar de Vagas",
                                 formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
-    sub = p.add_subparsers(dest="cmd", required=True)
+    sub = p.add_subparsers(dest="cmd")
 
+    ab = sub.add_parser("abrir")
+    ab.add_argument("--porta", type=int)
+    ab.add_argument("--sem-navegador", action="store_true")
     sub.add_parser("init")
     d = sub.add_parser("demo")
     d.add_argument("--porta", type=int, default=8323)
@@ -76,7 +81,17 @@ def main(argv=None) -> int:
 
     a = p.parse_args(argv)
 
-    if a.cmd == "init":
+    if a.cmd in (None, "abrir"):
+        from . import caminhos, config, contexto
+        from .inicio import abertura_terminal, init
+        if not caminhos.config().exists():
+            init(silencioso=True)
+        porta = getattr(a, "porta", None) or config.carregar()["painel"]["porta"]
+        if contexto.primeira_vez():
+            abertura_terminal(porta)
+        from .servidor import servir
+        servir(porta, abrir=not getattr(a, "sem_navegador", False))
+    elif a.cmd == "init":
         from .inicio import init
         init()
     elif a.cmd == "demo":
