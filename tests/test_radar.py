@@ -332,11 +332,11 @@ class TestContexto(ComDados):
 
     def test_nome_de_arquivo_nao_escapa_da_pasta(self):
         from radar import contexto
-        r = contexto.receber("anexo", "../../../etc/Meu Caso (final).PDF", b"%PDF-1.4 teste", "case")
+        r = contexto.receber("anexo", "../../../etc/Meu Caso (final).PDF", b"%PDF-1.4 teste")
         arquivo = r["anexos"][0]["arquivo"]
         self.assertEqual(arquivo, "anexos/meu-caso-final.pdf")
         self.assertTrue((self.pasta / arquivo).exists())
-        r = contexto.receber("anexo", "meu caso final.pdf", b"%PDF-1.4 outro", "case")
+        r = contexto.receber("anexo", "meu caso final.pdf", b"%PDF-1.4 outro")
         self.assertEqual(r["anexos"][1]["arquivo"], "anexos/meu-caso-final-2.pdf")
 
     def test_confere_os_bytes_e_nao_so_a_extensao(self):
@@ -350,7 +350,7 @@ class TestContexto(ComDados):
 
     def test_remover_so_mexe_dentro_de_anexos(self):
         from radar import contexto
-        contexto.receber("anexo", "a.txt", "certificado".encode(), "certificado")
+        contexto.receber("anexo", "a.txt", "certificado".encode())
         alvo = self.pasta / "config.json"
         with self.assertRaises(contexto.ContextoInvalido):
             contexto.remover("../config.json")
@@ -358,6 +358,18 @@ class TestContexto(ComDados):
         r = contexto.remover("anexos/a.txt")
         self.assertEqual(r["anexos"], [])
         self.assertFalse((self.pasta / "anexos" / "a.txt").exists())
+
+    def test_comentario_do_anexo(self):
+        from radar import contexto
+        r = contexto.receber("anexo", "caso.pdf", b"%PDF-1.4 caso")
+        self.assertEqual(r["anexos"][0]["comentario"], "")
+        r = contexto.comentar("anexos/caso.pdf", "  Estudo de caso\n do app,  usar em vaga de fintech ")
+        self.assertEqual(r["anexos"][0]["comentario"], "Estudo de caso do app, usar em vaga de fintech")
+        self.assertEqual(contexto.comentar("anexos/caso.pdf", "")["anexos"][0]["comentario"], "")
+        with self.assertRaises(contexto.ContextoInvalido):
+            contexto.comentar("anexos/caso.pdf", "x" * (contexto.MAX_COMENTARIO + 1))
+        with self.assertRaises(contexto.ContextoInvalido):
+            contexto.comentar("anexos/outro.pdf", "nada")
 
     def test_export_completa_o_perfil_minimo_e_some_do_disco(self):
         from radar import contexto
@@ -433,11 +445,16 @@ class TestAbertura(TestServidor):
         self.assertEqual(self.pedir("GET", "/")[0], 200)
 
     def test_recebe_anexo_com_nome_codificado(self):
-        st, r = self.arquivo(b"%PDF-1.4 caso", nome="Estudo%20de%20caso%20%C3%A1.pdf", **{"X-Radar-Categoria": "case"})
+        st, r = self.arquivo(b"%PDF-1.4 caso", nome="Estudo%20de%20caso%20%C3%A1.pdf")
         self.assertEqual(st, 200, r)
         self.assertEqual(r["anexos"][0]["arquivo"], "anexos/estudo-de-caso-a.pdf")
         self.assertEqual(r["anexos"][0]["nome_original"], "Estudo de caso á.pdf")
-        self.assertEqual(r["anexos"][0]["categoria"], "case")
+        st, corpo, _ = self.pedir("POST", "/api/contexto",
+                                  json.dumps({"acao": "comentar", "arquivo": "anexos/estudo-de-caso-a.pdf",
+                                              "comentario": "Portfólio resumido"}).encode(),
+                                  {"Content-Type": "application/json"})
+        self.assertEqual(st, 200, corpo)
+        self.assertEqual(json.loads(corpo)["anexos"][0]["comentario"], "Portfólio resumido")
 
     def test_arquivo_de_outro_site_ou_sem_octet_stream_e_recusado(self):
         st, _ = self.arquivo(b"%PDF-1.4", **{"Origin": "https://site-qualquer.com"})

@@ -12,8 +12,9 @@
                          {"id": "busca", "acao": "nova_busca"}
 - POST /api/contexto     {"acao": "salvar", "campos": {...}} | {"acao": "pular", "passo": "cv"}
                          {"acao": "remover", "arquivo": "anexos/x.pdf"} | {"acao": "concluir"}
+                         {"acao": "comentar", "arquivo": "anexos/x.pdf", "comentario": ""}
 - POST /api/arquivo      corpo = o arquivo cru (application/octet-stream), com os cabeçalhos
-                         X-Radar-Tipo (linkedin|cv|anexo), X-Radar-Nome, X-Radar-Categoria
+                         X-Radar-Tipo (linkedin|cv|anexo), X-Radar-Nome
 
 Cada decisão (1) muda o status do item em vagas.json, (2) entra na fila decisoes.json,
 consumida pela sessão do Claude, e (3) regenera o painel. Aprovar no painel NUNCA envia
@@ -123,6 +124,8 @@ def aplicar_contexto(pedido: dict) -> dict:
             resultado = contexto.pular(str(pedido.get("passo", "")))
         elif acao == "remover":
             resultado = contexto.remover(str(pedido.get("arquivo", "")))
+        elif acao == "comentar":
+            resultado = contexto.comentar(str(pedido.get("arquivo", "")), str(pedido.get("comentario", "")))
         elif acao == "concluir":
             resultado = contexto.concluir()
         else:
@@ -270,8 +273,6 @@ class Handler(SimpleHTTPRequestHandler):
                 tipo,
                 unquote(self.headers.get("X-Radar-Nome") or ""),
                 conteudo,
-                categoria=self.headers.get("X-Radar-Categoria") or "outro",
-                descricao=unquote(self.headers.get("X-Radar-Descricao") or ""),
             )
         except contexto.ContextoInvalido as e:
             resultado = {"ok": False, "erro": str(e)}

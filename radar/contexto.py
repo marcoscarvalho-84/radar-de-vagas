@@ -37,13 +37,7 @@ FUSO = timezone(timedelta(hours=-3))
 PASSOS = ("linkedin", "cv", "email", "portfolio", "anexos")
 LIMITE_ARQUIVO = 30 * 1024 * 1024  # o export "básico" do LinkedIn tem menos de 1 MB
 MAX_ANEXOS = 20
-CATEGORIAS = {
-    "portfolio": "Portfólio em PDF",
-    "case": "Estudo de caso",
-    "certificado": "Certificado",
-    "recomendacao": "Carta de recomendação",
-    "outro": "Outro",
-}
+MAX_COMENTARIO = 280  # o que o arquivo é e quando usar: uma frase basta
 
 # assinatura dos primeiros bytes: a extensão sozinha não prova o que o arquivo é
 ASSINATURAS = {
@@ -307,7 +301,7 @@ def _texto_pdf(arquivo: Path) -> str:
     return "\n".join((p.extract_text() or "") for p in PdfReader(str(arquivo)).pages).strip()
 
 
-def receber(tipo: str, nome: str, conteudo: bytes, categoria: str = "outro", descricao: str = "") -> dict:
+def receber(tipo: str, nome: str, conteudo: bytes) -> dict:
     """Recebe um arquivo da tela de abertura e devolve o estado atualizado (+ aviso)."""
     base, ext = nome_seguro(nome)
     _conferir(conteudo, ext, tipo)
@@ -322,8 +316,6 @@ def receber(tipo: str, nome: str, conteudo: bytes, categoria: str = "outro", des
     elif tipo == "cv":
         aviso = _guardar_cv(conteudo, ext)
     else:
-        if categoria not in CATEGORIAS:
-            categoria = "outro"
         with trava(caminhos.dados()):
             ctx = ler()
             if len(ctx["anexos"]) >= MAX_ANEXOS:
@@ -333,8 +325,7 @@ def receber(tipo: str, nome: str, conteudo: bytes, categoria: str = "outro", des
             ctx["anexos"].append({
                 "arquivo": f"anexos/{alvo.name}",
                 "nome_original": Path(str(nome).replace("\\", "/")).name[:120],
-                "categoria": categoria,
-                "descricao": str(descricao or "").strip()[:200],
+                "comentario": "",
                 "tamanho": len(conteudo),
                 "enviado_em": agora(),
             })
@@ -442,6 +433,21 @@ def remover(arquivo: str) -> dict:
     return estado()
 
 
+def comentar(arquivo: str, comentario: str) -> dict:
+    """Grava o comentário de um anexo: o que ele é e quando usar. Vazio apaga."""
+    texto = " ".join(str(comentario or "").split())
+    if len(texto) > MAX_COMENTARIO:
+        raise ContextoInvalido(f"O comentário passa de {MAX_COMENTARIO} caracteres. Uma frase basta.")
+    with trava(caminhos.dados()):
+        ctx = ler()
+        item = next((a for a in ctx["anexos"] if a.get("arquivo") == arquivo), None)
+        if item is None:
+            raise ContextoInvalido("Esse anexo não está na lista.")
+        item["comentario"] = texto
+        gravar_json(caminho(), ctx)
+    return estado()
+
+
 # ---------- estado para a tela ----------
 
 def estado() -> dict:
@@ -470,6 +476,5 @@ def estado() -> dict:
         "portfolio": ctx["portfolio"],
         "anexos": ctx["anexos"],
         "sugestoes": ctx["sugestoes"],
-        "categorias": CATEGORIAS,
         "aceitos": {k: sorted(v) for k, v in ACEITOS.items()},
     }

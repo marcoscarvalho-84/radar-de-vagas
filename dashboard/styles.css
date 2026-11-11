@@ -1190,7 +1190,7 @@ details.linha--abre > .proposta-corpo {
 }
 
 .footer {
-  padding-block: var(--space-xxxl);
+  padding-block: var(--space-lg);
   background: var(--ink);
   color: var(--paper);
   border-top: 1px solid var(--paper);
@@ -1198,7 +1198,7 @@ details.linha--abre > .proposta-corpo {
   line-height: var(--leading-small);
 }
 /* com a barra de decisões aberta o rodapé ganha folga para não ficar atrás dela */
-.com-barra .footer { padding-bottom: calc(var(--space-xxxl) + 88px); }
+.com-barra .footer { padding-bottom: calc(var(--space-lg) + 88px); }
 .footer__grade {
   display: flex;
   flex-wrap: wrap;

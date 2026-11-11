@@ -10,8 +10,12 @@
   nome de arquivo refeito, assinatura dos bytes conferida e arquivos gravados só para o
   seu usuário. O ZIP do LinkedIn é lido e apagado: conexões e mensagens nunca ficam.
 - A abertura tem duas telas: a apresentação (manchete, três ações, os combinados em tom de
-  nota logo abaixo, como funciona em linha do tempo horizontal) e "Seu contexto", aberta por
-  "Montar meu contexto".
+  nota logo abaixo, como funciona em linha do tempo horizontal) e "Criando contexto", aberta
+  por "Montar meu contexto". Cada passo dessa tela cabe sem rolar numa tela de notebook
+  (1280x720), e o número do passo fica parado: só o algarismo troca. Passo feito ganha um
+  check amarelo na trilha e no resumo do "Pronto".
+- Anexos sem tipo de arquivo: cada arquivo da lista ganha um comentário (o que é e quando
+  usar), que o `/radar-aplicar` usa para escolher o anexo certo.
 - Radar 3D em Three.js na abertura (pinos na altura do fit, varredura que acende cada vaga,
   arrastar para girar), com o SVG de reserva sem WebGL.
 - Visual: base do DS do portfólio do autor (papel quente, linha fina, caixa baixa, grão),

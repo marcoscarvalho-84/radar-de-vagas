@@ -84,7 +84,7 @@ O que a pessoa entregou no passo a passo de `bin/radar` (primeira vez). Gravado 
   "email": "voce@exemplo.com",
   "portfolio": {"url": "https://...", "outros": ["https://github.com/..."]},
   "anexos": [{"arquivo": "anexos/estudo-de-caso.pdf", "nome_original": "Estudo de caso.pdf",
-              "categoria": "portfolio|case|certificado|recomendacao|outro", "descricao": "",
+              "comentario": "o que é e quando usar, escrito pela pessoa (até 280 caracteres)",
               "tamanho": 123456, "enviado_em": "ISO"}],
   "pulados": ["cv"],
   "sugestoes": {"email": "do export do LinkedIn, para a pessoa confirmar", "portfolio": "idem"}

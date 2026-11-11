@@ -186,30 +186,44 @@
   <!-- ============ TELA 2 · SEU CONTEXTO ============ -->
   <main id="contexto" class="tela-contexto" hidden>
     <section class="wrap" id="passos">
-      <a class="voltar" href="#topo">← Apresentação</a>
-      <h1 class="tela-titulo" id="titulo-contexto" tabindex="-1">Seu contexto</h1>
-      <p class="tela-lead">Cinco passos para o Radar trabalhar com a sua história. Tudo fica guardado assim que você envia, e qualquer passo pode ser pulado.</p>
+      <!-- a tela inteira cabe numa altura de notebook: título e texto dividem a linha -->
+      <div class="tela-cabeca">
+        <h1 class="tela-titulo" id="titulo-contexto" tabindex="-1">Criando contexto</h1>
+        <p class="tela-lead">Cinco passos para o <b>Radar</b> trabalhar com a sua história. Tudo fica guardado assim que você envia, e qualquer passo pode ser pulado.</p>
+      </div>
 
-      <ol class="trilha" aria-label="Passos">
-        <li><button type="button" data-ir="linkedin"><span class="trilha__n">1</span>LinkedIn</button></li>
-        <li><button type="button" data-ir="cv"><span class="trilha__n">2</span>CV</button></li>
-        <li><button type="button" data-ir="email"><span class="trilha__n">3</span>E-mail</button></li>
-        <li><button type="button" data-ir="portfolio"><span class="trilha__n">4</span>Portfólio</button></li>
-        <li><button type="button" data-ir="anexos"><span class="trilha__n">5</span>Anexos</button></li>
-        <li><button type="button" data-ir="pronto"><span class="trilha__n">✓</span>Pronto</button></li>
-      </ol>
-      <div class="progresso">
-        <div class="progresso__trilho" aria-hidden="true"><span id="progresso-barra"></span></div>
-        <span class="progresso__texto" id="progresso-texto" aria-live="polite">Carregando</span>
+      <div class="trilha-linha">
+        <ol class="trilha" aria-label="Passos">
+          <li><button type="button" data-ir="linkedin"><span class="trilha__n">1</span>LinkedIn</button></li>
+          <li><button type="button" data-ir="cv"><span class="trilha__n">2</span>CV</button></li>
+          <li><button type="button" data-ir="email"><span class="trilha__n">3</span>E-mail</button></li>
+          <li><button type="button" data-ir="portfolio"><span class="trilha__n">4</span>Portfólio</button></li>
+          <li><button type="button" data-ir="anexos"><span class="trilha__n">5</span>Anexos</button></li>
+          <li><button type="button" data-ir="pronto"><span class="trilha__n">✓</span>Pronto</button></li>
+        </ol>
+        <div class="progresso">
+          <div class="progresso__trilho" aria-hidden="true"><span id="progresso-barra"></span></div>
+          <span class="progresso__texto" id="progresso-texto" aria-live="polite">Carregando</span>
+        </div>
       </div>
 
       <!-- 1 · LinkedIn -->
       <section class="passo" data-passo="linkedin" id="passo-linkedin" aria-labelledby="t-linkedin" hidden>
         <div class="passo__lado">
-          <span class="passo__num" aria-hidden="true">01</span>
+          <span class="passo__num" aria-hidden="true">1</span>
           <h3 id="t-linkedin" tabindex="-1">Seu LinkedIn</h3>
           <p class="passo__porque">É de onde o Radar tira a sua trajetória: cargos, datas, formação e competências. Vira um rascunho, e você confirma cada fato depois.</p>
           <p class="passo__nota"><span class="meta">Privacidade</span>Do export, só os arquivos do perfil são lidos. Conexões, mensagens e convites nunca são abertos, e o ZIP é apagado assim que a leitura termina.</p>
+          <details class="como-baixar">
+            <summary>Como baixar o export (2 minutos)</summary>
+            <ol>
+              <li>No LinkedIn, clique na sua foto (Eu) e em Configurações e privacidade.</li>
+              <li>Entre em Privacidade dos dados e depois em Obter uma cópia dos seus dados.</li>
+              <li>Marque os dados do perfil (Perfil, Cargos, Formação acadêmica, Competências, Idiomas) e solicite o arquivo.</li>
+              <li>O LinkedIn manda o link por e-mail, em geral em poucos minutos. Baixe o ZIP e solte aqui.</li>
+            </ol>
+            <p>Com pressa? No seu perfil, Mais e depois Salvar em PDF. Solte o PDF agora e o export fica para depois.</p>
+          </details>
         </div>
         <div class="passo__corpo">
           <label class="campo">
@@ -234,17 +248,6 @@
             <div><strong></strong><span></span></div>
           </div>
 
-          <details class="como-baixar">
-            <summary>Como baixar o export (2 minutos)</summary>
-            <ol>
-              <li>No LinkedIn, clique na sua foto (Eu) e em Configurações e privacidade.</li>
-              <li>Entre em Privacidade dos dados e depois em Obter uma cópia dos seus dados.</li>
-              <li>Marque os dados do perfil (Perfil, Cargos, Formação acadêmica, Competências, Idiomas) e solicite o arquivo.</li>
-              <li>O LinkedIn manda o link por e-mail, em geral em poucos minutos. Baixe o ZIP e solte aqui.</li>
-            </ol>
-            <p>Com pressa? No seu perfil, Mais e depois Salvar em PDF. Solte o PDF agora e o export fica para depois.</p>
-          </details>
-
           <p class="erro" id="erro-linkedin" role="alert"></p>
           <div class="passo__acoes">
             <button class="btn-primario" type="button" data-salvar="linkedin" data-precisa-servidor>Salvar e continuar</button>
@@ -256,7 +259,7 @@
       <!-- 2 · CV -->
       <section class="passo" data-passo="cv" id="passo-cv" aria-labelledby="t-cv" hidden>
         <div class="passo__lado">
-          <span class="passo__num" aria-hidden="true">02</span>
+          <span class="passo__num" aria-hidden="true">2</span>
           <h3 id="t-cv" tabindex="-1">Seu CV atual</h3>
           <p class="passo__porque">Ele mostra como você já conta a sua história. O texto vira fonte de fatos a confirmar e referência de tom; os CVs novos saem no layout do Radar, um por vaga.</p>
           <p class="passo__nota"><span class="meta">Privacidade</span>O seu CV atual não é enviado a ninguém. Ele fica em meus-dados/anexos.</p>
@@ -289,7 +292,7 @@
       <!-- 3 · E-mail -->
       <section class="passo" data-passo="email" id="passo-email" aria-labelledby="t-email" hidden>
         <div class="passo__lado">
-          <span class="passo__num" aria-hidden="true">03</span>
+          <span class="passo__num" aria-hidden="true">3</span>
           <h3 id="t-email" tabindex="-1">Seu e-mail</h3>
           <p class="passo__porque">O endereço que vai no cabeçalho de cada CV e nos formulários de candidatura. Use o que você confere todo dia: é por ele que a resposta chega.</p>
           <p class="passo__nota"><span class="meta">Privacidade</span>Ele só aparece no CV e nos formulários que você aprovar.</p>
@@ -312,7 +315,7 @@
       <!-- 4 · Portfólio -->
       <section class="passo" data-passo="portfolio" id="passo-portfolio" aria-labelledby="t-portfolio" hidden>
         <div class="passo__lado">
-          <span class="passo__num" aria-hidden="true">04</span>
+          <span class="passo__num" aria-hidden="true">4</span>
           <h3 id="t-portfolio" tabindex="-1">Seu portfólio</h3>
           <p class="passo__porque">O link que prova o que o CV afirma. Vai no cabeçalho do CV e nos campos de portfólio dos formulários.</p>
           <p class="passo__nota"><span class="meta">Senha</span>Portfólio com senha? A senha não fica aqui. Quando um formulário pedir, o Radar pergunta a você na hora.</p>
@@ -343,20 +346,16 @@
       <!-- 5 · Anexos -->
       <section class="passo" data-passo="anexos" id="passo-anexos" aria-labelledby="t-anexos" hidden>
         <div class="passo__lado">
-          <span class="passo__num" aria-hidden="true">05</span>
+          <span class="passo__num" aria-hidden="true">5</span>
           <h3 id="t-anexos" tabindex="-1">Anexos</h3>
           <p class="passo__porque">O que alguns formulários pedem além do CV: portfólio em PDF, estudo de caso, certificado, carta de recomendação. Ficam prontos para quando a vaga pedir.</p>
           <p class="passo__nota"><span class="meta">Na candidatura</span>Nenhum anexo sai sem o seu ok. Antes de enviar, o Radar mostra qual arquivo vai em qual campo.</p>
         </div>
         <div class="passo__corpo">
-          <label class="campo">
-            <span class="campo__rotulo">Que tipo de arquivo é?</span>
-            <select id="anexo-categoria"></select>
-          </label>
           <div class="soltar" data-tipo="anexo">
             <input type="file" accept=".pdf,.docx,.pptx,.png,.jpg,.jpeg,.webp,.txt,.md" multiple hidden />
             <span class="soltar__titulo">Solte aqui os seus anexos</span>
-            <span class="soltar__sub">PDF, DOCX, PPTX, PNG, JPG, WEBP, TXT ou MD, até 30 MB cada. Pode soltar vários de uma vez.</span>
+            <span class="soltar__sub">PDF, DOCX, PPTX, PNG, JPG, WEBP, TXT ou MD, até 30 MB cada. Pode soltar vários de uma vez e comentar cada um na lista.</span>
             <div class="soltar__linha">
               <button class="btn-fio" type="button" data-escolher data-precisa-servidor>Escolher arquivos</button>
               <span class="soltar__estado" role="status"></span>
@@ -376,42 +375,44 @@
       <!-- Pronto -->
       <section class="passo" data-passo="pronto" id="passo-pronto" aria-labelledby="t-pronto" hidden>
         <div class="passo__lado">
-          <span class="passo__num" id="pronto-contagem" aria-hidden="true">0/5</span>
+          <!-- no lugar do número, o check amarelo da trilha, na altura dos números dos passos -->
+          <span class="passo__num passo__num--check" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="23" /><path d="M15 24.5l6 6 12-13" /></svg>
+          </span>
           <h3 id="t-pronto" tabindex="-1">Quase lá</h3>
           <p class="passo__porque" id="pronto-porque"></p>
         </div>
         <div class="passo__corpo">
           <ul class="checklist" id="checklist" aria-label="Resumo do seu contexto"></ul>
 
-          <ol class="proximos" aria-label="Próximos passos">
-            <li>
-              <span class="proximos__n">1</span>
-              <div>
-                <strong>Responda o questionário</strong>
-                <p>Abra o Claude Code nesta pasta e rode <code>/radar-configurar</code>. São 12 blocos curtos: cargos, cidade, regime, pretensão, o que evitar. Ele já sabe o que você pôs aqui.</p>
-              </div>
-            </li>
-            <li>
-              <span class="proximos__n">2</span>
-              <div>
-                <strong>Rode a primeira varredura</strong>
-                <p><code>/radar-triagem</code> busca as vagas novas e traz as melhores para o painel, cada uma com nota de fit.</p>
-              </div>
-            </li>
-            <li>
-              <span class="proximos__n">3</span>
-              <div>
-                <strong>Decida no painel</strong>
-                <p>Aprofundar, aprovar, ajustar ou pular, com um clique. Nada sai sem o seu ok.</p>
-              </div>
-            </li>
-          </ol>
-
           <p class="erro" id="erro-pronto" role="alert"></p>
           <div class="passo__acoes">
-            <button class="btn-primario" type="button" id="concluir" data-precisa-servidor>Ir para o painel</button>
+            <button class="btn-primario" type="button" id="concluir" data-precisa-servidor>Salvar contexto e ir para o painel</button>
           </div>
         </div>
+        <ol class="proximos" aria-label="Próximos passos">
+          <li>
+            <span class="proximos__n">1</span>
+            <div>
+              <strong>Responda o questionário</strong>
+              <p>Abra o Claude Code nesta pasta e rode <code>/radar-configurar</code>. São 12 blocos curtos: cargos, cidade, regime, pretensão, o que evitar. Ele já sabe o que você pôs aqui.</p>
+            </div>
+          </li>
+          <li>
+            <span class="proximos__n">2</span>
+            <div>
+              <strong>Rode a primeira varredura</strong>
+              <p><code>/radar-triagem</code> busca as vagas novas e traz as melhores para o painel, cada uma com nota de fit.</p>
+            </div>
+          </li>
+          <li>
+            <span class="proximos__n">3</span>
+            <div>
+              <strong>Decida no painel</strong>
+              <p>Aprofundar, aprovar, ajustar ou pular, com um clique. Nada sai sem o seu ok.</p>
+            </div>
+          </li>
+        </ol>
       </section>
     </section>
   </main>
@@ -458,6 +459,8 @@
       telaAtual = tela;
       $("#tela-abertura").hidden = contexto;
       $("#contexto").hidden = !contexto;
+      // sem fita e rodapé no passo a passo: a tela cabe sem rolar
+      document.body.classList.toggle("na-tela-contexto", contexto);
       document.title = contexto ? "Radar de Vagas · Seu contexto" : TITULO;
       $$(".nav [data-tela]").forEach(a => {
         if (a.dataset.tela === tela) a.setAttribute("aria-current", "page");
@@ -505,14 +508,13 @@
     }
 
     // XHR e não fetch: só ele conta o progresso do envio
-    function enviar(tipo, arquivo, categoria, aoAndar) {
+    function enviar(tipo, arquivo, aoAndar) {
       return new Promise((resolve, reject) => {
         const x = new XMLHttpRequest();
         x.open("POST", "/api/arquivo");
         x.setRequestHeader("Content-Type", "application/octet-stream");
         x.setRequestHeader("X-Radar-Tipo", tipo);
         x.setRequestHeader("X-Radar-Nome", encodeURIComponent(arquivo.name));
-        if (categoria) x.setRequestHeader("X-Radar-Categoria", categoria);
         x.upload.onprogress = e => { if (e.lengthComputable) aoAndar(Math.round(e.loaded / e.total * 100)); };
         x.onload = () => {
           let j;
@@ -554,6 +556,18 @@
       ir(PASSOS[Math.min(PASSOS.indexOf(atual) + 1, PASSOS.length - 1)]);
     }
 
+    // o check dos passos feitos: o mesmo traço do check grande do "Pronto"
+    function check() {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("class", "check");
+      svg.setAttribute("aria-hidden", "true");
+      const traco = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      traco.setAttribute("d", "M6.5 12.5l3.5 3.5 7.5-8");
+      svg.append(traco);
+      return svg;
+    }
+
     function desenharTrilha() {
       $$(".trilha button").forEach(b => {
         const p = b.dataset.ir;
@@ -561,7 +575,11 @@
         b.classList.toggle("pulado", pulado(p) && !feito(p));
         if (p === atual) b.setAttribute("aria-current", "step");
         else b.removeAttribute("aria-current");
-        if (p !== "pronto") $(".trilha__n", b).textContent = feito(p) ? "✓" : String(PASSOS.indexOf(p) + 1);
+        if (p !== "pronto") {
+          const n = $(".trilha__n", b);
+          if (feito(p)) n.replaceChildren(check());
+          else n.textContent = String(PASSOS.indexOf(p) + 1);
+        }
       });
       const n = PASSOS.slice(0, 5).filter(feito).length;
       $("#progresso-barra").style.width = `${n * 20}%`;
@@ -619,11 +637,10 @@
       const extras = $$(".link-extra");
       extras.forEach((el, i) => { if (document.activeElement !== el) el.value = semProtocolo(estado.portfolio.outros[i] || ""); });
 
-      const sel = $("#anexo-categoria");
-      if (!sel.options.length) {
-        for (const [valor, rotulo] of Object.entries(estado.categorias)) sel.add(new Option(rotulo, valor));
-      }
+      // a lista é refeita a cada envio: quem está escrevendo um comentário não perde o texto
       const lista = $("#lista-anexos");
+      const ativo = document.activeElement;
+      const escrevendo = lista.contains(ativo) && ativo.dataset.arquivo ? { arquivo: ativo.dataset.arquivo, valor: ativo.value } : null;
       lista.replaceChildren(...estado.anexos.map(a => {
         const item = document.createElement("li");
         const info = document.createElement("div");
@@ -634,23 +651,36 @@
         meta.className = "lista-anexos__meta";
         meta.textContent = tamanho(a.tamanho);
         info.append(nome, meta);
-        const tag = document.createElement("span");
-        tag.className = "etiqueta";
-        tag.textContent = estado.categorias[a.categoria] || a.categoria;
         const tirar = document.createElement("button");
         tirar.type = "button";
         tirar.className = "btn-texto";
         tirar.textContent = "Remover";
         tirar.setAttribute("aria-label", `Remover ${nome.textContent}`);
         tirar.addEventListener("click", () => remover(a.arquivo));
-        item.append(info, tag, tirar);
+        const comentario = document.createElement("input");
+        comentario.type = "text";
+        comentario.className = "lista-anexos__comentario";
+        comentario.maxLength = 280;
+        comentario.placeholder = "Comentário: o que é e quando usar (opcional)";
+        comentario.value = a.comentario || "";
+        comentario.dataset.arquivo = a.arquivo;
+        comentario.setAttribute("aria-label", `Comentário sobre ${nome.textContent}`);
+        const salvo = document.createElement("span");
+        salvo.className = "lista-anexos__salvo";
+        salvo.setAttribute("role", "status");
+        comentario.addEventListener("change", () => comentar(a.arquivo, comentario, salvo));
+        comentario.addEventListener("keydown", e => { if (e.key === "Enter") comentar(a.arquivo, comentario, salvo); });
+        item.append(info, tirar, comentario, salvo);
         return item;
       }));
+      if (escrevendo) {
+        const campo = $$(".lista-anexos__comentario", lista).find(c => c.dataset.arquivo === escrevendo.arquivo);
+        if (campo) { campo.value = escrevendo.valor; campo.focus(); }
+      }
     }
 
     function desenharPronto() {
       const n = PASSOS.slice(0, 5).filter(feito).length;
-      $("#pronto-contagem").textContent = `${n}/5`;
       $("#t-pronto").textContent = n === 5 ? "Seu contexto está de pé" : n >= 3 ? "Quase lá" : "Dá para seguir assim";
       $("#pronto-porque").textContent = n === 5
         ? "Com isso o Radar já monta o cabeçalho do CV, conhece a sua trajetória e tem os anexos à mão. As preferências vêm do questionário."
@@ -667,7 +697,8 @@
         const marca = document.createElement("span");
         marca.className = "checklist__marca" + (feito(p) ? "" : " pendente");
         marca.setAttribute("aria-hidden", "true");
-        marca.textContent = feito(p) ? "✓" : "–";
+        if (feito(p)) marca.append(check());
+        else marca.textContent = "–";
         const texto = document.createElement("div");
         const t = document.createElement("strong");
         t.textContent = NOMES[p];
@@ -753,6 +784,21 @@
       } catch (e) { erro("anexos", e.message); }
     }
 
+    async function comentar(arquivo, campo, salvo) {
+      limpar("anexos");
+      const texto = campo.value.trim();
+      const antes = (estado.anexos.find(a => a.arquivo === arquivo) || {}).comentario || "";
+      if (texto === antes) return;
+      salvo.textContent = "Salvando";
+      try {
+        estado = await pedir({ acao: "comentar", arquivo, comentario: texto });
+        salvo.textContent = texto ? "Comentário salvo." : "Comentário apagado.";
+      } catch (e) {
+        salvo.textContent = "";
+        erro("anexos", e.message);
+      }
+    }
+
     async function concluir(botao) {
       botao.disabled = true;
       try {
@@ -787,8 +833,7 @@
         zona.classList.add("enviando");
         status.textContent = `Enviando ${arq.name}`;
         try {
-          const categoria = tipo === "anexo" ? $("#anexo-categoria").value : "";
-          const r = await enviar(tipo, arq, categoria, pct => {
+          const r = await enviar(tipo, arq, pct => {
             barra.style.width = `${pct}%`;
             status.textContent = pct < 100 ? `Enviando ${arq.name} · ${pct}%` : `Lendo ${arq.name}`;
           });
