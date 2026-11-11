@@ -94,7 +94,6 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: var(--space-xxl);
-  border-block: var(--fio);
 }
 .topicos li {
   display: flex;
