@@ -1,0 +1,1154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Radar de Vagas</title>
+  <!-- Dashboard auto-contido: dados injetados por radar/gerar_dados.py -->
+  <link rel="stylesheet" href="styles.css?v=1794355612" />
+</head>
+<body>
+
+  <a class="pular-para" href="#hoje">Pular para as decisões de hoje</a>
+
+  <header class="header">
+    <a class="logo" href="#topo">Radar de <em>Vagas</em></a>
+    <nav class="nav" aria-label="Principal">
+      <a href="#hoje">Hoje</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#historico">Histórico</a>
+    </nav>
+    <span class="badge-atualizado" id="atualizado">—</span>
+  </header>
+
+  <main>
+    <section class="hero wrap" id="topo">
+      <p class="meta">Busca diária —</p>
+      <h1>Aplicar é fácil.<br /><span class="accent">Aplicar bem é raro.</span></h1>
+      <p>Varredura de vagas, triagem com nota de fit, pesquisa da empresa, CV sob medida e mapa de quem contatar. Nada sai daqui sem o seu ok.</p>
+      <span class="aviso-exemplo" id="aviso-config" hidden>Config sem pretensão salarial: a rotina vai perguntar antes de aplicar</span>
+    </section>
+
+    <section class="faixa-calma" aria-label="Números do Radar">
+      <div class="wrap"><div class="stats" id="stats"></div></div>
+    </section>
+
+    <section id="hoje" class="secao wrap">
+      <h2 class="h2">Hoje<small id="hoje-sub"></small></h2>
+      <div class="alternar" id="alternar-visao" role="group" aria-label="Visão">
+        <button class="btn-decisao" type="button" data-visao="cards">Cards</button>
+        <button class="btn-decisao" type="button" data-visao="tabela">Listagem</button>
+      </div>
+      <div id="hoje-conteudo"></div>
+    </section>
+
+    <section id="pipeline" class="secao wrap">
+      <h2 class="h2">Pipeline<small id="pipeline-sub"></small></h2>
+      <div id="pipeline-lista"></div>
+    </section>
+
+    <section id="historico" class="secao wrap">
+      <h2 class="h2">Histórico<small id="historico-sub"></small></h2>
+      <div id="historico-lista"></div>
+    </section>
+  </main>
+
+  <div class="barra-decisoes" id="barra-decisoes" hidden>
+    <span><strong id="barra-contagem">0</strong> <span id="barra-rotulo">decisões</span></span>
+    <button class="btn-copiar" id="btn-copiar" type="button">Copiar para o chat</button>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite">Decisões copiadas, cole na conversa do Claude</div>
+
+  <!-- fita de fechamento: decorativa, para no hover e com movimento reduzido.
+       Dois grupos iguais para o trilho andar metade de si sem emenda -->
+  <div class="fita" aria-hidden="true">
+    <div class="fita__trilho">
+      <span class="fita__grupo">Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok · Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok · Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok ·&nbsp;</span>
+      <span class="fita__grupo">Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok · Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok · Radar de Vagas · Aplicar bem é raro · Nada sai daqui sem o seu ok ·&nbsp;</span>
+    </div>
+  </div>
+
+  <!-- rodapé montado pelo script a partir de CONFIG.nome e CONFIG.links:
+       nada pessoal mora no código -->
+  <footer class="footer">
+    <div class="wrap footer__grade">
+      <div class="footer__marca">
+        <strong>Radar de Vagas</strong>
+        <span id="rodape-nome" hidden></span>
+      </div>
+      <nav class="footer__links" id="rodape-links" aria-label="Links do perfil" hidden></nav>
+      <a class="footer__topo" href="#topo">Voltar ao topo ↑</a>
+    </div>
+  </footer>
+
+  <!-- DADOS:INICIO (gerado por radar/gerar_dados.py, não editar à mão) -->
+  <script>
+  window.REGISTRO = {"dias": []};
+  window.VAGAS = {"vagas": [], "pessoas": []};
+  window.CONFIG = {};
+  </script>
+  <!-- DADOS:FIM -->
+  <script>
+    const R = window.REGISTRO || { dias: [] };
+    const V = window.VAGAS || {};
+    const CFG = window.CONFIG || {};
+    const dias = R.dias || [];
+
+    // datas: aceita "AAAA-MM-DD" e ISO completo com fuso (aprovado_em) e
+    // devolve DD.MM.AAAA. Vale o dia como foi gravado, sem converter fuso.
+    // Só dígitos passam: o resultado entra direto no HTML sem precisar de esc()
+    const fmtData = (iso) => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ""));
+      return m ? `${m[3]}.${m[2]}.${m[1]}` : "—";
+    };
+    const esc = (s) =>
+      String(s ?? "").replace(/[&<>"]/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const pad = (n) => String(n).padStart(2, "0");
+    const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
+
+    // link só sai para http(s), mailto ou caminho relativo (/cvs/...): um
+    // "javascript:" vindo de dado raspado não pode virar href clicável
+    const urlSegura = (u) => {
+      const s = String(u || "").trim();
+      if (!s) return "";
+      if (/^[a-z][a-z0-9+.-]*:/i.test(s) && !/^(https?|mailto):/i.test(s)) return "";
+      return s;
+    };
+
+    // "hoje" é a data local da máquina; a conta de dias usa só a parte de
+    // data, então um ISO com hora e fuso conta pelo dia em que foi gravado
+    const hojeISO = (() => {
+      const d = new Date();
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    })();
+    const diasDesde = (iso) => {
+      const dia = String(iso || "").slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dia)) return null;
+      return Math.round((new Date(hojeISO) - new Date(dia)) / 86400000);
+    };
+
+    // prazos da rotina vêm da config; campo ausente, vazio ou inválido cai
+    // no padrão do projeto
+    const prazo = (chave, padrao) => {
+      const n = Number(CFG[chave]);
+      return Number.isFinite(n) && n > 0 ? n : padrao;
+    };
+    const FOLLOW_UP_DIAS = prazo("follow_up_dias", 7);
+    const APROVADO_ALERTA_DIAS = prazo("aprovado_alerta_dias", 3);
+    const TRIAGEM_EXPIRA_DIAS = prazo("triagem_expira_dias", 14);
+
+    const MOVIMENTO_REDUZIDO = !!(window.matchMedia
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+    // fita: o link vira uma faixa tinta com o rótulo em amarelo. O rótulo se
+    // repete em número par porque o marquee anda metade do trilho por volta
+    const marquee = (url, rotulo) => {
+      const href = urlSegura(url);
+      if (!href) return "";
+      const span = `<span>${esc(rotulo)} ↗</span>`.repeat(10);
+      return `<a class="marquee${rotulo.length <= 3 ? " marquee--curta" : ""}" href="${esc(href)}" target="_blank" rel="noopener">
+        <span class="marquee__track" aria-hidden="true">${span}</span>
+        <span class="sr-only">${esc(rotulo)} (abre em nova aba)</span></a>`;
+    };
+
+    // ---- identidade: título e rodapé saem da config, nunca do código ----
+    const NOME = String(CFG.nome || "").trim();
+    if (NOME) {
+      document.title = `Radar de Vagas · ${NOME}`;
+      const el = document.getElementById("rodape-nome");
+      el.textContent = NOME;
+      el.hidden = false;
+    }
+    const rotuloLink = (s) => String(s).trim()
+      .replace(/^(https?:\/\/|mailto:)/i, "").replace(/^www\./i, "").replace(/\/+$/, "");
+    // endereço sem esquema ("linkedin.com/in/...") ganha https://
+    const hrefPerfil = (s) => {
+      const v = String(s || "").trim();
+      if (!v) return "";
+      return /^[a-z][a-z0-9+.-]*:/i.test(v) ? urlSegura(v) : "https://" + v.replace(/^\/+/, "");
+    };
+    const linksPerfil = Object.values(CFG.links && typeof CFG.links === "object" ? CFG.links : {})
+      .map((v) => [hrefPerfil(v), v])
+      .filter(([h]) => h);
+    if (linksPerfil.length) {
+      const el = document.getElementById("rodape-links");
+      el.innerHTML = linksPerfil.map(([h, v]) =>
+        `<a href="${esc(h)}" target="_blank" rel="noopener">${esc(rotuloLink(v))}</a>`).join("");
+      el.hidden = false;
+    }
+
+    // ---- aviso de pretensão: a config do painel só diz se ela existe ----
+    if (CFG.pretensao_definida === false) {
+      document.getElementById("aviso-config").hidden = false;
+    }
+    if (R.atualizado_em) {
+      document.getElementById("atualizado").innerHTML =
+        `<span class="badge-rotulo">Atualizado </span>${esc(fmtData(R.atualizado_em))}`;
+    }
+
+    // ---- achatar o histórico ----
+    const histVagas = [], histPessoas = [];
+    for (const dia of dias) {
+      (dia.vagas || []).forEach((x) => histVagas.push({ ...x, data: dia.data }));
+      (dia.pessoas || []).forEach((x) => histPessoas.push({ ...x, data: dia.data }));
+    }
+
+    // ---- o que já saiu como candidatura ----
+    // Chave empresa+cargo em minúsculas, a mesma que casa o registro com o
+    // vagas.json. Vaga que aparece aqui nunca ganha botão de aplicar de novo,
+    // nem nos cards nem na listagem. Se a mesma vaga aparece em mais de um dia,
+    // vale a data mais antiga: é quando a candidatura saiu
+    const APLICADAS = ["Aplicada", "Networking", "Entrevista", "Oferta"];
+    const chaveVaga = (v) => `${v.empresa}||${v.cargo}`.toLowerCase();
+    const dataAplicacao = (h) => h.data_candidatura || h.data || "";
+    const JA_APLICADAS = new Map();
+    for (const h of histVagas) {
+      if (!APLICADAS.includes(h.status)) continue;
+      const k = chaveVaga(h), atual = JA_APLICADAS.get(k);
+      if (!atual || (dataAplicacao(h) && dataAplicacao(h) < dataAplicacao(atual))) JA_APLICADAS.set(k, h);
+    }
+    const jaAplicada = (v) => JA_APLICADAS.get(chaveVaga(v));
+    const pillJaAplicada = (iso) =>
+      `<span class="pill pill--calma">Já aplicada${iso ? ` em ${fmtData(iso)}` : ""}</span>`;
+
+    // ---- stats ----
+    const cont = (lista, ...st) => lista.filter((x) => st.includes(x.status)).length;
+    document.getElementById("stats").innerHTML = [
+      [histVagas.length, "vagas trabalhadas"],
+      [cont(histVagas, ...APLICADAS), "candidaturas enviadas"],
+      [cont(histVagas, "Entrevista", "Oferta"), "em processo"],
+      [histPessoas.length, "pessoas contatadas"],
+      [cont(histPessoas, "aceito", "respondeu"), "responderam"],
+    ].map(([n, l]) => `<div class="stat"><strong>${n}</strong><span>${l}</span></div>`).join("");
+
+    const vazio = (msg) => `<div class="vazio">${msg}</div>`;
+
+    const pillStatus = (s) => {
+      const forte = ["Oferta", "Entrevista", "aceito", "respondeu"];
+      const solido = ["Aplicada", "Networking", "enviado", "CV pronto"];
+      const cls = forte.includes(s) ? "pill pill--accent" : solido.includes(s) ? "pill pill--solid" : "pill";
+      return `<span class="${cls}">${esc(s || "—")}</span>`;
+    };
+
+    // ============================================================
+    // HOJE: triagem e vagas trabalhadas aguardando decisão
+    // ============================================================
+    const MODO_SERVIDOR = location.protocol === "http:" || location.protocol === "https:";
+    const ativos = (l) => (l || []).filter((x) => !["recusado", "executado"].includes(x.status));
+    const gVagas = ativos(V.vagas), gPessoas = ativos(V.pessoas);
+    const completas = gVagas.filter((v) => v.profundidade === "completa");
+    const triagem = gVagas.filter((v) => v.profundidade !== "completa");
+    const porId = new Map([...gVagas, ...gPessoas].map((x) => [x.id, x]));
+    const IDS_PESSOA = new Set((V.pessoas || []).map((p) => p.id));
+    const decisoes = new Map(); // modo arquivo: id -> {acao, nota}
+
+    const rotuloDe = (p) => {
+      const idx = p.id.match(/\d+$/);
+      const grupo = IDS_PESSOA.has(p.id) ? "pessoa" : "vaga";
+      return `${grupo} ${idx ? idx[0] : p.id}`;
+    };
+
+    const barraFit = (n) => {
+      const v = Math.max(0, Math.min(100, Number(n) || 0));
+      return `<span class="fit"><span class="fit-barra" aria-hidden="true"><i style="width:${v}%"></i></span><span class="sr-only">fit </span><b>${v}</b></span>`;
+    };
+
+    const campos = (pares) => {
+      const linhas = pares.filter(([, v]) => v).map(([r, v]) =>
+        `<div class="campo"><span class="meta">${esc(r)}</span><p>${esc(v)}</p></div>`);
+      return linhas.length ? `<div class="campos">${linhas.join("")}</div>` : "";
+    };
+
+    const listaCurta = (rotulo, itens) =>
+      itens && itens.length
+        ? `<div class="campo"><span class="meta">${esc(rotulo)}</span><ul class="lista-curta">${
+            itens.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`
+        : "";
+
+    const caixaDecisao = (p, miolo) => `<div class="decisoes" data-id="${esc(p.id)}">${miolo}</div>`;
+
+    const botoes = (p, acoes) => {
+      if (p.status === "aprovado")
+        return caixaDecisao(p, IDS_PESSOA.has(p.id)
+          ? '<span class="pill pill--accent">Marcada para contato</span>'
+          : '<span class="pill pill--accent">Aprovado · na fila de execução</span>');
+      if (p.status === "aprofundar")
+        return caixaDecisao(p, '<span class="pill pill--solid">Aprofundar · na fila de pesquisa</span>');
+      if (p.status === "ajuste")
+        return caixaDecisao(p, `<span class="pill pill--solid">Ajuste pedido</span>${
+          p.nota_ajuste ? `<span class="nota-ajuste">Ajuste: ${esc(p.nota_ajuste)}</span>` : ""}`);
+      // no modo arquivo o botão alterna (o segundo clique desfaz), então nasce
+      // com aria-pressed; no servidor cada clique é uma ação única
+      const pressed = MODO_SERVIDOR ? "" : ' aria-pressed="false"';
+      const btns = acoes.map(([acao, rotulo, nome]) =>
+        `<button class="btn-decisao" data-acao="${acao}" type="button"${pressed}${
+          nome ? ` aria-label="${esc(nome)}"` : ""}>${rotulo}</button>`).join("");
+      return caixaDecisao(p, `${btns}<span class="nota-ajuste" data-nota></span>`);
+    };
+
+    // vaga que já saiu como candidatura não ganha botão nenhum, só o selo
+    const botoesVaga = (v, acoes) => {
+      const ap = jaAplicada(v);
+      return ap ? caixaDecisao(v, pillJaAplicada(dataAplicacao(ap))) : botoes(v, acoes);
+    };
+
+    // ---- accordion: o card fecha e mostra só o que decide ver mais ----
+    const chevron = '<span class="chevron" aria-hidden="true"></span>';
+
+    // selo do estado, visível com o card fechado (senão some junto com o corpo)
+    const selo = (p) => ({
+      aprovado: `<span class="pill pill--accent">${IDS_PESSOA.has(p.id) ? "Marcada para contato" : "Aprovado"}</span>`,
+      aprofundar: '<span class="pill pill--solid">A aprofundar</span>',
+      ajuste: '<span class="pill pill--solid">Ajuste pedido</span>',
+    }[p.status] || "");
+
+    // sinais são HTML pronto ou texto já seguro, nunca entrada crua
+    const sinais = (itens) => {
+      const l = itens.filter(Boolean);
+      return l.length ? `<span class="sinais">${l.map((s) => `<span>${s}</span>`).join("")}</span>` : "";
+    };
+
+    const marcas = (itens) => {
+      const l = itens.filter(Boolean);
+      return l.length ? `<div class="marcas">${l.join("")}</div>` : "";
+    };
+
+    // aprovada que não sai vira vaga fechada: mostra quando foi aprovada e,
+    // passado o prazo da config, alerta em magenta
+    const avisoAprovada = (v) => {
+      if (v.status !== "aprovado" || !v.aprovado_em || jaAplicada(v)) return "";
+      const d = diasDesde(v.aprovado_em);
+      const quando = `<span class="data-entrada">aprovada em ${fmtData(v.aprovado_em)}</span>`;
+      return d !== null && d >= APROVADO_ALERTA_DIAS
+        ? `${quando}<span class="alerta">Aprovada há ${plural(d, "dia", "dias")} e ainda não enviada</span>`
+        : quando;
+    };
+
+    // data de entrada no Radar: as antigas foram reconstruídas como limite
+    // superior (histórico + backups) e levam til; as novas gravam data exata.
+    // Triagem sem decisão parada além do prazo da config vira alerta
+    const seloEntrada = (v) => {
+      if (!v.adicionada_em) return "";
+      const d = diasDesde(v.adicionada_em);
+      if (v.profundidade === "triagem" && v.status === "proposto" && !jaAplicada(v)
+          && d !== null && d >= TRIAGEM_EXPIRA_DIAS)
+        return `<span class="alerta">Na mesa há ${plural(d, "dia", "dias")}, decida ou descarte</span>`;
+      return `<span class="data-entrada${v.adicionada_em_aprox ? " data-entrada--aprox" : ""}"${
+          v.adicionada_em_aprox ? ' title="Data reconstruída: limite superior. Vagas novas gravam a data exata."' : ""
+        }>entrou ${v.adicionada_em_aprox ? "~" : ""}${fmtData(v.adicionada_em)}</span>`;
+    };
+
+    const tese = (texto) => texto
+      ? `<div class="tese"><span class="tese__rotulo">Ângulo</span><p>${esc(texto)}</p></div>`
+      : "";
+
+    const blocoVagaCompleta = (v, i) => {
+      const gente = gPessoas.filter((p) => p.vaga_id === v.id);
+      const flags = (v.red_flags || []).length;
+      const ap = jaAplicada(v);
+      return `
+      <details class="proposta" data-item="${esc(v.id)}">
+        <summary>
+          <span class="meta num">${pad(i + 1)}</span>
+          <div class="resumo">
+            <div class="vaga-head">
+              <h3>${esc(v.empresa)} — ${esc(v.cargo)}</h3>
+              ${barraFit(v.fit)}
+            </div>
+            <p class="apoio">${esc([v.local, v.modelo, v.porta === "lideranca" ? "porta liderança" : v.porta === "ic" ? "porta IC sênior" : ""].filter(Boolean).join(" · "))}</p>
+            ${sinais([
+              ap ? pillJaAplicada(dataAplicacao(ap)) : selo(v),
+              v.cv ? "CV pronto" : "",
+              gente.length ? plural(gente.length, "pessoa", "pessoas") : "",
+              flags ? plural(flags, "red flag", "red flags") : "",
+            ])}
+            ${marcas([avisoAprovada(v)])}
+          </div>
+          ${chevron}
+        </summary>
+        <div class="proposta-corpo">
+          ${tese(v.angulo)}
+          ${campos([
+            ["Salário", [v.salario, v.salario_fonte && `(${v.salario_fonte})`].filter(Boolean).join(" ")],
+            ["Fit", v.fit_resumo],
+          ])}
+          ${listaCurta("Forças diretas", v.forcas)}
+          ${listaCurta("Lacunas honestas", v.lacunas)}
+          ${listaCurta("Red flags", v.red_flags)}
+          ${listaCurta("Sobre a empresa", v.empresa_contexto)}
+          ${listaCurta("Melhorias que esta vaga sugere", v.melhorias)}
+          ${blocoCv(v, "CV sob medida")}
+          <p class="apoio">${marquee(v.url, "Ver a vaga")}</p>
+          ${botoesVaga(v, [["aprovar", "✓ Aprovar candidatura"], ["ajustar", "✎ Ajustar"], ["pular", "✕ Descartar"]])}
+          ${pessoasDaVaga(v.id)}
+        </div>
+      </details>`;
+    };
+
+    const blocoCv = (a, rotulo) => {
+      const cv = urlSegura(a.cv);
+      if (!cv) return "";
+      const prev = urlSegura(a.cv_preview);
+      return `<div class="cv-bloco">
+        ${prev ? `<a href="${esc(cv)}" target="_blank" rel="noopener"><img src="${esc(prev)}?t=${Date.now()}" alt="Preview do CV adaptado" loading="lazy" /></a>` : ""}
+        <div>
+          <span class="meta">${esc(rotulo)}</span>
+          <p><a href="${esc(cv)}" target="_blank" rel="noopener">${esc(cv.split("/").pop())}</a></p>
+          ${a.cv_racional ? `<p class="apoio">${esc(a.cv_racional)}</p>` : ""}
+        </div>
+      </div>`;
+    };
+
+    // pessoas-chave ficam dentro do card da vaga, em accordion próprio: são
+    // três por vaga, e abertas empurram o botão da vaga para longe
+    const pessoasDaVaga = (vagaId) => {
+      const lista = gPessoas.filter((p) => p.vaga_id === vagaId);
+      if (!lista.length) return "";
+      return `<details class="pessoas-da-vaga">
+        <summary>
+          <span class="meta">Pessoas-chave desta vaga · ${plural(lista.length, "pessoa", "pessoas")}</span>
+          ${chevron}
+        </summary>
+        <div>${lista.map(blocoPessoa).join("")}</div>
+      </details>`;
+    };
+
+    const blocoTriagem = (v, i) => {
+      const flags = (v.red_flags || []).length;
+      const ap = jaAplicada(v);
+      return `
+      <details class="proposta" data-item="${esc(v.id)}">
+        <summary>
+          <span class="meta num">${pad(i + 1)}</span>
+          <div class="resumo">
+            <div class="vaga-head">
+              <h3>${esc(v.empresa)} — ${esc(v.cargo)}</h3>
+              ${barraFit(v.fit)}
+            </div>
+            <p class="apoio">${esc([v.local, v.modelo, v.salario].filter(Boolean).join(" · "))}</p>
+            ${sinais([ap ? pillJaAplicada(dataAplicacao(ap)) : selo(v), flags ? plural(flags, "red flag", "red flags") : ""])}
+            ${marcas([seloEntrada(v)])}
+          </div>
+          ${chevron}
+        </summary>
+        <div class="proposta-corpo">
+          ${v.fit_resumo ? `<p>${esc(v.fit_resumo)}</p>` : ""}
+          ${listaCurta("Red flags", v.red_flags)}
+          <p class="apoio">${marquee(v.url, "Ver a vaga")}</p>
+          ${botoesVaga(v, [["aprofundar", "↳ Aprofundar"], ["pular", "✕ Descartar"]])}
+        </div>
+      </details>`;
+    };
+
+    // iniciais no lugar da foto: as URLs de foto do LinkedIn são assinadas e
+    // expiram, então o avatar é gerado aqui e o link leva ao perfil real.
+    // Primeira letra do primeiro nome + primeira do último; nome único, uma letra
+    const iniciais = (nome) => {
+      const partes = String(nome || "").trim().split(/\s+/).filter(Boolean);
+      if (!partes.length) return "";
+      const primeira = [...partes[0]][0];
+      const ultima = partes.length > 1 ? [...partes[partes.length - 1]][0] : "";
+      return (primeira + ultima).toUpperCase();
+    };
+
+    const primeiroGrau = (p) => p.grau === "1º";
+
+    // o projeto mapeia quem contatar, mas não escreve a mensagem: o card mostra
+    // papel, grau de conexão e por que esta pessoa, e a decisão é só marcar
+    const blocoPessoa = (p) => {
+      const perfil = urlSegura(p.url);
+      return `
+      <article class="proposta pessoa" data-item="${esc(p.id)}">
+        <span class="avatar" aria-hidden="true">${esc(iniciais(p.nome))}</span>
+        <div class="pessoa-corpo">
+          <div class="vaga-head">
+            <h4>${perfil ? `<a href="${esc(perfil)}" target="_blank" rel="noopener">${esc(p.nome)}</a>` : esc(p.nome)}</h4>
+            ${p.grau ? `<span class="pill${primeiroGrau(p) ? " pill--accent" : ""}">${esc(p.grau)} grau</span>` : ""}
+          </div>
+          <p class="apoio">${esc([p.cargo, p.empresa].filter(Boolean).join(" · "))}</p>
+          ${p.papel ? `<p class="meta papel">${esc(p.papel)}</p>` : ""}
+          ${p.porque ? `<div class="campo"><span class="meta">Por que esta pessoa</span><p>${esc(p.porque)}</p></div>` : ""}
+          <p class="apoio">${marquee(p.url, "Abrir o perfil")}</p>
+          ${botoes(p, [["aprovar", "✓ Vou contatar"], ["pular", "✕ Pular"]])}
+        </div>
+      </article>`;
+    };
+
+    const btnExpandir = '<button class="btn-decisao btn-expandir" type="button" data-expandir>Expandir tudo</button>';
+
+    const subsecao = (titulo, itens, tpl) =>
+      itens.length
+        ? `<div class="subsecao">
+            <div class="sub-header">
+              <span class="meta">${titulo}</span>
+              ${btnExpandir}
+            </div>
+            ${itens.map(tpl).join("")}
+          </div>`
+        : "";
+
+    const hojeVazio = !gVagas.length && !gPessoas.length;
+    document.getElementById("hoje-sub").textContent = (hojeVazio
+      ? "nada aguardando"
+      : `${completas.length} vagas trabalhadas · ${triagem.length} na triagem · ${gPessoas.length} pessoas${V.data ? " · varredura de " + fmtData(V.data) : ""}`)
+      + (MODO_SERVIDOR ? " · conectado à rotina" : " · modo leitura: decisões via copiar para o chat");
+
+    const subsecaoTriagem = `
+      <div class="subsecao" id="subsecao-triagem">
+        <div class="sub-header">
+          <span class="meta">Triagem do dia — aprofunde ou descarte${V.resumo_busca ? " · " + esc(V.resumo_busca) : ""}</span>
+          <span class="sub-acoes">
+            ${btnExpandir}
+            <button class="btn-decisao btn-nova-pesquisa" id="btn-nova-busca" type="button">⟳ Nova varredura</button>
+          </span>
+        </div>
+        <div id="triagem-lista">${triagem.length
+          ? triagem.map(blocoTriagem).join("")
+          : '<div class="vazio">Nada na triagem — peça uma nova varredura acima.</div>'}</div>
+      </div>`;
+
+    // ============================================================
+    // VISÃO EM LISTAGEM: o Radar inteiro em uma linha por vaga,
+    // com filtro e ordenação. Une o que aguarda decisão (vagas.json)
+    // com o que já foi executado (registro.json), para servir de
+    // confirmação do que foi aplicado e quando.
+    // ============================================================
+    const universo = (() => {
+      const mapa = new Map();
+      // base: tudo do Radar, inclusive recusado e executado (a listagem mostra o todo)
+      for (const v of (V.vagas || [])) {
+        mapa.set(chaveVaga(v), { ...v, radar: v.status, pipeline: null });
+      }
+      // sobrepõe o histórico executado, que é a fonte da verdade do pipeline
+      for (const h of histVagas) {
+        const k = chaveVaga(h);
+        const base = mapa.get(k) || {};
+        mapa.set(k, {
+          ...base, ...h,
+          fit: base.fit ?? h.fit,
+          fit_resumo: base.fit_resumo || h.angulo || "",
+          red_flags: base.red_flags || [],
+          porta: base.porta, profundidade: base.profundidade,
+          id: base.id || h.empresa,
+          radar: base.radar || null,
+          pipeline: h.status,
+          data_registro: h.data,
+          adicionada_em: base.adicionada_em || h.data || null,
+          adicionada_em_aprox: base.adicionada_em ? base.adicionada_em_aprox : !!h.data,
+        });
+      }
+      return [...mapa.values()];
+    })();
+
+    const estadoDe = (v) => {
+      if (v.pipeline) return v.pipeline;
+      return ({
+        proposto: "Aguardando você",
+        aprovado: "Aprovada, a enviar",
+        ajuste: "Em ajuste",
+        aprofundar: "A aprofundar",
+        recusado: "Descartada",
+        executado: "Executada",
+      })[v.radar] || "—";
+    };
+
+    const FILTROS = [
+      ["todas", "Todas"],
+      ["aplicadas", "Aplicadas"],
+      ["aenviar", "Aprovadas, a enviar"],
+      ["aguardando", "Aguardando você"],
+      ["completa", "Trabalhadas"],
+      ["triagem", "Triagem"],
+      ["lideranca", "Liderança"],
+      ["ic", "IC sênior"],
+    ];
+
+    const passaFiltro = (v, f) => {
+      switch (f) {
+        case "aplicadas": return APLICADAS.includes(v.pipeline);
+        case "aenviar": return v.radar === "aprovado";
+        case "aguardando": return v.radar === "proposto";
+        case "completa": return v.profundidade === "completa";
+        case "triagem": return v.profundidade === "triagem";
+        case "lideranca": return v.porta === "lideranca";
+        case "ic": return v.porta === "ic";
+        default: return true;
+      }
+    };
+
+    const ORDENS = [
+      ["adicionada-desc", "Mais novas"],
+      ["adicionada-asc", "Mais antigas"],
+      ["fit-desc", "Mais fit"],
+      ["fit-asc", "Menos fit"],
+      ["aplicada-desc", "Aplicada mais recente"],
+      ["aplicada-asc", "Aplicada mais antiga"],
+      ["empresa", "Empresa A-Z"],
+      ["estado", "Estado"],
+    ];
+
+    const PESO_ESTADO = ["Oferta", "Entrevista", "Networking", "Aplicada", "CV pronto",
+      "Aprovada, a enviar", "Em ajuste", "A aprofundar", "Aguardando você", "Analisada",
+      "Executada", "Recusada", "Encerrada", "Descartada", "—"];
+
+    const ordenar = (lista, o) => {
+      const arr = [...lista];
+      const dt = (v) => v.data_candidatura || "";
+      const de = (v) => v.adicionada_em || "";
+      const cmp = {
+        // vaga sem data de entrada vai para o fim nas duas direções: "mais
+        // antigas" não pode ser sequestrada por quem simplesmente não tem data
+        "adicionada-desc": (a, b) => (de(b) || "").localeCompare(de(a) || "")
+          || (Number(b.fit) || 0) - (Number(a.fit) || 0),
+        "adicionada-asc": (a, b) => {
+          if (!de(a) && !de(b)) return (Number(b.fit) || 0) - (Number(a.fit) || 0);
+          if (!de(a)) return 1;
+          if (!de(b)) return -1;
+          return de(a).localeCompare(de(b)) || (Number(b.fit) || 0) - (Number(a.fit) || 0);
+        },
+        "fit-desc": (a, b) => (Number(b.fit) || 0) - (Number(a.fit) || 0),
+        "fit-asc": (a, b) => (Number(a.fit) || 0) - (Number(b.fit) || 0),
+        "aplicada-desc": (a, b) => dt(b).localeCompare(dt(a)) || (Number(b.fit) || 0) - (Number(a.fit) || 0),
+        "aplicada-asc": (a, b) => {
+          if (!dt(a) && !dt(b)) return (Number(b.fit) || 0) - (Number(a.fit) || 0);
+          if (!dt(a)) return 1;
+          if (!dt(b)) return -1;
+          return dt(a).localeCompare(dt(b));
+        },
+        empresa: (a, b) => String(a.empresa).localeCompare(String(b.empresa), "pt-BR"),
+        estado: (a, b) => PESO_ESTADO.indexOf(estadoDe(a)) - PESO_ESTADO.indexOf(estadoDe(b))
+          || (Number(b.fit) || 0) - (Number(a.fit) || 0),
+      }[o] || cmp0;
+      return arr.sort(cmp);
+    };
+    function cmp0(a, b) { return (Number(b.fit) || 0) - (Number(a.fit) || 0); }
+
+    let filtroAtual = "todas", ordemAtual = "fit-desc";
+    try {
+      filtroAtual = localStorage.getItem("radar-filtro") || "todas";
+      ordemAtual = localStorage.getItem("radar-ordem") || "fit-desc";
+    } catch {}
+
+    const ORDENAVEL = { Vaga: "fit-desc", Empresa: "empresa", "Entrou em": "adicionada-desc",
+      "Aplicada em": "aplicada-desc", Estado: "estado" };
+
+    const tabela = () => {
+      const filtradas = universo.filter((v) => passaFiltro(v, filtroAtual));
+      const lista = ordenar(filtradas, ordemAtual);
+      const nAplicadas = universo.filter((v) => APLICADAS.includes(v.pipeline)).length;
+
+      const controles = `
+        <div class="filtros" role="group" aria-label="Filtrar e ordenar a listagem">
+          <div class="filtros-linha">
+            <span class="filtros-rotulo">Ver</span>
+            ${FILTROS.map(([k, r]) => {
+              const n = universo.filter((v) => passaFiltro(v, k)).length;
+              return `<button class="btn-decisao${k === filtroAtual ? " ativa--aprovar" : ""}" type="button" data-filtro="${k}" aria-pressed="${k === filtroAtual}">${r} <span class="filtros-n">${n}</span></button>`;
+            }).join("")}
+          </div>
+          <div class="filtros-linha">
+            <span class="filtros-rotulo">Ordenar</span>
+            ${ORDENS.map(([k, r]) =>
+              `<button class="btn-decisao${k === ordemAtual ? " ativa--ajustar" : ""}" type="button" data-ordem="${k}" aria-pressed="${k === ordemAtual}">${r}</button>`).join("")}
+          </div>
+          <p class="filtros-resumo">${lista.length} de ${universo.length} vagas no Radar · <strong>${nAplicadas}</strong> ${nAplicadas === 1 ? "candidatura confirmada" : "candidaturas confirmadas"}</p>
+        </div>`;
+
+      if (!lista.length) return controles + vazio("Nenhuma vaga neste filtro.");
+
+      // decisão direto da linha: a listagem é onde dá pra comparar tudo lado a
+      // lado. Só rende botão em vaga que ainda está no Radar aguardando decisão;
+      // o que já virou histórico (pipeline) não se decide de novo, e o que já
+      // saiu como candidatura mostra quando saiu. Triagem não aplica direto:
+      // primeiro aprofunda (pesquisa, ângulo e CV), depois se decide aplicar
+      const decisaoLinha = (v) => {
+        if (APLICADAS.includes(v.pipeline)) return pillJaAplicada(v.data_candidatura || v.data_registro);
+        if (v.pipeline || !v.radar) return "—";
+        if (v.radar === "aprovado") {
+          const d = diasDesde(v.aprovado_em);
+          return `<div class="celula-pilha"><span class="pill pill--accent">Na fila</span>${
+            v.aprovado_em ? `<span class="data-entrada">aprovada em ${fmtData(v.aprovado_em)}</span>` : ""}${
+            d !== null && d >= APROVADO_ALERTA_DIAS ? `<span class="alerta">Há ${plural(d, "dia", "dias")} sem envio</span>` : ""}</div>`;
+        }
+        if (v.radar === "aprofundar") return '<span class="pill pill--solid">A aprofundar</span>';
+        if (v.radar === "ajuste") return '<span class="pill pill--solid">Em ajuste</span>';
+        if (v.radar !== "proposto") return "—";
+        const acoes = v.profundidade === "triagem"
+          ? [["aprofundar", "↳ Aprofundar"], ["pular", "✕", "Descartar"]]
+          : [["aprovar", "✓ Aplicar"], ["ajustar", "✎", "Ajustar"], ["pular", "✕", "Descartar"]];
+        const pressed = MODO_SERVIDOR ? "" : ' aria-pressed="false"';
+        return `<div class="decisoes decisoes--linha" data-id="${esc(v.id)}">${acoes.map(([a, r, nome]) =>
+          `<button class="btn-decisao btn-decisao--mini" data-acao="${a}" type="button"${pressed}${
+            nome ? ` aria-label="${nome}"` : ""}>${r}</button>`).join("")
+        }<span class="nota-ajuste" data-nota></span></div>`;
+      };
+
+      const celulaEntrada = (v) => {
+        if (!v.adicionada_em) return "—";
+        const data = `<span class="data-entrada${v.adicionada_em_aprox ? " data-entrada--aprox" : ""}"${
+          v.adicionada_em_aprox ? ' title="Data reconstruída: limite superior a partir do histórico e dos backups. Vagas novas gravam a data exata."' : ""
+        }>${v.adicionada_em_aprox ? "~" : ""}${fmtData(v.adicionada_em)}</span>`;
+        const d = diasDesde(v.adicionada_em);
+        const parada = v.profundidade === "triagem" && v.radar === "proposto" && !v.pipeline
+          && d !== null && d >= TRIAGEM_EXPIRA_DIAS;
+        return parada
+          ? `<div class="celula-pilha">${data}<span class="alerta">Na mesa há ${plural(d, "dia", "dias")}</span></div>`
+          : data;
+      };
+
+      const linkSeguro = (u, rotulo) => {
+        const h = urlSegura(u);
+        return h ? `<a href="${esc(h)}" target="_blank" rel="noopener">${rotulo}</a>` : "";
+      };
+
+      const linhas = lista.map((v) => {
+        const gente = gPessoas.filter((p) => p.vaga_id === v.id);
+        const obs = [v.fit_resumo, (v.red_flags || [])[0]].filter(Boolean).join(" | ");
+        const aplicada = APLICADAS.includes(v.pipeline);
+        const links = [linkSeguro(v.url, "abrir"), linkSeguro(v.cv, "CV")].filter(Boolean).join(" · ");
+        return `<tr${aplicada ? ' class="linha--aplicada"' : ""}>
+          <td data-r="Vaga"><strong>${esc(v.cargo)}</strong><span class="fit-mini">fit ${esc(v.fit ?? "—")}</span></td>
+          <td data-r="Empresa">${esc(v.empresa)}</td>
+          <td data-r="Estado">${pillStatus(estadoDe(v))}</td>
+          <td data-r="Decisão">${decisaoLinha(v)}</td>
+          <td data-r="Entrou em">${celulaEntrada(v)}</td>
+          <td data-r="Aplicada em">${v.data_candidatura ? fmtData(v.data_candidatura) : "—"}</td>
+          <td data-r="Link">${links || "—"}</td>
+          <td data-r="Pretensão">${esc(v.salario || "—")}</td>
+          <td data-r="Decisores">${gente.length
+            ? gente.map((p) => linkSeguro(p.url, esc(p.nome)) || esc(p.nome)).join("<br>")
+            : "—"}</td>
+          <td data-r="Próximo passo">${esc(v.proximo_passo || "—")}</td>
+          <td data-r="Observação">${esc(obs || "—")}</td>
+        </tr>`;
+      }).join("");
+
+      const th = (rotulo) => {
+        const o = ORDENAVEL[rotulo];
+        if (!o) return `<th scope="col">${rotulo}</th>`;
+        const ativa = ordemAtual.startsWith(o.split("-")[0]);
+        const asc = ativa && ordemAtual.endsWith("-asc");
+        return `<th scope="col"><button class="th-ordena${ativa ? " th-ordena--ativa" : ""}${asc ? " th-ordena--asc" : ""}" type="button" data-ordem="${o}">${rotulo}</button></th>`;
+      };
+
+      return controles + `<div class="tabela-wrap"><table class="tabela-vagas">
+        <thead><tr>
+          ${["Vaga", "Empresa", "Estado", "Decisão", "Entrou em", "Aplicada em", "Link", "Pretensão", "Decisores", "Próximo passo", "Observação"].map(th).join("")}
+        </tr></thead>
+        <tbody>${linhas}</tbody>
+      </table></div>`;
+    };
+
+    const conteudoCards = () => (hojeVazio && !V.data
+      ? vazio("Nada aguardando decisão — a próxima rotina preenche este bloco.")
+      : subsecao("Vagas trabalhadas — pesquisa, ângulo, CV e pessoas", completas, blocoVagaCompleta)
+        + subsecaoTriagem);
+
+    const alvo = document.getElementById("hoje-conteudo");
+    let modoAtual = "cards";
+    const renderizar = (modo) => {
+      modoAtual = modo;
+      document.querySelectorAll("#alternar-visao button").forEach((b) => {
+        const ativa = b.dataset.visao === modo;
+        b.classList.toggle("ativa--aprovar", ativa);
+        b.setAttribute("aria-pressed", String(ativa));
+      });
+      alvo.innerHTML = modo === "tabela" ? tabela() : conteudoCards();
+      try { localStorage.setItem("radar-visao", modo); } catch {}
+    };
+
+    let visaoInicial = "cards";
+    try { visaoInicial = localStorage.getItem("radar-visao") || "cards"; } catch {}
+    renderizar(visaoInicial === "tabela" ? "tabela" : "cards");
+
+    document.getElementById("alternar-visao").addEventListener("click", (ev) => {
+      const b = ev.target.closest("button[data-visao]");
+      if (b) renderizar(b.dataset.visao);
+    });
+
+    // filtro e ordenação da listagem (inclui clique no cabeçalho da coluna)
+    alvo.addEventListener("click", (ev) => {
+      // abre ou fecha todos os cards da subseção em que o botão está
+      const be = ev.target.closest("button[data-expandir]");
+      if (be) {
+        const escopo = be.closest(".subsecao") || alvo;
+        const cards = escopo.querySelectorAll("details.proposta");
+        const abrir = [...cards].some((d) => !d.open);
+        cards.forEach((d) => (d.open = abrir));
+        be.textContent = abrir ? "Recolher tudo" : "Expandir tudo";
+        return;
+      }
+      const bf = ev.target.closest("button[data-filtro]");
+      if (bf) {
+        filtroAtual = bf.dataset.filtro;
+        try { localStorage.setItem("radar-filtro", filtroAtual); } catch {}
+        renderizar("tabela");
+        return;
+      }
+      const bo = ev.target.closest("button[data-ordem]");
+      if (bo) {
+        let nova = bo.dataset.ordem;
+        // clicar de novo na mesma COLUNA inverte a direção. Só no cabeçalho:
+        // botão explícito ("Mais novas", "Mais antigas") pede uma direção
+        // nomeada, e invertê-la faria o botão fazer o contrário do que diz
+        if (bo.classList.contains("th-ordena")
+            && nova.includes("-") && ordemAtual.split("-")[0] === nova.split("-")[0]) {
+          nova = ordemAtual.endsWith("-desc")
+            ? nova.replace("-desc", "-asc")
+            : nova.replace("-asc", "-desc");
+        }
+        ordemAtual = nova;
+        try { localStorage.setItem("radar-ordem", ordemAtual); } catch {}
+        renderizar("tabela");
+      }
+    });
+
+    // ============================================================
+    // PIPELINE: vagas vivas do histórico, por status
+    // ============================================================
+    const ORDEM = ["Oferta", "Entrevista", "Networking", "Aplicada", "CV pronto", "Analisada"];
+    const vivas = histVagas.filter((v) => ORDEM.includes(v.status));
+
+    // A análise completa de cada vaga (fit, forças, lacunas, red flags, contexto,
+    // ângulo, CV) vive no vagas.json e não no registro. Depois de aplicada a vaga
+    // vira "executado" e sai da seção Hoje, então a análise ficava invisível justo
+    // quando você mais precisa dela: antes de uma conversa com recrutador. Aqui o
+    // registro é casado com o vagas.json por empresa + cargo para trazer o corpo de
+    // volta, em modo leitura (sem botão de decisão: a decisão já foi tomada).
+    // chaveVaga(v) já existe acima (empresa||cargo em minúsculas) e é a mesma
+    // chave usada para casar registro com vagas.json: reaproveitada aqui.
+    const ANALISES = new Map((V.vagas || []).map((v) => [chaveVaga(v), v]));
+    const analiseDe = (v) => ANALISES.get(chaveVaga(v));
+
+    const corpoAnalise = (a, gente) => `
+      ${tese(a.angulo)}
+      ${campos([
+        ["Salário", [a.salario, a.salario_fonte && `(${a.salario_fonte})`].filter(Boolean).join(" ")],
+        ["Fit", a.fit_resumo],
+      ])}
+      ${listaCurta("Forças diretas", a.forcas)}
+      ${listaCurta("Lacunas honestas", a.lacunas)}
+      ${listaCurta("Red flags", a.red_flags)}
+      ${listaCurta("Sobre a empresa", a.empresa_contexto)}
+      ${listaCurta("Melhorias que esta vaga sugere", a.melhorias)}
+      ${blocoCv(a, "CV enviado")}
+      ${gente && gente.length ? `<div class="campo"><span class="meta">Pessoas mapeadas nesta vaga</span><ul class="lista-curta">${
+        gente.map((p) => `<li>${esc([p.nome, p.cargo, p.papel].filter(Boolean).join(" · "))}${
+          p.status ? ` — ${esc(p.status)}` : ""}</li>`).join("")}</ul></div>` : ""}`;
+
+    // pessoas do registro (já contatadas) + as ainda propostas no vagas.json
+    const pessoasDaEmpresa = (a, empresa) => {
+      const alvo = String(empresa || "").trim().toLowerCase();
+      const doPlano = (V.pessoas || []).filter((p) =>
+        (a && p.vaga_id === a.id) ||
+        String(p.empresa || "").trim().toLowerCase() === alvo);
+      const doHist = histPessoas.filter((p) =>
+        String(p.empresa || "").trim().toLowerCase() === alvo);
+      const vistos = new Set(), out = [];
+      for (const p of [...doHist, ...doPlano]) {
+        const k = String(p.nome || "").trim().toLowerCase();
+        if (!k || vistos.has(k)) continue;
+        vistos.add(k); out.push(p);
+      }
+      return out;
+    };
+
+    const linhaPipeline = (v, i) => {
+      const d = diasDesde(v.data_candidatura || v.data);
+      const vencido = ["Aplicada", "Networking"].includes(v.status) && d !== null && d >= FOLLOW_UP_DIAS;
+      const a = analiseDe(v);
+      const cabeca = `
+          <span class="meta num">${pad(i + 1)}</span>
+          <span class="data">${fmtData(v.data_candidatura || v.data)}</span>
+          <div class="principal">
+            <div class="vaga-head">
+              <h3>${esc(v.empresa)} — ${esc(v.cargo)}</h3>
+              ${a ? barraFit(a.fit) : ""}
+            </div>
+            <p>${esc([v.local, v.modelo, v.salario].filter(Boolean).join(" · "))}</p>
+            ${v.proximo_passo ? `<p>Próximo passo: ${esc(v.proximo_passo)}</p>` : ""}
+            ${vencido ? `<p class="alerta">Sem resposta há ${d} dias, follow-up vencido</p>` : ""}
+            ${a ? sinais([
+              a.cv ? "CV enviado" : "",
+              (a.red_flags || []).length ? plural(a.red_flags.length, "red flag", "red flags") : "",
+              "abrir para a análise completa",
+            ]) : ""}
+          </div>
+          <div class="acoes">${pillStatus(v.status)}${marquee(v.url, "Ver")}</div>`;
+      if (!a) return `<article class="linha">${cabeca}</article>`;
+      const gente = pessoasDaEmpresa(a, v.empresa);
+      return `
+        <details class="linha linha--abre">
+          <summary>${cabeca}${chevron}</summary>
+          <div class="proposta-corpo">
+            ${corpoAnalise(a, gente)}
+            ${v.notas ? `<div class="campo"><span class="meta">Notas da candidatura</span><p>${esc(v.notas)}</p></div>` : ""}
+          </div>
+        </details>`;
+    };
+
+    vivas.sort((a, b) => ORDEM.indexOf(a.status) - ORDEM.indexOf(b.status));
+    document.getElementById("pipeline-sub").textContent = vivas.length
+      ? `${vivas.length} ${vivas.length === 1 ? "vaga viva" : "vagas vivas"}`
+      : "ainda vazio";
+    document.getElementById("pipeline-lista").innerHTML = vivas.length
+      ? vivas.map(linhaPipeline).join("")
+      : vazio("Sem candidatura viva — o pipeline enche conforme você aprova.");
+
+    // ============================================================
+    // HISTÓRICO: por dia
+    // ============================================================
+    const itensDoDia = (dia) => [
+      ...(dia.vagas || []).map((x) => ({ ...x, _tipo: "Vaga" })),
+      ...(dia.pessoas || []).map((x) => ({ ...x, _tipo: "Pessoa" })),
+    ];
+
+    const linhaHist = (it, i) => {
+      const titulo = it._tipo === "Vaga" ? `${it.empresa} — ${it.cargo}` : it.nome;
+      const apoio = it._tipo === "Vaga"
+        ? [it.local, it.modelo, it.salario, it.angulo].filter(Boolean).join(" · ")
+        : [it.cargo, it.empresa, it.papel].filter(Boolean).join(" · ");
+      const porque = it._tipo === "Pessoa" ? it.porque : "";
+      return `
+        <article class="linha">
+          <span class="meta num">${pad(i + 1)}</span>
+          <span class="data">${it._tipo}</span>
+          <div class="principal">
+            <h3>${esc(titulo)}</h3>
+            ${apoio ? `<p>${esc(apoio)}</p>` : ""}
+            ${porque ? `<p>${esc(porque)}</p>` : ""}
+          </div>
+          <div class="acoes">${pillStatus(it.status)}${marquee(it.url, "Ver")}${
+            it.cv ? marquee(it.cv, "CV") : ""}</div>
+        </article>`;
+    };
+
+    const resumoDia = (dia) => [
+      [(dia.vagas || []).length, "vaga", "vagas"],
+      [(dia.pessoas || []).length, "pessoa", "pessoas"],
+    ].filter(([n]) => n).map(([n, s, p]) => `${n} ${n === 1 ? s : p}`).join(" · ");
+
+    // observacoes é lista no registro; texto solto também vale
+    const obsDoDia = (dia) => [].concat(dia.observacoes || []).filter(Boolean);
+
+    const blocoDia = (dia) => `
+      <div class="dia-bloco">
+        <div class="dia-header">
+          <span class="dia-data">${fmtData(dia.data)}</span>
+          <span class="meta">${resumoDia(dia) || "sem ações"}</span>
+        </div>
+        ${itensDoDia(dia).map(linhaHist).join("")}
+        ${obsDoDia(dia).map((o) => `<p class="dia-obs">${esc(o)}</p>`).join("")}
+      </div>`;
+
+    document.getElementById("historico-sub").textContent = dias.length
+      ? `${dias.length} ${dias.length === 1 ? "dia" : "dias"}`
+      : "ainda vazio";
+    document.getElementById("historico-lista").innerHTML = dias.length
+      ? dias.map(blocoDia).join("")
+      : vazio("Ainda sem histórico — ele cresce a cada rotina.");
+
+    // ============================================================
+    // Interação: decidir item a item
+    // ============================================================
+    const barra = document.getElementById("barra-decisoes");
+    const contagem = document.getElementById("barra-contagem");
+    const toast = document.getElementById("toast");
+
+    const atualizarBarra = () => {
+      contagem.textContent = decisoes.size;
+      document.getElementById("barra-rotulo").textContent = decisoes.size === 1 ? "decisão" : "decisões";
+      barra.hidden = decisoes.size === 0;
+      document.body.classList.toggle("com-barra", decisoes.size > 0);
+    };
+
+    let timerAviso = null;
+    const avisar = (msg) => {
+      toast.textContent = msg;
+      toast.classList.add("visivel");
+      clearTimeout(timerAviso);
+      timerAviso = setTimeout(() => toast.classList.remove("visivel"), 2600);
+    };
+
+    const AVISO = {
+      aprovar: "Aprovado, a rotina executa e confirma no chat",
+      aprofundar: "Na fila: pesquisa completa, ângulo e CV",
+      ajustar: "Ajuste registrado, a rotina propõe nova versão",
+      pular: "Descartado",
+    };
+    const avisoDe = (id, acao) => IDS_PESSOA.has(id)
+      ? ({ aprovar: "Marcada para contato", pular: "Pessoa pulada" }[acao] || "Registrado")
+      : AVISO[acao] || "Registrado";
+
+    const ACOES_DECISAO = ["aprovar", "aprofundar", "ajustar", "pular"];
+
+    document.getElementById("hoje-conteudo").addEventListener("click", async (ev) => {
+      // ---- botão global: nova varredura ----
+      const btnNova = ev.target.closest("#btn-nova-busca");
+      if (btnNova) {
+        if (!MODO_SERVIDOR && decisoes.has("busca")) { // segundo clique desfaz
+          decisoes.delete("busca");
+          btnNova.classList.remove("ativa--ajustar");
+          atualizarBarra();
+          return;
+        }
+        if (!window.confirm("Descartar a triagem do dia e pedir uma nova varredura no LinkedIn?")) return;
+        if (MODO_SERVIDOR) {
+          btnNova.disabled = true;
+          try {
+            const r = await fetch("/api/decisao", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: "busca", acao: "nova_busca", nota: "" }),
+            });
+            const res = await r.json();
+            if (!res.ok) throw new Error(res.erro || "falha no servidor");
+          } catch (e) {
+            btnNova.disabled = false;
+            avisar("Não registrou: " + e.message);
+            return;
+          }
+          document.getElementById("triagem-lista").innerHTML =
+            '<div class="vazio">Nova varredura solicitada — a rotina está buscando vagas novas.</div>';
+          avisar("Pedido enviado, vagas novas a caminho");
+        } else {
+          decisoes.set("busca", { acao: "nova_busca", nota: "" });
+          btnNova.classList.add("ativa--ajustar");
+          atualizarBarra();
+          avisar("Pedido anotado, copie as decisões para o chat");
+        }
+        return;
+      }
+
+      const btn = ev.target.closest(".btn-decisao");
+      if (!btn) return;
+      const caixa = btn.closest(".decisoes");
+      // botão com a mesma cara mas outra função (filtro, ordem, expandir) não
+      // decide nada: sem esta saída, o clique estourava aqui em TypeError
+      if (!caixa) return;
+      // nos cards o alvo visual é o <article.proposta>; na listagem é a <tr>
+      const artigo = btn.closest(".proposta") || btn.closest("tr");
+      const id = caixa.dataset.id;
+      const acao = btn.dataset.acao;
+      const notaEl = caixa.querySelector("[data-nota]");
+      const pessoa = IDS_PESSOA.has(id);
+
+      // ---- modo servidor: o clique é a ação real, via API ----
+      if (MODO_SERVIDOR) {
+        let nota = "";
+        if (acao === "ajustar") {
+          nota = window.prompt("O que ajustar neste item?") || "";
+          if (!nota.trim()) return;
+        }
+        caixa.querySelectorAll(".btn-decisao").forEach((b) => (b.disabled = true));
+        try {
+          const r = await fetch("/api/decisao", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, acao, nota }),
+          });
+          const res = await r.json();
+          if (!res.ok) throw new Error(res.erro || "falha no servidor");
+        } catch (e) {
+          caixa.querySelectorAll(".btn-decisao").forEach((b) => (b.disabled = false));
+          avisar("Não registrou: " + e.message);
+          return;
+        }
+        // na célula da listagem o selo tem que caber na coluna: rótulo curto,
+        // senão a linha estica e quebra a tabela inteira
+        const naLinha = caixa.classList.contains("decisoes--linha");
+        if (acao === "pular") {
+          // com movimento reduzido o item só desaparece (fade), sem deslizar
+          artigo.style.transition = MOVIMENTO_REDUZIDO
+            ? "opacity 240ms cubic-bezier(0.2, 0.7, 0.2, 1)"
+            : "opacity 400ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 400ms cubic-bezier(0.2, 0.7, 0.2, 1)";
+          artigo.style.opacity = "0";
+          if (!MOVIMENTO_REDUZIDO) artigo.style.transform = "translateX(24px)";
+          setTimeout(() => artigo.remove(), MOVIMENTO_REDUZIDO ? 240 : 400);
+        } else if (acao === "aprovar") {
+          artigo.classList.add("decidida-aprovar");
+          caixa.innerHTML = `<span class="pill pill--accent">${
+            pessoa ? "Marcada para contato" : naLinha ? "Na fila" : "Aprovado · na fila de execução"}</span>`;
+        } else if (acao === "aprofundar") {
+          artigo.classList.add("decidida-aprofundar");
+          caixa.innerHTML = `<span class="pill pill--solid">${naLinha ? "A aprofundar" : "Aprofundar · na fila de pesquisa"}</span>`;
+        } else {
+          artigo.classList.add("decidida-ajustar");
+          caixa.innerHTML = naLinha
+            ? '<span class="pill pill--solid">Em ajuste</span>'
+            : `<span class="pill pill--solid">Ajuste pedido</span><span class="nota-ajuste">Ajuste: ${esc(nota)}</span>`;
+        }
+        avisar(avisoDe(id, acao));
+        return;
+      }
+
+      // ---- modo arquivo (file://): compõe decisões para colar no chat ----
+      // A escolha mora no aria-pressed do botão, uma fonte só para o desfazer e
+      // para o leitor de tela. Antes o desfazer procurava a classe da ação
+      // (ativa--aprofundar), mas Aprofundar recebia ativa--aprovar, e o segundo
+      // clique nunca desfazia
+      const jaAtiva = btn.getAttribute("aria-pressed") === "true";
+
+      // ajuste pede a nota antes de mexer em qualquer coisa: cancelar o prompt
+      // deixa a decisão anterior como estava, na tela e na fila
+      let nota = "";
+      if (!jaAtiva && acao === "ajustar") {
+        nota = (window.prompt("O que ajustar neste item?") || "").trim();
+        if (!nota) return;
+      }
+
+      caixa.querySelectorAll(".btn-decisao").forEach((b) => {
+        b.classList.remove(...ACOES_DECISAO.map((a) => `ativa--${a}`));
+        b.setAttribute("aria-pressed", "false");
+      });
+      artigo.classList.remove(...ACOES_DECISAO.map((a) => `decidida-${a}`));
+      if (notaEl) notaEl.textContent = "";
+
+      if (jaAtiva) { // segundo clique desfaz a decisão
+        decisoes.delete(id);
+        atualizarBarra();
+        return;
+      }
+
+      if (acao === "ajustar" && notaEl) notaEl.textContent = "Ajuste pedido: " + nota;
+      btn.classList.add(`ativa--${acao}`);
+      btn.setAttribute("aria-pressed", "true");
+      artigo.classList.add(`decidida-${acao}`);
+      decisoes.set(id, { acao, nota });
+      atualizarBarra();
+    });
+
+    document.getElementById("btn-copiar").addEventListener("click", async () => {
+      const linhas = [...decisoes.entries()].map(([id, d]) => {
+        if (d.acao === "nova_busca")
+          return "• Descartar a triagem do dia e rodar uma nova varredura no LinkedIn";
+        const p = porId.get(id);
+        if (!p) return `• ${d.acao}: ${id}`;
+        const rotulo = rotuloDe(p);
+        const pessoa = IDS_PESSOA.has(id);
+        // pessoa se identifica pelo nome; vaga, por empresa e cargo
+        const quem = pessoa ? p.nome || "" : [p.empresa, p.cargo].filter(Boolean).join(" — ");
+        const sufixo = quem ? ` (${quem})` : "";
+        if (d.acao === "aprovar") return pessoa ? `• Vou contatar a ${rotulo}${sufixo}` : `• Aprovo a ${rotulo}${sufixo}`;
+        if (d.acao === "aprofundar") return `• Aprofundar a ${rotulo}${sufixo}`;
+        if (d.acao === "pular") return `• Descarto a ${rotulo}${sufixo}`;
+        return `• Ajustar a ${rotulo}${sufixo}: ${d.nota}`;
+      });
+      const texto = `Decisões da varredura de ${V.data ? fmtData(V.data) : "hoje"} (via dashboard):\n${linhas.join("\n")}\nItens não mencionados seguem pendentes.`;
+      try {
+        await navigator.clipboard.writeText(texto);
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = texto;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      avisar("Decisões copiadas, cole na conversa do Claude");
+    });
+  </script>
+</body>
+</html>

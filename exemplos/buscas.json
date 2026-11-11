@@ -1,0 +1,36 @@
+{
+  "_leia": "O que a varredura procura. Uma palavra-chave por vez: o LinkedIn não respeita OR nem aspas. Edite à vontade.",
+  "janela_horas": 48,
+  "grupos": [
+    {
+      "local": "Brazil",
+      "palavras_chave": [
+        "Head of Design",
+        "Design Manager",
+        "Staff Product Designer",
+        "Principal Product Designer",
+        "Lead Product Designer",
+        "Senior Product Designer",
+        "Product Designer Sênior"
+      ]
+    },
+    {
+      "local": "Latin America",
+      "palavras_chave": ["Staff Product Designer", "Senior Product Designer"]
+    }
+  ],
+  "filtro_titulo": {
+    "precisa_ter": ["design", "designer", "ux", "ui"],
+    "senioridade": ["senior", "sr", "sênior", "especialista", "staff", "principal", "lead", "head", "manager", "director", "diretor", "gerente", "coordenador"],
+    "descartar_se_tiver": ["junior", "jr", "pleno", "estágio", "estagiário", "intern", "trainee", "engineer", "engenheiro", "developer", "desenvolvedor", "gráfico", "motion", "interior", "industrial", "3d"]
+  },
+  "corte": {
+    "descartar_se": [
+      "senioridade abaixo da mínima do config",
+      "modelo de trabalho fora de config.trabalho",
+      "escopo de UI puro sem produto, ou acúmulo explícito de funções",
+      "mesma empresa e mesmo cargo já no Radar ou no arquivo",
+      "vaga sem descrição real (link quebrado ou fechada)"
+    ]
+  }
+}

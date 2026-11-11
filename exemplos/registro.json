@@ -1,0 +1,76 @@
+{
+  "_leia": "Histórico FICTÍCIO do que foi executado. Só entra aqui o que foi aprovado e feito.",
+  "atualizado_em": "2026-11-10T10:00:00-03:00",
+  "leva": 1,
+  "leva_inicio": "2026-10-20",
+  "dias": [
+    {
+      "data": "2026-10-28",
+      "vagas": [
+        {
+          "empresa": "Lume Varejo",
+          "cargo": "Senior UX Designer",
+          "url": "https://www.linkedin.com/jobs/view/1000000006",
+          "local": "Brasil",
+          "modelo": "remoto",
+          "salario": "",
+          "salario_fonte": "",
+          "status": "Aplicada",
+          "angulo": "Varejo digital com operação complexa por trás.",
+          "cv": "",
+          "data_candidatura": "2026-10-28",
+          "proximo_passo": "Follow-up em 04/11/2026 se não houver retorno",
+          "notas": ""
+        }
+      ],
+      "pessoas": [],
+      "observacoes": ["Candidatura enviada pelo ATS da empresa, confirmação por e-mail."]
+    },
+    {
+      "data": "2026-11-03",
+      "vagas": [
+        {
+          "empresa": "Vértice Software",
+          "cargo": "Product Design Manager",
+          "url": "https://www.linkedin.com/jobs/view/1000000008",
+          "local": "Brasil",
+          "modelo": "remoto",
+          "salario": "R$ 28.000 mensais",
+          "salario_fonte": "publicada na vaga",
+          "status": "Entrevista",
+          "angulo": "Gestão de designers com a mão no produto.",
+          "cv": "",
+          "data_candidatura": "2026-11-03",
+          "proximo_passo": "Conversa com a diretora de produto em 12/11/2026",
+          "notas": "Primeira conversa com recruiter em 07/11."
+        },
+        {
+          "empresa": "Faro Dados",
+          "cargo": "Senior Product Designer",
+          "url": "https://www.linkedin.com/jobs/view/1000000009",
+          "local": "Brasil",
+          "modelo": "remoto",
+          "salario": "",
+          "salario_fonte": "",
+          "status": "Encerrada",
+          "angulo": "",
+          "cv": "",
+          "data_candidatura": "",
+          "proximo_passo": "",
+          "notas": "Anúncio fechou antes do envio."
+        }
+      ],
+      "pessoas": [
+        {
+          "nome": "Elisa Torres",
+          "cargo": "Tech Recruiter",
+          "empresa": "Vértice Software",
+          "url": "https://www.linkedin.com/in/exemplo-elisa-torres",
+          "papel": "recruiter da vaga",
+          "status": "aceito"
+        }
+      ],
+      "observacoes": []
+    }
+  ]
+}

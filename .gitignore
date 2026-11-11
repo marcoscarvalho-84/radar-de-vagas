@@ -1,0 +1,13 @@
+# Tudo que é seu: perfil, fatos, pretensão, vagas, histórico, CVs, painel gerado
+meus-dados/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Sistema e editores
+.DS_Store
+*.log
+.radar.lock
+.claude/settings.local.json

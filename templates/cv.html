@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="{{IDIOMA}}">
+<head>
+<meta charset="utf-8">
+<title>{{DOC_TITLE}}</title>
+<style>
+  /* ===== Fontes: o build_cv.py injeta os @font-face aqui ===== */
+  {{FONT_FACES}}
+
+  :root{
+    --bg:   #F5F4F0;   /* off-white quente */
+    --ink:  #050505;   /* quase preto */
+    --body: #3C3C3A;   /* texto corrido */
+    --muted:#8B8B88;   /* datas, labels de seção, contatos */
+    --hair: #DCDBD6;   /* hairlines */
+    --serif-stack: "CVFont", "Figtree", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  @page{ size: A4; margin: 0; }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  /* min-height, não height: com altura fixa o conteúdo que estoura fica
+     sobreposto dentro da mesma página e a validação de 1 página nunca acusa.
+     Com min-height, o excesso vira uma 2ª página e o build_cv.py falha. */
+  html,body{
+    width:210mm; min-height:297mm;
+    background:var(--bg);
+    font-family:var(--serif-stack);
+    color:var(--body);
+    -weasy-hyphens:none;
+  }
+
+  .page{
+    width:210mm; min-height:297mm;
+    padding:13mm 16mm 12mm 16mm;
+    display:flex; flex-direction:column;
+  }
+
+  /* ===== Header ===== */
+  .header{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .name{
+    font-weight:900; color:var(--ink);
+    font-size:27.5pt; line-height:1.04; letter-spacing:-0.01em;
+  }
+  .head-right{ text-align:right; font-size:8.6pt; line-height:1.5; padding-top:1.2mm; }
+  .head-right .tagline{ color:var(--ink); font-weight:500; }
+  .head-right .loc{ color:var(--muted); font-weight:500; margin-bottom:1.6mm; }
+  .head-right .contact{ color:var(--muted); font-weight:400; }
+
+  /* ===== Hook ===== */
+  .hook{
+    margin-top:7.5mm;
+    font-size:17pt; line-height:1.3; font-weight:700;
+    color:var(--ink); letter-spacing:-0.005em;
+    max-width:178mm;
+  }
+  .hook .accent{ color:var(--muted); font-weight:700; }
+
+  .rule{ border:none; border-top:0.35mm solid var(--hair); margin:5.5mm 0 0 0; }
+
+  /* ===== Grade de seções: label esquerda + conteúdo ===== */
+  .section{ display:flex; margin-top:6mm; }
+  .rail{
+    width:34mm; flex:0 0 34mm;
+    font-size:6.8pt; font-weight:600; color:var(--muted);
+    letter-spacing:0.32em; text-transform:uppercase;
+    padding-top:0.8mm;
+  }
+  .content{ flex:1; }
+
+  /* Positioning */
+  .positioning{ font-size:9.3pt; line-height:1.5; color:var(--body); }
+  .positioning b{ color:var(--ink); font-weight:600; }
+
+  /* Why this role */
+  .why-row{
+    display:flex; padding:2.6mm 0;
+    border-top:0.28mm solid var(--hair);
+  }
+  .why-row:first-child{ border-top:none; padding-top:0; }
+  .why-label{
+    width:34mm; flex:0 0 34mm; padding-right:5mm;
+    font-size:8.8pt; line-height:1.32; font-weight:700; color:var(--ink);
+  }
+  .why-text{ flex:1; font-size:8.8pt; line-height:1.45; color:var(--body); }
+
+  /* Experience */
+  .xp{ margin-bottom:4.2mm; }
+  .xp:last-child{ margin-bottom:0; }
+  .xp-head{ display:flex; justify-content:space-between; align-items:baseline; gap:6mm; }
+  .xp-role{ font-size:9.3pt; font-weight:700; color:var(--ink); line-height:1.35; }
+  .xp-meta{
+    font-size:6.6pt; font-weight:600; color:var(--muted);
+    letter-spacing:0.18em; text-transform:uppercase; white-space:nowrap;
+    padding-top:0.6mm;
+  }
+  .xp-desc{ font-size:8.6pt; line-height:1.45; color:var(--body); margin-top:0.8mm; }
+  .xp-desc b{ color:var(--ink); font-weight:600; }
+
+  /* ===== Footer ===== */
+  .footer{
+    margin-top:auto; padding-top:3.2mm;
+    border-top:0.35mm solid var(--hair);
+    display:flex; justify-content:space-between;
+    font-size:6.6pt; font-weight:600; color:var(--muted);
+    letter-spacing:0.22em; text-transform:uppercase;
+  }
+
+  /* ===== Densidade: overrides calculados pelo build_cv.py =====
+     O auto-ajuste reduz corpos de texto e respiros verticais até o conteúdo
+     caber em 1 página. Vazio quando o CV cabe no tamanho cheio. */
+  {{DENSITY_OVERRIDES}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="name">{{NOME}}</div>
+    <div class="head-right">
+      <div class="tagline">{{TAGLINE_L1}}<br>{{TAGLINE_L2}}</div>
+      <div class="loc">{{LOCATION_LINE}}</div>
+      <div class="contact">{{CONTATOS}}</div>
+    </div>
+  </div>
+
+  <!-- quebra forçada: o trecho em cinza sempre começa uma linha nova, sem travessão -->
+  <div class="hook">{{HOOK_MAIN}}<br><span class="accent">{{HOOK_ACCENT}}</span></div>
+
+  <hr class="rule">
+
+  <div class="section">
+    <div class="rail">{{POSITIONING_LABEL}}</div>
+    <div class="content"><div class="positioning">{{POSITIONING}}</div></div>
+  </div>
+
+  <div class="section">
+    <div class="rail">{{WHY_LABEL}}</div>
+    <div class="content">
+      {{WHY_ROWS}}
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="rail">{{EXPERIENCE_LABEL}}</div>
+    <div class="content">
+      {{EXPERIENCE}}
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>{{TOOLS_LINE}}</div>
+    <div>{{LANGUAGES_LINE}}</div>
+  </div>
+
+</div>
+</body>
+</html>

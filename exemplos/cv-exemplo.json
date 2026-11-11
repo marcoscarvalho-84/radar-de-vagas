@@ -1,0 +1,25 @@
+{
+  "doc_title": "Ana Souza · CV · Acme Pagamentos",
+  "idioma": "en",
+  "tagline_l1": "Senior Product Designer",
+  "tagline_l2": "Fintech B2B · Design Systems",
+  "location_line": "Recife, PE · remote-first",
+  "hook_main": "Nine years making financial operations feel simple",
+  "hook_accent": "now scaling one system across many products.",
+  "positioning_label": "Positioning",
+  "positioning": "Product designer focused on B2B financial products, where a single unclear screen becomes a support ticket and a lost payment. I turn dense business rules into flows people trust, and I build the systems that keep many products coherent as teams grow.",
+  "why_label": "Why Acme",
+  "why_rows": [
+    {"label": "Payments, already my day job", "text": "Five years designing reconciliation and billing for 3,000 companies, the same operational problems Acme solves for small merchants."},
+    {"label": "One system for many products", "text": "Led a design system adopted by 4 products, with shared tokens, documentation and a contribution model."},
+    {"label": "Decisions backed by numbers", "text": "Redesigned an e-commerce checkout and cut abandonment by 12%, measured in an A/B test."},
+    {"label": "Senior IC who raises the bar", "text": "Runs critiques and pairs with juniors without leaving the craft: strategy, flows and final pixels."}
+  ],
+  "experience_label": "Experience",
+  "experience": [
+    {"role_line": "Banco Exemplo · Senior Product Designer", "meta": "2021 – Now · Remote", "desc": "Owns the reconciliation experience for 3,000 business clients and leads the design system shared by 4 products."},
+    {"role_line": "Loja Exemplo · Product Designer", "meta": "2017 – 2021 · São Paulo", "desc": "Checkout and account area for an e-commerce with 1 million orders a month; checkout redesign cut abandonment by 12%."}
+  ],
+  "tools_line": "Figma · Design systems · Prototyping · Research",
+  "languages_line": "Portuguese (native) · English (advanced)"
+}

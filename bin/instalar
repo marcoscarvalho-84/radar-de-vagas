@@ -1,0 +1,42 @@
+#!/bin/bash
+# Instala o que o Radar precisa para gerar PDF e prepara a pasta de dados.
+#
+#   bin/instalar
+#
+# - cria a venv em ~/.cache/radar-de-vagas/venv (fora de pastas sincronizadas)
+# - instala weasyprint e pypdf (requirements.txt)
+# - confere pango e poppler (macOS: Homebrew; Linux: o gerenciador da distro)
+# - roda bin/radar init
+set -euo pipefail
+
+RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VENV="$HOME/.cache/radar-de-vagas/venv"
+
+command -v python3 >/dev/null || { echo "Precisa de Python 3.10 ou mais novo."; exit 1; }
+python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' \
+  || { echo "Python 3.10 ou mais novo, por favor (o seu: $(python3 --version))."; exit 1; }
+
+if [ ! -x "$VENV/bin/python" ]; then
+  echo "Criando a venv em $VENV"
+  mkdir -p "$(dirname "$VENV")"
+  python3 -m venv "$VENV"
+fi
+"$VENV/bin/python" -m pip install -q --upgrade pip
+"$VENV/bin/python" -m pip install -q -r "$RAIZ/requirements.txt"
+
+if [ "$(uname)" = "Darwin" ]; then
+  if command -v brew >/dev/null; then
+    brew list pango >/dev/null 2>&1 || echo "Falta o pango (WeasyPrint): brew install pango"
+    command -v pdftoppm >/dev/null || echo "Falta o poppler (preview do CV): brew install poppler"
+  else
+    echo "Sem Homebrew: instale pango e poppler para gerar PDF e preview (https://brew.sh)."
+  fi
+else
+  command -v pdftoppm >/dev/null || echo "Falta o poppler-utils (preview do CV): sudo apt install poppler-utils"
+  echo "No Linux o WeasyPrint precisa de pango: sudo apt install libpango-1.0-0 libpangoft2-1.0-0"
+fi
+
+"$RAIZ/bin/radar" init
+echo
+echo "Pronto. Para ver sem configurar nada: bin/radar demo"
+echo "Para começar de verdade: abra o Claude Code nesta pasta e rode /radar-configurar"

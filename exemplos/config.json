@@ -1,0 +1,71 @@
+{
+  "_leia": "Suas preferências. Preenchido pelo questionário (/radar-configurar). Regra de ouro: campo vazio significa PERGUNTAR antes de responder qualquer formulário, nunca chutar.",
+  "objetivo": {
+    "portas": [
+      {"id": "lideranca", "titulo": "Liderança formal", "cargos": ["Head of Design", "Design Manager", "Design Director"]},
+      {"id": "ic", "titulo": "IC sênior estratégico", "cargos": ["Staff Product Designer", "Principal Product Designer", "Lead Product Designer"]}
+    ],
+    "senioridade_minima": "senior",
+    "dominios_fortes": ["fintech B2B", "SaaS", "design systems"],
+    "dominios_evitar": ["tabaco"],
+    "o_que_busca": "Produto B2B complexo, time de design com espaço para sistema e processo."
+  },
+  "trabalho": {
+    "cidade_base": "Recife, PE",
+    "modelos_aceitos": ["remoto"],
+    "hibrido_ou_presencial_so_em": ["Recife"],
+    "aceita_internacional": true,
+    "autorizacao_trabalho": "Brasileira, sem visto para outros países.",
+    "exige_visto_ou_relocation": "perguntar"
+  },
+  "remuneracao": {
+    "regra": "Usar a faixa publicada na vaga quando houver; senão, o ponto médio da estimativa com fonte.",
+    "clt_mensal": "",
+    "pj_mensal": "",
+    "usd_anual": "",
+    "piso": "",
+    "ultima_remuneracao": "perguntar"
+  },
+  "disponibilidade": "Imediata",
+  "fit": {
+    "pesos": {"dominio": 25, "senioridade": 20, "porta": 20, "escopo": 20, "modelo": 15},
+    "fit_minimo_para_aprofundar": 60,
+    "vagas_trabalhadas_por_dia": 2
+  },
+  "pessoas": {
+    "por_vaga": 3,
+    "papeis": ["recruiter da vaga", "hiring manager provável", "head ou director da área, ou par sênior"]
+  },
+  "cv": {
+    "idioma_padrao": "en",
+    "perguntar_antes_de_traduzir": true,
+    "nome_arquivo": "{Nome}-CV-{Empresa}-{Cargo}.pdf",
+    "secao_why": true,
+    "diferencial": "Design system levado do zero à adoção em vários produtos, medido em números de adoção."
+  },
+  "carta": {
+    "quando": "só quando o formulário pedir",
+    "palavras_min": 120,
+    "palavras_max": 200
+  },
+  "formulario": {
+    "senioridade_declarada": "nivel_da_vaga",
+    "nunca_preencher": ["documentos (CPF, RG, passaporte)", "dados bancários", "endereço completo", "autodeclaração de diversidade", "senha, conta nova ou captcha"],
+    "sempre_perguntar": ["aceites jurídicos fora do padrão", "perguntas de saúde ou vida pessoal", "vaga com relocation ou visto"]
+  },
+  "estilo": {
+    "tom": "direto, caloroso, sem hype",
+    "proibicoes": ["travessão em frase nova", "emoji", "copiar frases do anúncio"],
+    "max_frases_de_efeito_por_resposta": 1
+  },
+  "rotina": {
+    "horario": "09:00",
+    "janela_horas": 48,
+    "follow_up_dias": 7,
+    "triagem_expira_dias": 14,
+    "aprovado_alerta_dias": 3
+  },
+  "painel": {
+    "porta": 8322
+  }
+}

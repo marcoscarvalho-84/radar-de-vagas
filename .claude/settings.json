@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bin/radar validar)",
+      "Bash(bin/radar gerar)",
+      "Bash(bin/radar proximo-id:*)",
+      "Bash(bin/radar marcar:*)",
+      "Bash(bin/radar expirar)",
+      "Bash(bin/radar varrer:*)",
+      "Bash(caffeinate -i bin/radar varrer:*)",
+      "Bash(bin/radar cv:*)",
+      "Bash(bin/radar carta:*)",
+      "Bash(lsof -ti tcp:8322)",
+      "WebSearch",
+      "WebFetch(domain:www.linkedin.com)",
+      "WebFetch(domain:br.linkedin.com)"
+    ]
+  }
+}

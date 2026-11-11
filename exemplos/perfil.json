@@ -1,0 +1,46 @@
+{
+  "_leia": "Perfil FICTÍCIO. O seu nasce de bin/radar perfil importar (export oficial do LinkedIn) e é completado pelo questionário.",
+  "nome": "Ana Souza",
+  "nome_cv": ["Ana", "Souza"],
+  "headline": "Senior Product Designer · fintech B2B e design systems",
+  "resumo": "Product designer com 9 anos em produto B2B, os últimos 5 em pagamentos.",
+  "local": "Recife, PE",
+  "contatos": {
+    "email": "ana.souza@example.com",
+    "telefone": "",
+    "linkedin": "linkedin.com/in/exemplo-ana-souza",
+    "portfolio": "anasouza.example.com"
+  },
+  "idiomas": [
+    {"idioma": "Português", "nivel": "nativo"},
+    {"idioma": "Inglês", "nivel": "avançado"}
+  ],
+  "formacao": [
+    {"instituicao": "Universidade Exemplo", "curso": "Design", "inicio": "2011", "fim": "2015"}
+  ],
+  "experiencias": [
+    {
+      "empresa": "Banco Exemplo",
+      "cargo": "Senior Product Designer",
+      "inicio": "2021-03",
+      "fim": "atual",
+      "local": "Remoto",
+      "descricao": "Lidera o design da conciliação financeira para 3 mil empresas e o design system de 4 produtos."
+    },
+    {
+      "empresa": "Loja Exemplo",
+      "cargo": "Product Designer",
+      "inicio": "2017-06",
+      "fim": "2021-02",
+      "local": "São Paulo, SP",
+      "descricao": "Checkout e área logada de e-commerce com 1 milhão de pedidos por mês."
+    }
+  ],
+  "competencias": ["Design systems", "Pesquisa com usuários", "Figma", "Prototipação"],
+  "certificacoes": [],
+  "provas": [
+    {"fato": "Design system adotado por 4 produtos", "numero": "4 produtos", "origem": "experiência Banco Exemplo", "confirmado_em": "2026-10-20"},
+    {"fato": "Redesenho do checkout reduziu abandono", "numero": "-12% de abandono", "origem": "experiência Loja Exemplo", "confirmado_em": "2026-10-20"}
+  ],
+  "fonte": {"importado_de": "exemplo", "em": "2026-10-20"}
+}

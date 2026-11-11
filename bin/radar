@@ -1,0 +1,30 @@
+#!/bin/bash
+# Ponto de entrada único do Radar de Vagas: bin/radar <comando> (bin/radar --help).
+#
+# Acha o Python certo, nesta ordem: $RADAR_PYTHON, a venv do bin/instalar em
+# ~/.cache/radar-de-vagas/venv, uma .venv na raiz, e por fim o python3 do sistema.
+# A venv fica FORA da pasta do projeto de propósito: Dropbox, iCloud e Drive tiram
+# arquivos do disco ("dataless") e o Python trava ao abrir uma venv sincronizada.
+set -euo pipefail
+
+RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if [ -n "${RADAR_PYTHON:-}" ]; then
+  PY="$RADAR_PYTHON"
+elif [ -x "$HOME/.cache/radar-de-vagas/venv/bin/python" ]; then
+  PY="$HOME/.cache/radar-de-vagas/venv/bin/python"
+elif [ -x "$RAIZ/.venv/bin/python" ]; then
+  PY="$RAIZ/.venv/bin/python"
+else
+  PY="$(command -v python3)"
+fi
+
+# macOS com Homebrew: o WeasyPrint precisa achar pango e gdk-pixbuf
+if [ "$(uname)" = "Darwin" ]; then
+  for LIB in /opt/homebrew/lib /usr/local/lib; do
+    [ -d "$LIB" ] && export DYLD_FALLBACK_LIBRARY_PATH="$LIB:${DYLD_FALLBACK_LIBRARY_PATH:-}"
+  done
+fi
+
+export PYTHONPATH="$RAIZ${PYTHONPATH:+:$PYTHONPATH}"
+exec "$PY" -m radar "$@"

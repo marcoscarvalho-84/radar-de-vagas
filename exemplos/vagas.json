@@ -1,0 +1,180 @@
+{
+  "_leia": "Dados FICTÍCIOS para avaliar o Radar sem configurar nada. Empresas, pessoas e links são inventados. Rode: bin/radar demo",
+  "data": "2026-11-10",
+  "gerado_em": "2026-11-10T09:40:00-03:00",
+  "resumo_busca": "6 palavras-chave, 212 vagas em 48h, 9 lidas, 3 cortadas na triagem",
+  "vagas": [
+    {
+      "id": "vaga-1",
+      "empresa": "Acme Pagamentos",
+      "cargo": "Staff Product Designer, Plataforma",
+      "url": "https://www.linkedin.com/jobs/view/1000000001",
+      "local": "Brasil",
+      "modelo": "remoto",
+      "porta": "ic",
+      "profundidade": "completa",
+      "adicionada_em": "2026-11-10",
+      "fit": 84,
+      "fit_resumo": "Domínio de pagamentos B2B e design system em escala batem com as duas provas mais fortes do perfil; a lacuna é mobile nativo.",
+      "salario": "R$ 24.000 a 30.000 mensais (CLT)",
+      "salario_fonte": "estimativa Glassdoor BR, nov/2026",
+      "forcas": [
+        "Design system para 4 produtos: a vaga pede exatamente consolidação de plataforma",
+        "5 anos em fintech B2B, com fluxos de conciliação e cobrança"
+      ],
+      "lacunas": [
+        "Nunca liderou app nativo: endereçar com o trabalho responsivo de alto volume"
+      ],
+      "red_flags": [],
+      "empresa_contexto": [
+        "Série B em 2026, foco em adquirência para PMEs",
+        "Time de design de 12 pessoas, design system público no GitHub"
+      ],
+      "melhorias": [
+        "Terceira vaga seguida pedindo métricas de adoção de design system: vale um case com números de adoção"
+      ],
+      "angulo": "Quem já consolidou quatro produtos num sistema só resolve o problema de plataforma que a Acme descreve.",
+      "cv": "/cvs/Ana-Souza-CV-Acme-Staff-Product-Designer.pdf",
+      "cv_preview": "/cvs/Ana-Souza-CV-Acme-Staff-Product-Designer.png",
+      "cv_racional": "Positioning reescrito para plataforma e escala. Why Acme com as quatro linhas da receita. Experiência na fintech sobe ênfase em conciliação; agência antiga encurtada.",
+      "status": "proposto"
+    },
+    {
+      "id": "vaga-2",
+      "empresa": "Nimbus Saúde",
+      "cargo": "Head of Design",
+      "url": "https://www.linkedin.com/jobs/view/1000000002",
+      "local": "São Paulo, SP",
+      "modelo": "remoto",
+      "porta": "lideranca",
+      "profundidade": "completa",
+      "adicionada_em": "2026-11-05",
+      "fit": 78,
+      "fit_resumo": "Liderança de time de 6 e operação de design batem; saúde é domínio novo.",
+      "salario": "R$ 32.000 mensais (PJ)",
+      "salario_fonte": "publicada na vaga",
+      "forcas": ["Montou e liderou time de 6 com contratação e rituais"],
+      "lacunas": ["Sem experiência em saúde regulada"],
+      "red_flags": ["Acumula design e marketing de marca"],
+      "empresa_contexto": ["Healthtech de telemedicina, 400 funcionários"],
+      "melhorias": [],
+      "angulo": "Uma liderança que já organizou design do zero em empresa crescendo rápido.",
+      "cv": "",
+      "cv_preview": "",
+      "cv_racional": "",
+      "status": "aprovado",
+      "aprovado_em": "2026-11-05T15:20:00-03:00"
+    },
+    {
+      "id": "vaga-3",
+      "empresa": "Orbital Logística",
+      "cargo": "Senior Product Designer",
+      "url": "https://www.linkedin.com/jobs/view/1000000003",
+      "local": "Recife, PE",
+      "modelo": "híbrido",
+      "profundidade": "triagem",
+      "adicionada_em": "2026-11-10",
+      "fit": 72,
+      "fit_resumo": "Ferramentas internas de operação, bom encaixe com o histórico B2B; híbrido em Recife é aceito.",
+      "red_flags": [],
+      "status": "proposto"
+    },
+    {
+      "id": "vaga-4",
+      "empresa": "Tucano Edtech",
+      "cargo": "Lead Product Designer",
+      "url": "https://www.linkedin.com/jobs/view/1000000004",
+      "local": "Brasil",
+      "modelo": "remoto",
+      "profundidade": "triagem",
+      "adicionada_em": "2026-11-08",
+      "fit": 66,
+      "fit_resumo": "Escopo de liderança sem time formal; edtech B2C fica longe do histórico.",
+      "red_flags": ["Descrição pede também ilustração e motion"],
+      "status": "proposto"
+    },
+    {
+      "id": "vaga-5",
+      "empresa": "Quasar Seguros",
+      "cargo": "Product Designer Especialista",
+      "url": "https://www.linkedin.com/jobs/view/1000000005",
+      "local": "Brasil",
+      "modelo": "remoto",
+      "profundidade": "triagem",
+      "adicionada_em": "2026-10-22",
+      "fit": 61,
+      "fit_resumo": "Seguros B2B2C, fluxos densos de regra; senioridade ok.",
+      "red_flags": [],
+      "status": "proposto"
+    },
+    {
+      "id": "vaga-6",
+      "empresa": "Lume Varejo",
+      "cargo": "Senior UX Designer",
+      "url": "https://www.linkedin.com/jobs/view/1000000006",
+      "local": "Brasil",
+      "modelo": "remoto",
+      "profundidade": "completa",
+      "adicionada_em": "2026-10-28",
+      "fit": 74,
+      "fit_resumo": "E-commerce com marketplace, encaixe bom.",
+      "salario": "",
+      "salario_fonte": "",
+      "angulo": "Varejo digital com operação complexa por trás.",
+      "cv": "",
+      "status": "executado"
+    },
+    {
+      "id": "vaga-7",
+      "empresa": "Pixel Agência",
+      "cargo": "UI Designer Sênior",
+      "url": "https://www.linkedin.com/jobs/view/1000000007",
+      "local": "Porto Alegre, RS",
+      "modelo": "presencial",
+      "profundidade": "triagem",
+      "adicionada_em": "2026-11-03",
+      "fit": 40,
+      "fit_resumo": "UI pura, presencial fora da cidade base.",
+      "red_flags": ["Presencial em outra cidade"],
+      "status": "recusado"
+    }
+  ],
+  "pessoas": [
+    {
+      "id": "pessoa-1",
+      "vaga_id": "vaga-1",
+      "nome": "Bruna Lima",
+      "cargo": "Talent Acquisition Partner",
+      "empresa": "Acme Pagamentos",
+      "url": "https://www.linkedin.com/in/exemplo-bruna-lima",
+      "papel": "recruiter da vaga",
+      "grau": "2º",
+      "porque": "Aparece como hiring team no anúncio da vaga.",
+      "status": "proposto"
+    },
+    {
+      "id": "pessoa-2",
+      "vaga_id": "vaga-1",
+      "nome": "Carlos Prado",
+      "cargo": "Head of Design",
+      "empresa": "Acme Pagamentos",
+      "url": "https://www.linkedin.com/in/exemplo-carlos-prado",
+      "papel": "hiring manager provável",
+      "grau": "3º",
+      "porque": "Lidera o time de design da plataforma, para quem a vaga reporta.",
+      "status": "proposto"
+    },
+    {
+      "id": "pessoa-3",
+      "vaga_id": "vaga-1",
+      "nome": "Diana Reis",
+      "cargo": "Principal Product Designer",
+      "empresa": "Acme Pagamentos",
+      "url": "https://www.linkedin.com/in/exemplo-diana-reis",
+      "papel": "par sênior",
+      "grau": "2º",
+      "porque": "Mantém o design system público citado na vaga.",
+      "status": "proposto"
+    }
+  ]
+}
