@@ -296,8 +296,73 @@ def export_linkedin(com_conexoes=True) -> bytes:
     return buf.getvalue()
 
 
+class TestBuscas(ComDados):
+    """As buscas nascem das posições da pessoa, nunca dos cargos do exemplo."""
+
+    def setUp(self):
+        super().setUp()
+        for nome in ("contexto.json", "buscas.json"):
+            (self.pasta / nome).unlink()
+        (self.pasta / "perfil.json").write_text(json.dumps({
+            "nome": "Bia Costa", "headline": "Analista de Dados | SQL e Python", "local": "Recife, Pernambuco, Brazil",
+            "experiencias": [
+                {"empresa": "Velha", "cargo": "Analista de BI", "inicio": "2018-01", "fim": "2021-02"},
+                {"empresa": "Nova", "cargo": "Analista de Dados Sênior", "inicio": "2021-03", "fim": "atual"},
+            ]}), encoding="utf-8")
+
+    def test_init_cria_buscas_vazio_sem_o_exemplo(self):
+        from radar import inicio
+        inicio.init(silencioso=True)
+        texto = (self.pasta / "buscas.json").read_text(encoding="utf-8")
+        self.assertEqual(json.loads(texto)["grupos"], [])
+        self.assertNotIn("Designer", texto)
+
+    def test_posicoes_viram_buscas_no_pais_do_perfil(self):
+        from radar import contexto
+        r = contexto.salvar({"posicoes": ["Data Analyst", " data  analyst ", "Analista de Dados Sênior"]})
+        self.assertEqual(r["posicoes"], ["Data Analyst", "Analista de Dados Sênior"])
+        self.assertTrue(r["feitos"]["posicoes"])
+        b = self.ler("buscas.json")
+        self.assertEqual(b["origem"], "posicoes")
+        self.assertEqual(b["grupos"], [{"local": "Brazil", "palavras_chave": ["Data Analyst", "Analista de Dados Sênior"]}])
+        # a sugestão vem da trajetória, mais recente primeiro, sem repetir o que já foi escolhido
+        self.assertEqual(r["sugestoes_posicoes"], ["Analista de Dados", "Analista de BI"])
+
+    def test_exemplo_e_substituido_mas_o_questionario_nao(self):
+        from radar import buscas, contexto
+        shutil.copy(EXEMPLOS / "buscas.json", self.pasta / "buscas.json")
+        self.assertTrue(buscas.e_exemplo(buscas.ler()))
+        contexto.salvar({"posicoes": ["Analista de Dados"]})
+        self.assertEqual(buscas.palavras(buscas.ler()), ["Analista de Dados"])
+        refinado = {**buscas.ler(), "origem": "questionario",
+                    "grupos": [{"local": "Brazil", "palavras_chave": ["Data Analyst", "Analista de Dados"]}]}
+        (self.pasta / "buscas.json").write_text(json.dumps(refinado), encoding="utf-8")
+        r = contexto.salvar({"posicoes": ["Cientista de Dados"]})
+        self.assertEqual(buscas.palavras(buscas.ler()), ["Data Analyst", "Analista de Dados"])
+        self.assertEqual(r["buscas"]["origem"], "questionario")
+
+    def test_coleta_recusa_sem_palavra_chave_e_com_o_exemplo(self):
+        from radar import buscas, varredura
+        from radar.arquivos import gravar_json
+        gravar_json(self.pasta / "buscas.json", buscas.vazio())
+        with self.assertRaises(SystemExit):
+            varredura.coleta(24, self.pasta / "coleta.json")
+        shutil.copy(EXEMPLOS / "buscas.json", self.pasta / "buscas.json")
+        with self.assertRaises(SystemExit) as erro:
+            varredura.coleta(24, self.pasta / "coleta.json")
+        self.assertIn("exemplo", str(erro.exception))
+        self.assertFalse((self.pasta / "coleta.json").exists())
+
+    def test_posicoes_invalidas(self):
+        from radar import contexto
+        for posicoes in (["x"], ["Analista"] * 1 + [f"Cargo {i}" for i in range(8)], "Analista"):
+            with self.assertRaises(contexto.ContextoInvalido, msg=posicoes):
+                contexto.salvar({"posicoes": posicoes})
+        self.assertFalse((self.pasta / "buscas.json").exists())
+
+
 class TestContexto(ComDados):
-    """Os 5 passos da tela de abertura, sem servidor."""
+    """Os 6 passos da tela de abertura, sem servidor."""
 
     def setUp(self):
         super().setUp()

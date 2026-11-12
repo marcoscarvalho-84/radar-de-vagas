@@ -81,6 +81,7 @@ O que a pessoa entregou no passo a passo de `bin/radar` (primeira vez). Gravado 
   "abertura": {"iniciada_em": "ISO", "concluida_em": "ISO ou vazio (vazio = abre a tela de novo)"},
   "linkedin": {"url": "https://www.linkedin.com/in/...", "fonte": "export|pdf|", "importado_em": "ISO"},
   "cv": {"arquivo": "anexos/cv-atual.pdf", "texto": "anexos/cv-atual.txt", "palavras": 412, "enviado_em": "ISO"},
+  "posicoes": ["Analista de Dados Sênior", "Data Analyst"],
   "email": "voce@exemplo.com",
   "portfolio": {"url": "https://...", "outros": ["https://github.com/..."]},
   "anexos": [{"arquivo": "anexos/estudo-de-caso.pdf", "nome_original": "Estudo de caso.pdf",
@@ -96,7 +97,26 @@ que o CV lê). Sem perfil ainda, nasce um perfil mínimo que o import do export 
 Texto lido do CV atual (`anexos/cv-atual.txt`) e do PDF do perfil (`perfil-bruto.txt`) é
 RASCUNHO: só vira fato depois de confirmado no `/radar-perfil`.
 
-## config.json, buscas.json, perfil.json, fatos.md
+## buscas.json
+
+```json
+{
+  "origem": "|posicoes|questionario",
+  "janela_horas": 48,
+  "grupos": [{"local": "Brazil", "palavras_chave": ["Analista de Dados Sênior", "Data Analyst"]}],
+  "filtro_titulo": {"precisa_ter": [], "senioridade": [], "descartar_se_tiver": []},
+  "corte": {"descartar_se": ["..."]}
+}
+```
+
+Nasce vazio no `bin/radar init`. O passo **Posições** da tela de abertura grava a primeira
+versão (`origem: "posicoes"`: cada posição vira uma busca no país do perfil). O
+`/radar-configurar` refina a partir do LinkedIn e do CV e marca `origem: "questionario"`;
+daí em diante a tela não sobrescreve. Sem palavra-chave, ou com a cópia do
+`exemplos/buscas.json` (que é só da demonstração), `bin/radar varrer coleta` recusa e diz
+onde preencher. Filtro de título vazio não corta nada.
+
+## config.json, perfil.json, fatos.md
 
 Ver `exemplos/` e `docs/questionario.md` (cada pergunta diz o campo que preenche). Regra
 geral do config: **campo vazio significa perguntar**.

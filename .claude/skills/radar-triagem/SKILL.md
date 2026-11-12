@@ -15,8 +15,11 @@ Padrões que mandam aqui: `docs/padroes.md`, seções 1, 2 e 9. Detalhes técnic
 
 A coleta usa as palavras-chave e locais de `meus-dados/buscas.json` e grava em
 `meus-dados/varredura/AAAA-MM-DD/`. Se aparecer "ATENÇÃO ... resultado incompleto", a busca
-foi bloqueada no meio: diga isso no resumo, não finja que o mercado está fraco. Se o LinkedIn
-devolver bloqueio em sequência, pare e avise; não insista.
+foi bloqueada no meio: diga isso no resumo, não finja que o mercado está fraco. Se a coleta
+recusar por falta de palavra-chave, ou porque o `buscas.json` ainda é o exemplo, não invente
+termos: rode o bloco Busca do `/radar-configurar`, que monta as buscas a partir das posições,
+do LinkedIn e do CV da pessoa. Se o LinkedIn devolver bloqueio em sequência, pare e avise;
+não insista.
 
 O `filtra` já corta título fora da área, júnior, fora da janela e duplicata contra o Radar,
 o histórico e as levas arquivadas. O que sobra está em `candidatas.json`.

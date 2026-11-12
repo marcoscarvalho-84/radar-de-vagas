@@ -77,9 +77,10 @@ passo de 5 minutos para pôr a sua história no contexto:
 |---|---|---|
 | 1. LinkedIn | o endereço do perfil e o export oficial (ZIP) ou o "Salvar em PDF" | trajetória, datas, formação e competências, como rascunho a confirmar |
 | 2. CV | o seu CV atual (PDF ou DOCX) | fonte de fatos a confirmar e referência de tom |
-| 3. E-mail | o endereço profissional | cabeçalho do CV e formulários |
-| 4. Portfólio | o link principal e até 3 outros | cabeçalho do CV e campos de portfólio |
-| 5. Anexos | portfólio em PDF, estudos de caso, certificados, cartas, cada um com um comentário seu | o que um formulário pedir além do CV |
+| 3. Posições | a posição ou as posições que você quer, com sugestões da sua trajetória | as buscas da varredura, refinadas depois a partir do seu LinkedIn e CV |
+| 4. E-mail | o endereço profissional | cabeçalho do CV e formulários |
+| 5. Portfólio | o link principal e até 3 outros | cabeçalho do CV e campos de portfólio |
+| 6. Anexos | portfólio em PDF, estudos de caso, certificados, cartas, cada um com um comentário seu | o que um formulário pedir além do CV |
 
 Todo passo pode ser pulado e retomado (link **Seu contexto** no painel). Do export do LinkedIn
 só os arquivos de perfil são lidos, e o ZIP é apagado logo depois. Depois disso, `bin/radar`

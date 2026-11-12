@@ -54,7 +54,10 @@ O bloco que mais muda a qualidade do CV. Fato sem número vira adjetivo.
 ## Bloco 3 · Objetivo: o que você procura (5 min)
 
 1. Quais **portas** você quer abrir? Uma porta é uma trilha de carreira com seus cargos.
-   Exemplo: "Liderança formal" (Head, Manager, Director) e "IC sênior" (Staff, Principal, Lead).
+   Parta das **posições desejadas** que você escreveu na tela de abertura
+   (`contexto.json > posicoes`) e da sua trajetória: a rotina agrupa as posições em portas e
+   pergunta se faltou alguma. Exemplo de uma pessoa de dados: "Análise" (Analista de Dados
+   Sênior, Data Analyst) e "Liderança" (Coordenador de BI, Analytics Manager).
    Uma, duas, no máximo três. → `config.objetivo.portas`
 2. Qual a senioridade mínima que faz sentido? (ex.: sênior) → `config.objetivo.senioridade_minima`
 3. Em uma frase: o que você busca no próximo trabalho? → `config.objetivo.o_que_busca`
@@ -100,11 +103,22 @@ Nada aqui tem padrão. Campo vazio faz a rotina PERGUNTAR na hora do formulário
 
 ## Bloco 8 · Busca (5 min)
 
-1. Palavras-chave: a rotina sugere a partir das suas portas (cada cargo vira uma busca, em
-   inglês e português). Quer tirar ou incluir alguma? → `buscas.json > grupos[].palavras_chave`
-2. Locais da busca (país ou região: "Brazil", "Latin America", "Portugal"...). → `buscas.json > grupos[].local`
+A primeira versão das buscas já existe se você respondeu **Posições** na tela de abertura:
+cada posição virou uma busca no país do seu perfil. Aqui a rotina a deixa sob medida, lendo
+as suas posições, o seu LinkedIn (`perfil.json`: cargos, headline, competências) e o texto
+do seu CV (`anexos/cv-atual.txt`). Nada de cargo genérico ou de outra área: cada termo
+proposto diz de onde veio.
+
+1. Palavras-chave: cada posição em português e em inglês, os títulos equivalentes que o
+   mercado usa para o mesmo trabalho e os níveis vizinhos que a sua trajetória sustenta.
+   Quer tirar ou incluir alguma? → `buscas.json > grupos[].palavras_chave`
+2. Locais da busca (país ou região: "Brazil", "Latin America", "Portugal"...). *padrão: o
+   país do seu perfil* → `buscas.json > grupos[].local`
 3. Janela: vagas das últimas 24 ou 48 horas? → `buscas.json > janela_horas` · *padrão 48*
-4. Palavras de título que descartam na hora (ex.: júnior, estágio, engenheiro). → `buscas.json > filtro_titulo`
+4. Filtro de título: os termos que uma vaga da sua área tem que ter no título, os que
+   marcam o seu nível e os que descartam na hora (funções vizinhas que não são a sua,
+   níveis abaixo). A rotina propõe os três a partir das posições e do CV.
+   → `buscas.json > filtro_titulo`
 
 ## Bloco 9 · CV e carta (3 min)
 

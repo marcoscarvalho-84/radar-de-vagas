@@ -30,6 +30,7 @@ import urllib.request
 from datetime import date, timedelta
 from pathlib import Path
 
+from . import buscas as _buscas
 from . import caminhos, config
 from .arquivos import gravar_json, ler_json
 
@@ -89,17 +90,22 @@ def chave(empresa: str, cargo: str) -> tuple[str, str]:
 # ---------------------------------------------------------------- coleta
 
 def coleta(horas: int, saida: Path) -> dict:
-    buscas = ler_json(caminhos.buscas(), None)
-    if not buscas or not buscas.get("grupos"):
-        raise SystemExit(f"Sem palavras-chave: preencha {caminhos.buscas()} (o questionário faz isso)")
+    buscas = _buscas.ler()
+    onde = "diga as posições que você quer no passo Posições (bin/radar, Seu contexto) ou rode /radar-configurar busca"
+    if _buscas.e_exemplo(buscas):
+        raise SystemExit(f"{caminhos.buscas()} ainda tem as palavras-chave do exemplo, que não são as suas: {onde}")
+    if not _buscas.palavras(buscas):
+        raise SystemExit(f"Sem palavras-chave em {caminhos.buscas()}: {onde}")
     tpr = f"r{int(horas) * 3600}"
     vagas, falhas = {}, []
     for grupo in buscas["grupos"]:
-        local = grupo["local"]
-        for kw in grupo["palavras_chave"]:
+        local = grupo.get("local", "")
+        for kw in grupo.get("palavras_chave") or []:
             vistos_kw, start = set(), 0
             for _ in range(PAGINAS_MAX):
-                q = urllib.parse.urlencode({"keywords": kw, "location": local, "f_TPR": tpr, "start": start})
+                # sem local, a busca não leva o parâmetro (o LinkedIn usa o mundo todo)
+                q = urllib.parse.urlencode({"keywords": kw, **({"location": local} if local else {}),
+                                            "f_TPR": tpr, "start": start})
                 codigo, corpo = baixar(BUSCA + q)
                 if codigo == 0:
                     falhas.append({"local": local, "palavra_chave": kw, "start": start})

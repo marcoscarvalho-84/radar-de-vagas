@@ -10,7 +10,7 @@ campo faltando). Sai com código 1 quando há erro.
 import re
 from datetime import date
 
-from . import caminhos
+from . import buscas, caminhos
 from .arquivos import ler_json
 from .varredura import chave
 
@@ -118,10 +118,22 @@ def checar_consistencia(vagas: dict, registro: dict) -> list[tuple[str, str]]:
     return achados
 
 
+def checar_buscas() -> list[tuple[str, str]]:
+    atual = buscas.ler()
+    if buscas.e_exemplo(atual):
+        # aviso, não erro: na demonstração o exemplo é o certo; nos seus dados a coleta já recusa
+        return [("aviso", "buscas.json ainda é o exemplo (cargos de design): a varredura recusa até você "
+                         "dizer as suas posições (bin/radar, passo Posições) ou rodar /radar-configurar busca")]
+    if not buscas.palavras(atual):
+        return [("aviso", "buscas.json sem palavras-chave: diga as posições que você quer no passo Posições")]
+    return []
+
+
 def checar_tudo() -> list[tuple[str, str]]:
     vagas = ler_json(caminhos.vagas(), {"vagas": [], "pessoas": []}) or {}
     registro = ler_json(caminhos.registro(), {"dias": []}) or {}
-    achados = checar_vagas(vagas) + checar_registro(registro) + checar_consistencia(vagas, registro)
+    achados = (checar_vagas(vagas) + checar_registro(registro) + checar_consistencia(vagas, registro)
+               + checar_buscas())
     hoje = date.today().isoformat()
     if vagas.get("data") and vagas["data"] > hoje:
         achados.append(("aviso", f"vagas.json com data no futuro ({vagas['data']})"))

@@ -2,8 +2,16 @@
 
 ## Ainda não lançado
 
+- Correção: o `bin/radar init` copiava o `exemplos/buscas.json` (cargos de design) para os
+  dados de quem instalava, e a varredura procurava cargos que não eram os da pessoa. Agora o
+  `buscas.json` nasce vazio, a coleta recusa sem palavra-chave ou com a cópia do exemplo, e
+  o `bin/radar validar` avisa.
+- Passo novo **Posições desejadas** na tela de abertura, com sugestões tiradas da trajetória
+  do LinkedIn: cada posição vira uma busca no país do perfil. O `/radar-configurar` refina
+  a partir das posições, do LinkedIn e do CV (português e inglês, títulos equivalentes,
+  filtro de título) e a tela não sobrescreve mais.
 - Tela de abertura: `bin/radar` na primeira vez abre no navegador uma apresentação do projeto
-  e um passo a passo de contexto em 5 passos (LinkedIn, CV, e-mail, portfólio, anexos),
+  e um passo a passo de contexto em 6 passos (LinkedIn, CV, posições, e-mail, portfólio, anexos),
   todos opcionais e retomáveis pelo link "Seu contexto" do painel.
 - `bin/radar` sem argumento (ou `bin/radar abrir`) sobe o painel e abre o navegador.
 - Upload pelo servidor local com as mesmas travas das decisões (Origin, Host, Content-Type),

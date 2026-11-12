@@ -77,7 +77,7 @@
           <a class="btn-primario" href="#contexto">Montar meu contexto</a>
           <a class="btn-fio" href="#como">Como funciona</a>
         </div>
-        <p class="abre__tempo">São 5 passos: LinkedIn, CV, e-mail, portfólio e anexos. Todos podem ser pulados e retomados.</p>
+        <p class="abre__tempo">São 6 passos: LinkedIn, CV, posições desejadas, e-mail, portfólio e anexos. Todos podem ser pulados e retomados.</p>
       </div>
 
       <!-- radar-3d.js troca o SVG por um radar 3D; sem WebGL, o SVG fica -->
@@ -189,16 +189,17 @@
       <!-- a tela inteira cabe numa altura de notebook: título e texto dividem a linha -->
       <div class="tela-cabeca">
         <h1 class="tela-titulo" id="titulo-contexto" tabindex="-1">Criando contexto</h1>
-        <p class="tela-lead">Cinco passos para o <b>Radar</b> trabalhar com a sua história. Tudo fica guardado assim que você envia, e qualquer passo pode ser pulado.</p>
+        <p class="tela-lead">Seis passos para o <b>Radar</b> trabalhar com a sua história. Tudo fica guardado assim que você envia, e qualquer passo pode ser pulado.</p>
       </div>
 
       <div class="trilha-linha">
         <ol class="trilha" aria-label="Passos">
           <li><button type="button" data-ir="linkedin"><span class="trilha__n">1</span>LinkedIn</button></li>
           <li><button type="button" data-ir="cv"><span class="trilha__n">2</span>CV</button></li>
-          <li><button type="button" data-ir="email"><span class="trilha__n">3</span>E-mail</button></li>
-          <li><button type="button" data-ir="portfolio"><span class="trilha__n">4</span>Portfólio</button></li>
-          <li><button type="button" data-ir="anexos"><span class="trilha__n">5</span>Anexos</button></li>
+          <li><button type="button" data-ir="posicoes"><span class="trilha__n">3</span>Posições</button></li>
+          <li><button type="button" data-ir="email"><span class="trilha__n">4</span>E-mail</button></li>
+          <li><button type="button" data-ir="portfolio"><span class="trilha__n">5</span>Portfólio</button></li>
+          <li><button type="button" data-ir="anexos"><span class="trilha__n">6</span>Anexos</button></li>
           <li><button type="button" data-ir="pronto"><span class="trilha__n">✓</span>Pronto</button></li>
         </ol>
         <div class="progresso">
@@ -289,10 +290,42 @@
         </div>
       </section>
 
-      <!-- 3 · E-mail -->
-      <section class="passo" data-passo="email" id="passo-email" aria-labelledby="t-email" hidden>
+      <!-- 3 · Posições desejadas: viram as buscas (radar/buscas.py) -->
+      <section class="passo" data-passo="posicoes" id="passo-posicoes" aria-labelledby="t-posicoes" hidden>
         <div class="passo__lado">
           <span class="passo__num" aria-hidden="true">3</span>
+          <h3 id="t-posicoes" tabindex="-1">Posições desejadas</h3>
+          <p class="passo__porque">É o que o Radar vai procurar por você. Escreva cada cargo como ele aparece nas vagas que você quer. As sugestões vêm da sua trajetória no LinkedIn.</p>
+          <p class="passo__nota"><span class="meta">Na busca</span>Cada posição vira uma busca no LinkedIn, no país do seu perfil. Depois o /radar-configurar lê o seu LinkedIn e o seu CV e completa com variações em português e inglês e títulos equivalentes.</p>
+        </div>
+        <div class="passo__corpo">
+          <div class="campo">
+            <label class="campo__rotulo" for="posicao-nova">Posição ou posições desejadas</label>
+            <div class="posicoes__entrada">
+              <input id="posicao-nova" type="text" autocomplete="off" spellcheck="false" placeholder="Ex.: Gerente de Produto Sênior" aria-describedby="ajuda-posicoes erro-posicoes" />
+              <button class="btn-fio" type="button" id="posicao-adicionar">Adicionar</button>
+            </div>
+            <span class="campo__ajuda" id="ajuda-posicoes">Uma por vez, até 8. Enter também adiciona.</span>
+          </div>
+          <ul class="posicoes" id="posicoes" aria-label="Posições escolhidas"></ul>
+          <div class="posicoes__sugestoes" id="posicoes-sugestoes" hidden>
+            <span class="meta">Da sua trajetória no LinkedIn</span>
+            <div class="posicoes__sugeridas" id="posicoes-sugeridas"></div>
+          </div>
+          <p class="posicoes__busca" id="posicoes-busca" hidden></p>
+
+          <p class="erro" id="erro-posicoes" role="alert"></p>
+          <div class="passo__acoes">
+            <button class="btn-primario" type="button" data-salvar="posicoes" data-precisa-servidor>Salvar e continuar</button>
+            <button class="btn-texto" type="button" data-pular="posicoes" data-precisa-servidor>Pular por agora</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 · E-mail -->
+      <section class="passo" data-passo="email" id="passo-email" aria-labelledby="t-email" hidden>
+        <div class="passo__lado">
+          <span class="passo__num" aria-hidden="true">4</span>
           <h3 id="t-email" tabindex="-1">Seu e-mail</h3>
           <p class="passo__porque">O endereço que vai no cabeçalho de cada CV e nos formulários de candidatura. Use o que você confere todo dia: é por ele que a resposta chega.</p>
           <p class="passo__nota"><span class="meta">Privacidade</span>Ele só aparece no CV e nos formulários que você aprovar.</p>
@@ -312,10 +345,10 @@
         </div>
       </section>
 
-      <!-- 4 · Portfólio -->
+      <!-- 5 · Portfólio -->
       <section class="passo" data-passo="portfolio" id="passo-portfolio" aria-labelledby="t-portfolio" hidden>
         <div class="passo__lado">
-          <span class="passo__num" aria-hidden="true">4</span>
+          <span class="passo__num" aria-hidden="true">5</span>
           <h3 id="t-portfolio" tabindex="-1">Seu portfólio</h3>
           <p class="passo__porque">O link que prova o que o CV afirma. Vai no cabeçalho do CV e nos campos de portfólio dos formulários.</p>
           <p class="passo__nota"><span class="meta">Senha</span>Portfólio com senha? A senha não fica aqui. Quando um formulário pedir, o Radar pergunta a você na hora.</p>
@@ -346,7 +379,7 @@
       <!-- 5 · Anexos -->
       <section class="passo" data-passo="anexos" id="passo-anexos" aria-labelledby="t-anexos" hidden>
         <div class="passo__lado">
-          <span class="passo__num" aria-hidden="true">5</span>
+          <span class="passo__num" aria-hidden="true">6</span>
           <h3 id="t-anexos" tabindex="-1">Anexos</h3>
           <p class="passo__porque">O que alguns formulários pedem além do CV: portfólio em PDF, estudo de caso, certificado, carta de recomendação. Ficam prontos para quando a vaga pedir.</p>
           <p class="passo__nota"><span class="meta">Na candidatura</span>Nenhum anexo sai sem o seu ok. Antes de enviar, o Radar mostra qual arquivo vai em qual campo.</p>
@@ -435,8 +468,11 @@
   <script>
   (() => {
     "use strict";
-    const PASSOS = ["linkedin", "cv", "email", "portfolio", "anexos", "pronto"];
-    const NOMES = { linkedin: "LinkedIn", cv: "CV", email: "E-mail", portfolio: "Portfólio", anexos: "Anexos" };
+    const PASSOS = ["linkedin", "cv", "posicoes", "email", "portfolio", "anexos", "pronto"];
+    const NOMES = { linkedin: "LinkedIn", cv: "CV", posicoes: "Posições", email: "E-mail", portfolio: "Portfólio", anexos: "Anexos" };
+    const TOTAL = PASSOS.length - 1; // o "pronto" não conta
+    const MAX_POSICOES = 8;
+    let posicoes = null; // o rascunho das posições: só vai para o servidor no "Salvar"
     const DO_TIPO = { linkedin: "linkedin", cv: "cv", anexo: "anexos" };
     const LIMITE = 30 * 1024 * 1024;
     const REDUZIDO = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -581,11 +617,11 @@
           else n.textContent = String(PASSOS.indexOf(p) + 1);
         }
       });
-      const n = PASSOS.slice(0, 5).filter(feito).length;
-      $("#progresso-barra").style.width = `${n * 20}%`;
+      const n = PASSOS.slice(0, TOTAL).filter(feito).length;
+      $("#progresso-barra").style.width = `${n / TOTAL * 100}%`;
       $("#progresso-texto").textContent = atual === "pronto"
-        ? `${n} de 5 feitos`
-        : `Passo ${PASSOS.indexOf(atual) + 1} de 5 · ${n} feito${n === 1 ? "" : "s"}`;
+        ? `${n} de ${TOTAL} feitos`
+        : `Passo ${PASSOS.indexOf(atual) + 1} de ${TOTAL} · ${n} feito${n === 1 ? "" : "s"}`;
     }
 
     // ---------- preencher a tela com o que já está guardado ----------
@@ -625,6 +661,8 @@
       recibo("#recibo-cv", cv.arquivo ? `CV guardado (${cv.arquivo.split(".").pop().toUpperCase()})` : "",
         cv.palavras ? `${plural(cv.palavras, "palavra lida", "palavras lidas")}. O texto vira fonte de fatos a confirmar.`
                     : "O texto não foi lido. Tudo bem: o questionário cobre.");
+
+      desenharPosicoes();
 
       const sug = estado.sugestoes || {};
       const email = $("#email");
@@ -679,20 +717,73 @@
       }
     }
 
+    // ---------- posições: chips do que a pessoa quer + sugestões da trajetória ----------
+    function chip(texto, acao, rotulo) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = texto;
+      b.setAttribute("aria-label", rotulo);
+      b.addEventListener("click", acao);
+      return b;
+    }
+
+    function desenharPosicoes() {
+      if (posicoes === null) posicoes = [...(estado.posicoes || [])];
+      $("#posicoes").replaceChildren(...posicoes.map(p => {
+        const item = document.createElement("li");
+        const nome = document.createElement("span");
+        nome.textContent = p;
+        item.append(nome, chip("×", () => { posicoes = posicoes.filter(x => x !== p); desenharPosicoes(); }, `Tirar ${p}`));
+        return item;
+      }));
+      const escolhidas = new Set(posicoes.map(p => p.toLocaleLowerCase()));
+      const sugeridas = (estado.sugestoes_posicoes || []).filter(s => !escolhidas.has(s.toLocaleLowerCase()));
+      $("#posicoes-sugestoes").hidden = !sugeridas.length;
+      $("#posicoes-sugeridas").replaceChildren(...sugeridas.map(s => chip(`+ ${s}`, () => adicionarPosicao(s), `Adicionar ${s}`)));
+      const busca = estado.buscas || {};
+      const aviso = $("#posicoes-busca");
+      if (busca.origem === "questionario" || busca.origem === "manual") {
+        aviso.textContent = "As suas buscas já foram refinadas no questionário. Posição nova entra lá: rode /radar-configurar busca.";
+      } else if (busca.origem === "posicoes" && busca.palavras_chave.length) {
+        aviso.textContent = `A varredura procura: ${busca.palavras_chave.join(", ")}${busca.locais.length ? ` · em ${busca.locais.join(", ")}` : " · sem país no perfil, em qualquer lugar"}.`;
+      } else {
+        aviso.textContent = "";
+      }
+      aviso.hidden = !aviso.textContent;
+    }
+
+    function adicionarPosicao(texto) {
+      limpar("posicoes");
+      const campo = $("#posicao-nova");
+      const p = (texto ?? campo.value).replace(/\s+/g, " ").trim();
+      if (!p) return false;
+      if (p.length < 2 || p.length > 80) { erro("posicoes", "Use de 2 a 80 caracteres por posição.", campo); return false; }
+      if (posicoes.some(x => x.toLocaleLowerCase() === p.toLocaleLowerCase())) {
+        if (texto === undefined) campo.value = "";
+        return true;
+      }
+      if (posicoes.length >= MAX_POSICOES) { erro("posicoes", `Até ${MAX_POSICOES} posições: mais que isso dilui a busca.`, campo); return false; }
+      posicoes.push(p);
+      if (texto === undefined) campo.value = "";
+      desenharPosicoes();
+      return true;
+    }
+
     function desenharPronto() {
-      const n = PASSOS.slice(0, 5).filter(feito).length;
-      $("#t-pronto").textContent = n === 5 ? "Seu contexto está de pé" : n >= 3 ? "Quase lá" : "Dá para seguir assim";
-      $("#pronto-porque").textContent = n === 5
+      const n = PASSOS.slice(0, TOTAL).filter(feito).length;
+      $("#t-pronto").textContent = n === TOTAL ? "Seu contexto está de pé" : n >= 3 ? "Quase lá" : "Dá para seguir assim";
+      $("#pronto-porque").textContent = n === TOTAL
         ? "Com isso o Radar já monta o cabeçalho do CV, conhece a sua trajetória e tem os anexos à mão. As preferências vêm do questionário."
         : "O que faltou não trava nada: o questionário pergunta na hora certa. Dá para voltar aqui quando quiser, pelo link Seu contexto no painel.";
       const detalhe = {
         linkedin: () => [semProtocolo(estado.linkedin.url), estado.linkedin.fonte === "export" ? "export importado" : estado.linkedin.fonte === "pdf" ? "PDF do perfil" : ""].filter(Boolean).join(" · "),
         cv: () => estado.cv.arquivo ? estado.cv.arquivo.replace("anexos/", "") : "",
+        posicoes: () => estado.posicoes.join(", "),
         email: () => estado.email,
         portfolio: () => [semProtocolo(estado.portfolio.url), estado.portfolio.outros.length ? `+ ${plural(estado.portfolio.outros.length, "link", "links")}` : ""].filter(Boolean).join(" "),
         anexos: () => estado.anexos.length ? plural(estado.anexos.length, "arquivo", "arquivos") : "",
       };
-      $("#checklist").replaceChildren(...PASSOS.slice(0, 5).map(p => {
+      $("#checklist").replaceChildren(...PASSOS.slice(0, TOTAL).map(p => {
         const item = document.createElement("li");
         const marca = document.createElement("span");
         marca.className = "checklist__marca" + (feito(p) ? "" : " pendente");
@@ -746,6 +837,13 @@
           }
         } else if (p === "cv") {
           if (!estado.cv.arquivo) return erro(p, "Solte o seu CV atual, ou pule por agora.");
+        } else if (p === "posicoes") {
+          const campo = $("#posicao-nova");
+          if (campo.value.trim() && !adicionarPosicao()) return;
+          if (!posicoes.length) return erro(p, "Escreva ao menos uma posição, ou pule por agora.", campo);
+          try { estado = await pedir({ acao: "salvar", campos: { posicoes } }); }
+          catch (e) { return erro(p, e.message, campo); }
+          posicoes = [...estado.posicoes];
         } else if (p === "email") {
           const campo = $("#email");
           if (!campo.value.trim()) return erro(p, "Escreva o seu e-mail, ou pule por agora.", campo);
@@ -874,9 +972,11 @@
     $("#concluir").addEventListener("click", e => concluir(e.currentTarget));
     $("#ir-painel").addEventListener("click", e => concluir(e.currentTarget));
     // Enter num campo de texto salva o passo, como num formulário
-    $$(".passo input:not([type=file])").forEach(el => el.addEventListener("keydown", e => {
+    $$(".passo input:not([type=file]):not(#posicao-nova)").forEach(el => el.addEventListener("keydown", e => {
       if (e.key === "Enter") $(`#passo-${atual} [data-salvar]`)?.click();
     }));
+    $("#posicao-nova").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); adicionarPosicao(); } });
+    $("#posicao-adicionar").addEventListener("click", () => adicionarPosicao());
 
     // ---------- começo: retoma do primeiro passo pendente ----------
     fetch("/api/contexto")

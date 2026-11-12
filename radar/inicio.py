@@ -16,7 +16,7 @@ import tempfile
 from datetime import date, timedelta
 from pathlib import Path
 
-from . import caminhos
+from . import buscas, caminhos
 from .arquivos import gravar_json, ler_json
 
 CONFIG_VAZIO = {
@@ -73,7 +73,8 @@ def init(silencioso: bool = False) -> Path:
             gravar_json(caminho, conteudo)
             criados.append(caminho.name)
     if not caminhos.buscas().exists():
-        shutil.copyfile(caminhos.EXEMPLOS / "buscas.json", caminhos.buscas())
+        # vazio de propósito: as buscas nascem das posições da pessoa, nunca do exemplo
+        gravar_json(caminhos.buscas(), buscas.vazio())
         criados.append("buscas.json")
     if not caminhos.fatos().exists():
         caminhos.fatos().write_text(FATOS_MODELO, encoding="utf-8")
@@ -102,7 +103,7 @@ def abertura_terminal(porta: int) -> None:
         "  melhores, gera o CV sob medida e mapeia quem contatar. Nada sai sem o seu ok.",
         "",
         f"  {negrito('Primeira vez aqui.')} A tela de abertura vai abrir no seu navegador:",
-        "  5 passos (LinkedIn, CV, e-mail, portfólio e anexos), uns 5 minutos.",
+        "  6 passos (LinkedIn, CV, posições, e-mail, portfólio e anexos), uns 5 minutos.",
         f"  Tudo fica em {caminhos.dados()}, no seu computador.",
         "",
         f"  → http://localhost:{porta}/boas-vindas",

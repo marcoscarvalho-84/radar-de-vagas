@@ -256,7 +256,7 @@ html { scrollbar-gutter: stable; }
 
 /* ============ TELA 2 · SEU CONTEXTO ============ */
 /* compacta de propósito: título, trilha e o passo inteiro cabem numa tela de notebook */
-.tela-contexto { padding-block: var(--space-lg) var(--space-xl); }
+.tela-contexto { padding-block: var(--space-lg); }
 .na-tela-contexto > .fita,
 .na-tela-contexto > .footer { display: none; }
 /* a tela ocupa a altura toda: no "Pronto", os próximos passos assentam no pé da tela */
@@ -484,6 +484,54 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
   background: var(--accent-break);
 }
 
+/* ---- posições desejadas: o que vai para a busca em tinta, a sugestão tracejada ---- */
+.posicoes__entrada { display: flex; gap: var(--space-xs); }
+.posicoes__entrada input { flex: 1; min-width: 0; }
+.posicoes__entrada .btn-fio { flex: none; }
+.posicoes { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.posicoes:empty { display: none; }
+.posicoes li {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 2px 2px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--text-small);
+  font-weight: var(--peso-medio);
+}
+.posicoes li button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-circulo);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.posicoes li button:hover { background: var(--g800); }
+.posicoes__sugestoes .meta { display: block; margin-bottom: var(--space-xs); }
+.posicoes__sugeridas { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.posicoes__sugeridas button {
+  min-height: 32px;
+  padding: 4px 14px;
+  border: 1px dashed var(--ink);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-small);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-tema);
+}
+.posicoes__sugeridas button:hover { background: var(--primary); border-style: solid; }
+.posicoes__busca { font-size: var(--text-small); color: var(--g700); }
+
 /* ---- zona de soltar arquivo: arrastando, ela acende em azul ---- */
 .soltar {
   display: flex;
@@ -596,7 +644,7 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
   grid-template-columns: 28px 6.5rem minmax(0, 1fr) auto;
   gap: var(--space-md);
   align-items: center;
-  padding: var(--space-xxs) 0;
+  padding: 2px 0;
   border-bottom: var(--fio);
 }
 @media (pointer: fine) { .checklist .btn-texto { min-height: 32px; padding-block: 4px; } }
@@ -619,7 +667,7 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--space-md);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-xs) var(--space-lg);
   background: var(--ink);
   color: var(--paper);
 }

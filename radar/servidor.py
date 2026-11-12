@@ -7,7 +7,7 @@
 - GET  /boas-vindas      a tela de abertura e o passo a passo de contexto
 - GET  /cvs/...          PDFs e previews de meus-dados/cvs
 - GET  /api/vagas        o vagas.json atual
-- GET  /api/contexto     o estado dos 5 passos (LinkedIn, CV, e-mail, portfólio, anexos)
+- GET  /api/contexto     o estado dos 6 passos (LinkedIn, CV, posições, e-mail, portfólio, anexos)
 - POST /api/decisao      {"id": "vaga-1", "acao": "aprovar|aprofundar|ajustar|pular", "nota": ""}
                          {"id": "busca", "acao": "nova_busca"}
 - POST /api/contexto     {"acao": "salvar", "campos": {...}} | {"acao": "pular", "passo": "cv"}

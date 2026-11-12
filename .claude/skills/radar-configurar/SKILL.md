@@ -35,9 +35,23 @@ conduzir.
   preservando o resto do arquivo. Fatos vão para `fatos.md` com a data de hoje
   ("Confirmado em AAAA-MM-DD"). Depois de gravar, mostre em 2 a 4 linhas o que mudou.
 - **Bloco 1 (perfil)** é conduzido pela skill `radar-perfil`: chame-a e volte daqui.
-- **Bloco 8 (busca):** monte as palavras-chave a partir das portas do Bloco 3 (cada cargo em
-  inglês e, quando fizer sentido, em português), uma por linha. Lembre que o LinkedIn não
-  respeita OR nem aspas: uma palavra-chave por busca.
+- **Bloco 3 (objetivo):** comece pelas posições que a pessoa escreveu na tela de abertura
+  (`contexto.json > posicoes`). Sem posições, pergunte primeiro: "Qual posição ou quais
+  posições você quer?". Agrupe em portas e confirme.
+- **Bloco 8 (busca): extremamente contextual.** Antes de propor, leia três fontes:
+  as posições desejadas (`contexto.json > posicoes`), a trajetória (`perfil.json`: cargos
+  e datas, headline, resumo, competências) e o texto do CV (`anexos/cv-atual.txt`). Proponha:
+  1. palavras-chave: cada posição em português e em inglês, os títulos equivalentes do
+     mercado para o mesmo trabalho e os níveis vizinhos que a trajetória sustenta (nunca
+     acima do que o CV prova, nunca de outra área);
+  2. local: o país do perfil, mais regiões se a pessoa aceita internacional (Bloco 4);
+  3. `filtro_titulo`: `precisa_ter` com os termos-núcleo da área tirados das posições,
+     `senioridade` com os marcadores de nível que cabem, `descartar_se_tiver` com funções
+     vizinhas que aparecem na mesma busca mas não são a dela.
+  Mostre a proposta numa tabela "termo · de onde veio (posição, LinkedIn ou CV)". Ao gravar,
+  marque `buscas.json > origem: "questionario"`: a tela de abertura não sobrescreve mais.
+  Se `buscas.json` ainda for o exemplo (cargos de design de `exemplos/`), substitua inteiro.
+  Lembre que o LinkedIn não respeita OR nem aspas: uma palavra-chave por busca.
 - Ritmo de conversa: frases curtas, sem jargão. A pessoa pode estar ansiosa com a busca;
   seja objetivo e gentil.
 

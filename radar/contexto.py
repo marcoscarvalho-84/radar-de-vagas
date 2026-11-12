@@ -1,12 +1,14 @@
 """O contexto que a pessoa entrega na tela de abertura (bin/radar, primeira vez).
 
-Cinco passos, todos opcionais e retomáveis:
+Seis passos, todos opcionais e retomáveis:
 
 1. LinkedIn   URL do perfil + export oficial (ZIP) ou "Salvar em PDF" do perfil
 2. CV         o CV atual (PDF ou DOCX); o texto vira fonte de fatos A CONFIRMAR
-3. E-mail     o que vai no cabeçalho do CV e nos formulários
-4. Portfólio  o link principal e até 3 outros (GitHub, Behance, site)
-5. Anexos     portfólio em PDF, estudos de caso, certificados, cartas
+3. Posições   os cargos que a pessoa quer; viram as primeiras buscas (radar/buscas.py),
+              com sugestões tiradas da trajetória do LinkedIn
+4. E-mail     o que vai no cabeçalho do CV e nos formulários
+5. Portfólio  o link principal e até 3 outros (GitHub, Behance, site)
+6. Anexos     portfólio em PDF, estudos de caso, certificados, cartas
 
 Onde cada coisa mora:
 - `perfil.json > contatos` recebe e-mail, LinkedIn e portfólio (é de lá que o CV lê).
@@ -30,11 +32,11 @@ from datetime import datetime, timedelta, timezone
 from html import unescape
 from pathlib import Path
 
-from . import caminhos
+from . import buscas, caminhos
 from .arquivos import editar_json, gravar_json, ler_json, trava
 
 FUSO = timezone(timedelta(hours=-3))
-PASSOS = ("linkedin", "cv", "email", "portfolio", "anexos")
+PASSOS = ("linkedin", "cv", "posicoes", "email", "portfolio", "anexos")
 LIMITE_ARQUIVO = 30 * 1024 * 1024  # o export "básico" do LinkedIn tem menos de 1 MB
 MAX_ANEXOS = 20
 MAX_COMENTARIO = 280  # o que o arquivo é e quando usar: uma frase basta
@@ -91,6 +93,7 @@ VAZIO = {
     "abertura": {"iniciada_em": "", "concluida_em": ""},
     "linkedin": {"url": "", "fonte": "", "importado_em": ""},
     "cv": {"arquivo": "", "texto": "", "enviado_em": ""},
+    "posicoes": [],
     "email": "",
     "portfolio": {"url": "", "outros": []},
     "anexos": [],
@@ -188,6 +191,11 @@ def salvar(campos: dict) -> dict:
         if len(outros) > 3:
             raise ContextoInvalido("Até 3 links além do portfólio. O resto cabe no próprio portfólio.")
         novos["outros_links"] = [normalizar_url(x) for x in outros]
+    if "posicoes" in campos:
+        try:
+            novos["posicoes"] = buscas.limpar_posicoes(campos["posicoes"])
+        except ValueError as e:
+            raise ContextoInvalido(str(e)) from None
 
     with editar_json(caminho(), {}) as ctx:
         _completar(ctx)
@@ -199,6 +207,8 @@ def salvar(campos: dict) -> dict:
             ctx["portfolio"]["url"] = novos["portfolio"]
         if "outros_links" in novos:
             ctx["portfolio"]["outros"] = novos["outros_links"]
+        if "posicoes" in novos:
+            ctx["posicoes"] = novos["posicoes"]
         for passo in _passos_de(novos):
             if passo in ctx["pulados"]:
                 ctx["pulados"].remove(passo)
@@ -212,11 +222,15 @@ def salvar(campos: dict) -> dict:
         contatos["portfolio"] = _sem_protocolo(novos["portfolio"])
     if contatos:
         _gravar_contatos(**contatos)
+    if "posicoes" in novos:
+        # fora da trava do contexto: a trava é da pasta e não entra duas vezes
+        buscas.atualizar_com_posicoes(novos["posicoes"], ler_json(caminhos.perfil(), {}) or {})
     return estado()
 
 
 def _passos_de(novos: dict) -> list[str]:
-    mapa = {"linkedin_url": "linkedin", "email": "email", "portfolio": "portfolio", "outros_links": "portfolio"}
+    mapa = {"linkedin_url": "linkedin", "email": "email", "portfolio": "portfolio", "outros_links": "portfolio",
+            "posicoes": "posicoes"}
     return [mapa[k] for k, v in novos.items() if v]
 
 
@@ -456,6 +470,7 @@ def estado() -> dict:
     feitos = {
         "linkedin": bool(ctx["linkedin"]["url"] or ctx["linkedin"]["importado_em"]),
         "cv": bool(ctx["cv"].get("arquivo")),
+        "posicoes": bool(ctx["posicoes"]),
         "email": bool(ctx["email"]),
         "portfolio": bool(ctx["portfolio"]["url"]),
         "anexos": bool(ctx["anexos"]),
@@ -472,6 +487,10 @@ def estado() -> dict:
             "competencias": len(perfil.get("competencias", [])),
         },
         "cv": ctx["cv"],
+        "posicoes": ctx["posicoes"],
+        "sugestoes_posicoes": [s for s in buscas.sugerir_posicoes(perfil)
+                               if s.casefold() not in {p.casefold() for p in ctx["posicoes"]}],
+        "buscas": buscas.resumo(buscas.ler()),
         "email": ctx["email"],
         "portfolio": ctx["portfolio"],
         "anexos": ctx["anexos"],
