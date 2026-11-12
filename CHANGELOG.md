@@ -2,6 +2,10 @@
 
 ## Ainda não lançado
 
+- Rodando por um assistente, a pessoa usa vendo a tela: o `CLAUDE.md`, o novo `AGENTS.md`
+  e as skills `/radar-configurar` e `/radar-perfil` mandam subir `bin/radar` e abrir a tela
+  de abertura ou o painel no navegador, em vez de perguntar pelo chat. Sem terminal, o
+  servidor imprime esse lembrete para o assistente junto com o link.
 - Correção: o `bin/radar init` copiava o `exemplos/buscas.json` (cargos de design) para os
   dados de quem instalava, e a varredura procurava cargos que não eram os da pessoa. Agora o
   `buscas.json` nasce vazio, a coleta recusa sem palavra-chave ou com a cópia do exemplo, e

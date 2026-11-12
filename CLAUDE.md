@@ -11,10 +11,32 @@ Quem manda em quê:
 - **As skills em `.claude/skills/`** mandam em cada função. Use-as pelo Skill tool.
 - **`meus-dados/`** é o CONTEÚDO da pessoa: perfil, fatos, preferências, vagas, histórico.
 
+## A pessoa usa vendo a tela
+
+O Radar tem duas telas no navegador: a **abertura** (o contexto: LinkedIn, CV, posições
+desejadas, e-mail, portfólio e anexos, com upload de arquivo) e o **painel** (as decisões).
+Quem roda o projeto por um assistente também usa essas telas. Nunca troque a tela por
+perguntas no chat:
+
+1. Suba o servidor em segundo plano (ele não termina sozinho): `bin/radar`. Antes, confira
+   se já está no ar com `lsof -ti tcp:8322`.
+2. Abra a tela para a pessoa: com um navegador à mão (Claude in Chrome, painel de preview),
+   abra o link nele; sem navegador, mande o link e peça para ela abrir. `bin/radar` também
+   tenta abrir o navegador padrão sozinho, então diga que a janela pode já estar aberta.
+   - primeira vez ou contexto incompleto (`contexto.json > abertura.concluida_em` vazio):
+     http://localhost:8322/boas-vindas
+   - decisões do dia, depois da triagem ou da análise: http://localhost:8322
+3. Diga em uma ou duas linhas o que ela vai fazer lá (na abertura: 6 passos, uns 5 minutos,
+   todos podem ser pulados) e espere ela avisar que terminou. Na abertura, o fim também
+   aparece em `abertura.concluida_em`.
+4. Só peça pelo chat o que a pessoa não conseguir fazer na tela (sem navegador, por
+   exemplo), e diga que dá para voltar à tela depois pelo link "Seu contexto" do painel.
+
 ## Primeira vez
 
 Se `meus-dados/config.json` não existe ou está vazio: não rode a rotina. Ofereça
-`bin/radar demo` (dados fictícios, 3 minutos) e então `/radar-configurar`.
+`bin/radar demo` (dados fictícios, 3 minutos). Depois, abra a tela de abertura como na
+seção acima e só então rode `/radar-configurar`, que parte do que a pessoa pôs lá.
 
 ## A rotina diária (ordem obrigatória)
 
@@ -29,8 +51,9 @@ Se `meus-dados/config.json` não existe ou está vazio: não rode a rotina. Ofer
    uma por vez. Menos vagas boas: trabalhar as que houver e dizer isso.
 4. **CV** (`/radar-cv`) para cada vaga analisada, com o preview conferido.
 5. **Pessoas** (`/radar-pessoas`) só para as vagas trabalhadas. Mapa, sem mensagem.
-6. **Publicar.** `bin/radar validar`, `bin/radar gerar`, garantir o painel no ar e mandar um
-   resumo curto: quantas vagas, quais trabalhadas, o que espera decisão.
+6. **Publicar.** `bin/radar validar`, `bin/radar gerar`, garantir o painel no ar, abrir
+   http://localhost:8322 para a pessoa (ou mandar o link) e mandar um resumo curto: quantas
+   vagas, quais trabalhadas, o que espera decisão no painel.
 7. **Prazos.** Listar o que venceu: candidaturas sem resposta há `rotina.follow_up_dias` dias
    (com sugestão de próximo passo), aprovações paradas há `rotina.aprovado_alerta_dias` dias, e
    triagem parada (`bin/radar expirar`, sem `--aplicar` até a pessoa concordar).

@@ -86,6 +86,9 @@ Todo passo pode ser pulado e retomado (link **Seu contexto** no painel). Do expo
 só os arquivos de perfil são lidos, e o ZIP é apagado logo depois. Depois disso, `bin/radar`
 abre direto o painel.
 
+Usando pelo Claude Code (ou outro assistente)? Peça "abre o Radar": ele sobe o servidor e
+abre a tela no seu navegador, para você usar vendo a tela em vez de responder pelo chat.
+
 Em seguida, no Claude Code:
 
 1. Rode `/radar-configurar`. São 12 blocos curtos (25 a 40 minutos na primeira vez): perfil,

@@ -12,12 +12,17 @@ conduzir.
 ## Antes da primeira pergunta
 
 1. Se `meus-dados/` não existe, rode `bin/radar init`.
-2. Leia `meus-dados/config.json`, `meus-dados/buscas.json`, `meus-dados/perfil.json`,
+2. **Tela antes do chat.** Se `contexto.json > abertura.concluida_em` está vazio, a pessoa
+   ainda não passou pela tela de abertura: suba `bin/radar` em segundo plano, abra
+   http://localhost:8322/boas-vindas para ela (ou mande o link) e espere ela terminar. É lá
+   que ela sobe o LinkedIn e o CV e escolhe as posições desejadas, vendo a tela; não peça
+   isso pelo chat. Volte daqui quando ela avisar.
+3. Leia `meus-dados/config.json`, `meus-dados/buscas.json`, `meus-dados/perfil.json`,
    `meus-dados/fatos.md` e `meus-dados/contexto.json` (o que a tela de abertura já trouxe:
    LinkedIn, CV atual, e-mail, portfólio, anexos). Não pergunte de novo o que já está lá;
    passo pulado na tela vira pergunta aqui. Descubra o primeiro bloco ainda vazio e comece por ele (ou pelo
    bloco que a pessoa pediu no argumento).
-3. Diga em uma linha quantos blocos faltam e quanto tempo leva, e que dá para parar a
+4. Diga em uma linha quantos blocos faltam e quanto tempo leva, e que dá para parar a
    qualquer momento.
 
 ## Como conduzir

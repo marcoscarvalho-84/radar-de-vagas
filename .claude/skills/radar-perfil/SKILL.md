@@ -19,7 +19,9 @@ Antes de pedir qualquer coisa, leia `meus-dados/contexto.json`. A tela de abertu
 - guardado o CV atual em `meus-dados/anexos/`, com o texto em `anexos/cv-atual.txt`;
 - gravado e-mail, LinkedIn e portfólio em `perfil.json > contatos`.
 
-Use o que existir e pule o passo correspondente abaixo. O texto do CV atual é a melhor fonte
+Se faltar o LinkedIn ou o CV, o caminho é a tela, não o chat: suba `bin/radar` em segundo
+plano e abra http://localhost:8322/boas-vindas para a pessoa (ou mande o link), no passo
+que falta. Use o que existir e pule o passo correspondente abaixo. O texto do CV atual é a melhor fonte
 para as perguntas de prova (seção 2): traga cada número que aparece nele e pergunte se a
 pessoa sustenta numa entrevista. Nada do CV antigo vira fato sem esse ok.
 

@@ -33,6 +33,7 @@ Segurança, porque o servidor escreve em disco a partir de um POST:
 """
 
 import json
+import sys
 import threading
 import webbrowser
 from datetime import datetime, timedelta, timezone
@@ -290,8 +291,13 @@ def servir(porta: int | None = None, abrir: bool = False) -> None:
     handler = partial(Handler, directory=str(caminhos.painel()))
     servidor = ThreadingHTTPServer(("127.0.0.1", porta), handler)
     print(f"Radar de Vagas em http://localhost:{porta}  (dados: {caminhos.dados()})  Ctrl+C para parar", flush=True)
+    rota = "/boas-vindas" if contexto.primeira_vez() else "/"
+    if not sys.stdout.isatty():
+        # sem terminal: quem lê esta saída é um assistente (Claude Code, Codex...), não a pessoa
+        print(f"Para o assistente: a pessoa usa o Radar vendo a tela. Abra http://localhost:{porta}{rota} "
+              "no navegador para ela (ou mande o link e peça para abrir) e não colete pelo chat o que "
+              "a tela pede (LinkedIn, CV, posições, decisões).", flush=True)
     if abrir:
-        rota = "/boas-vindas" if contexto.primeira_vez() else "/"
         # o navegador abre com um atraso curto: o servidor já está escutando quando a página pede
         threading.Timer(0.4, webbrowser.open, args=(f"http://localhost:{porta}{rota}",)).start()
     try:
