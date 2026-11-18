@@ -7,6 +7,7 @@
 # - instala weasyprint e pypdf (requirements.txt)
 # - confere pango e poppler (macOS: Homebrew; Linux: o gerenciador da distro)
 # - roda bin/radar init (a tela de abertura vem no primeiro bin/radar)
+# - gera um PDF de teste (bin/radar ambiente) e diz o que falta, se faltar
 set -euo pipefail
 
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -37,6 +38,16 @@ else
 fi
 
 "$RAIZ/bin/radar" init
+
+# Conferir pacote instalado não basta: a glib pode estar no Homebrew e desligada do lib/.
+# O teste de verdade é gerar um PDF pelo mesmo caminho que o bin/radar cv usa.
+echo
+echo "Conferindo se este computador gera o PDF do CV:"
+if ! "$RAIZ/bin/radar" ambiente; then
+  echo
+  echo "Resolva o que está como FALTA acima e confira de novo com: bin/radar ambiente"
+  exit 1
+fi
 echo
 echo "Pronto. Para ver sem configurar nada: bin/radar demo"
 echo "Para começar de verdade: bin/radar (abre a tela de abertura no navegador)"

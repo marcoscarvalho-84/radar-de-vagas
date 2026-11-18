@@ -24,6 +24,15 @@ não insista.
 O `filtra` já corta título fora da área, júnior, fora da janela e duplicata contra o Radar,
 o histórico e as levas arquivadas. O que sobra está em `candidatas.json`.
 
+Antes de ler descrição, olhe `candidatas.json > por_palavra`: quanto cada palavra-chave
+trouxe, quanto passou e os títulos que passaram. Termo que pega outra área aparece ali.
+"Revenue" traz revenue management de hotel. Uma sigla curta ("GTM", "CRM") casa com o nome
+de uma empresa. Quando uma palavra traz uma família de títulos que não são da pessoa:
+- corte essas vagas nesta triagem, sem nota;
+- proponha no resumo os termos para `buscas.json > filtro_titulo > descartar_se_tiver`
+  ("hotel", "hospitality", "revenue manager"), com quantas vagas de hoje cada um cortaria;
+- grave só com o ok da pessoa.
+
 ## 2. Ler e cortar
 
 Para as candidatas, em ordem de data (mais recentes primeiro):

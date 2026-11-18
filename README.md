@@ -60,8 +60,10 @@ bin/instalar
 ```
 
 Cria uma venv em `~/.cache/radar-de-vagas/venv` (fora de pastas sincronizadas como Dropbox e
-iCloud, que travam venvs), instala `weasyprint` e `pypdf`, confere `pango` e `poppler` e cria
-a sua pasta `meus-dados/`. No macOS: `brew install pango poppler`.
+iCloud, que travam venvs), instala `weasyprint` e `pypdf`, confere `pango` e `poppler`, cria
+a sua pasta `meus-dados/` e gera um PDF de teste para provar que o CV vai sair. No macOS:
+`brew install pango poppler`. Se o PDF de teste falhar, o instalador diz qual biblioteca
+falta e o comando que resolve; depois de resolver, confira com `bin/radar ambiente`.
 
 ## Começar
 

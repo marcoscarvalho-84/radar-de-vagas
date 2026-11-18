@@ -114,10 +114,17 @@ proposto diz de onde veio.
    Quer tirar ou incluir alguma? → `buscas.json > grupos[].palavras_chave`
 2. Locais da busca (país ou região: "Brazil", "Latin America", "Portugal"...). *padrão: o
    país do seu perfil* → `buscas.json > grupos[].local`
+   **Idioma do país.** Num país que não fala inglês, a maioria das vagas pede a língua local
+   fluente, e a triagem corta todas as que você não sustenta. Num teste na França, sem
+   francês fluente, sobraram 3 vagas boas em 1.228. Se o país da busca pede um idioma que
+   o seu perfil não mostra em nível de trabalho, a rotina avisa aqui (e o `bin/radar
+   validar` também) e propõe somar uma região que contrata em inglês ("European Union",
+   "EMEA") ou vagas remotas de empresas internacionais.
 3. Janela: vagas das últimas 24 ou 48 horas? → `buscas.json > janela_horas` · *padrão 48*
 4. Filtro de título: os termos que uma vaga da sua área tem que ter no título, os que
    marcam o seu nível e os que descartam na hora (funções vizinhas que não são a sua,
-   níveis abaixo). A rotina propõe os três a partir das posições e do CV.
+   níveis abaixo, e as áreas onde o seu termo também é cargo: "Revenue" puxa revenue
+   management de hotel). A rotina propõe os três a partir das posições e do CV.
    → `buscas.json > filtro_titulo`
 
 ## Bloco 9 · CV e carta (3 min)

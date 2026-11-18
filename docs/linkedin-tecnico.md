@@ -38,6 +38,20 @@ Sempre por palavra inteira (`\b...\b`). Por substring, "ux" casa com "a**ux**ili
 
 Vaga fechada: o corpo traz "No longer accepting applications" (ou 404/410).
 
+## Onde a candidatura acontece
+
+Sem login, o anúncio não mostra o link externo de candidatura. Mas o HTML do
+`jobPosting/{id}` diz onde ela é: `apply-link-offsite` é no site da empresa,
+`apply-link-onsite` é Easy Apply. O `bin/radar varrer checa` grava isso em `candidatura`
+(`externa` ou `linkedin`) e a descrição baixada traz a linha `CANDIDATURA:`.
+
+Candidatura externa: `bin/radar ats "<empresa>" "<cargo>"` procura a vaga nos quadros
+públicos do Greenhouse (`boards-api.greenhouse.io/v1/boards/{slug}/jobs`), do Lever
+(`api.lever.co/v0/postings/{slug}?mode=json`) e do Ashby
+(`api.ashbyhq.com/posting-api/job-board/{slug}`). Identificador que não existe devolve 404.
+A Gupy não tem um endpoint público equivalente estável: para empresa brasileira, WebSearch
+com "site:gupy.io <empresa>".
+
 ## Busca logada
 
 A busca logada passou a ignorar filtros de URL (`geoId`, `f_WT`, `f_E`, `sortBy`) e não

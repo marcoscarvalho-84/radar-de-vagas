@@ -19,7 +19,7 @@ Padrões: `docs/padroes.md`, seções 1, 5, 6 e 8. Fatos só de `perfil.json` e 
    - `why_label` = "Why {Empresa}" (ou "Por que a {Empresa}" em português) e as 4 linhas da
      receita, com a linha 2 vindo de `config.cv.diferencial`;
    - `experience`: mesma lista e mesmas datas de sempre; ajuste só a ênfase com keywords
-     reais da vaga. Porta IC: liderança como prova de escopo.
+     reais da vaga. Vaga sem gestão formal: liderança entra como prova de escopo, não como cargo.
    - Respeite `config.estilo.proibicoes` em todo texto novo.
 3. Gere:
 

@@ -490,7 +490,7 @@ def estado() -> dict:
         "posicoes": ctx["posicoes"],
         "sugestoes_posicoes": [s for s in buscas.sugerir_posicoes(perfil)
                                if s.casefold() not in {p.casefold() for p in ctx["posicoes"]}],
-        "buscas": buscas.resumo(buscas.ler()),
+        "buscas": buscas.resumo(buscas.ler(), perfil),
         "email": ctx["email"],
         "portfolio": ctx["portfolio"],
         "anexos": ctx["anexos"],

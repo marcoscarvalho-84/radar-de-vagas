@@ -54,6 +54,9 @@ def checar_vagas(vagas: dict) -> list[tuple[str, str]]:
         url = v.get("url") or ""
         if url and "linkedin.com" in url and not URL_VAGA_LINKEDIN.match(url):
             aviso(f"{id_}: link do LinkedIn não é permalink /jobs/view/{{id}} ({url})")
+        candidatura = str(v.get("url_candidatura") or "")
+        if candidatura and (not candidatura.startswith("https://") or "linkedin.com" in candidatura):
+            aviso(f"{id_}: url_candidatura deveria ser o link https do ATS da empresa ({candidatura})")
         if not v.get("adicionada_em") or not DATA.match(str(v.get("adicionada_em"))):
             aviso(f"{id_}: sem adicionada_em (AAAA-MM-DD)")
         if v.get("status") == "aprovado" and not v.get("aprovado_em"):
@@ -126,7 +129,8 @@ def checar_buscas() -> list[tuple[str, str]]:
                          "dizer as suas posições (bin/radar, passo Posições) ou rodar /radar-configurar busca")]
     if not buscas.palavras(atual):
         return [("aviso", "buscas.json sem palavras-chave: diga as posições que você quer no passo Posições")]
-    return []
+    perfil = ler_json(caminhos.perfil(), {}) or {}
+    return [("aviso", a) for a in buscas.avisos_idioma(atual, perfil)]
 
 
 def checar_tudo() -> list[tuple[str, str]]:

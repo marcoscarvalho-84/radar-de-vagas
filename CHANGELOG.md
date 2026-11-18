@@ -2,6 +2,30 @@
 
 ## Ainda não lançado
 
+Do retorno do primeiro teste de ponta a ponta feito por outra pessoa:
+
+- Correção: no Mac, o `bin/radar cv` falhava com erro de `libgobject` quando a glib estava
+  instalada no Homebrew mas desligada do `lib/`, e o `bin/instalar` não percebia. O
+  `bin/radar` agora também procura em `<brew>/opt/{glib,pango,harfbuzz,fontconfig}/lib`, o
+  instalador termina gerando um PDF de teste de verdade, e o comando novo
+  `bin/radar ambiente` diz qual biblioteca falta e o comando que resolve.
+- `/radar-analise` confere se a vaga ainda está aberta antes de qualquer pesquisa: vaga boa
+  fecha em dias, e o "aprofundar" do painel chega depois da triagem.
+- Candidatura no site da empresa: o `bin/radar varrer checa` diz se a vaga é Easy Apply ou
+  externa, e o comando novo `bin/radar ats "<empresa>" "<cargo>"` acha a vaga nos quadros
+  públicos do Greenhouse, Lever e Ashby. O link vai para o campo novo `url_candidatura`, o
+  painel mostra "Candidatar no site da empresa" e o `/radar-aplicar` vai direto por ele.
+- Aviso de idioma: busca num país que pede uma língua que o perfil não mostra em nível de
+  trabalho (França sem francês, por exemplo) aparece no passo Posições, no
+  `bin/radar validar` e no questionário, antes da primeira varredura.
+- Termo que pega outra área ("Revenue" traz revenue management de hotel; sigla curta casa
+  com nome de empresa): o `bin/radar varrer filtra` mostra quanto cada palavra-chave trouxe e
+  quanto passou, a `/radar-triagem` propõe os descartes, e o `/radar-configurar` já pensa
+  nos homônimos ao montar o filtro de título.
+
+- Correção: os filtros da Pipeline e a etiqueta de porta dos cards estavam fixos em
+  "Liderança" e "IC sênior", as portas do autor. Agora saem de `config.objetivo.portas` de
+  cada pessoa: um filtro por porta, com o título que ela deu.
 - Rodando por um assistente, a pessoa usa vendo a tela: o `CLAUDE.md`, o novo `AGENTS.md`
   e as skills `/radar-configurar` e `/radar-perfil` mandam subir `bin/radar` e abrir a tela
   de abertura ou o painel no navegador, em vez de perguntar pelo chat. Sem terminal, o

@@ -13,6 +13,7 @@ fictícios em `exemplos/`. `bin/radar validar` confere estas regras.
   "vagas": [{
     "id": "vaga-1",
     "empresa": "", "cargo": "", "url": "https://www.linkedin.com/jobs/view/{id}",
+    "url_candidatura": "link direto no ATS da empresa (bin/radar ats), quando a candidatura é fora do LinkedIn",
     "local": "", "modelo": "remoto|híbrido|presencial",
     "porta": "id de config.objetivo.portas",
     "profundidade": "triagem|completa",

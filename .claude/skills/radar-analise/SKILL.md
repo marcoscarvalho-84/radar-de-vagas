@@ -7,13 +7,30 @@ description: Aprofunda uma vaga do Radar (ou uma vaga que a pessoa mandar por li
 
 Padrões: `docs/padroes.md`, seções 1 e 3. Uma vaga por vez, do começo ao fim.
 
+## 0. Ainda está aberta?
+
+Antes de qualquer busca ou linha de análise. Vaga boa fecha rápido (num teste, a que mais
+combinava fechou em menos de uma semana), e entre a triagem e o "aprofundar" do painel
+passam dias.
+
+    bin/radar varrer checa <id do LinkedIn>
+
+- `fechada: true`: pare. `bin/radar marcar <vaga-N> recusado --nota "fechou antes de
+  aprofundar"`, diga isso em uma linha e siga para a próxima da fila.
+- `candidatura: "externa"`: a candidatura é no site da empresa. Rode
+  `bin/radar ats "<empresa>" "<cargo>"` e, achando a vaga, grave o link em
+  `url_candidatura` (o `url` continua o permalink do LinkedIn). Não achou: procure a página
+  de carreiras com WebSearch ("<empresa> careers <cargo>"; no Brasil, também gupy.io e
+  inhire). Achou lá e não no LinkedIn, ou o contrário, com datas diferentes: confira qual
+  está valendo.
+- Vaga sem id do LinkedIn (link de ATS mandado pela pessoa): abra o link. Redirecionou para
+  a página geral de carreiras, deu erro ou veio sem texto: fechou.
+
 ## 1. Ler a vaga
 
 - Vaga do Radar: a descrição está em `meus-dados/varredura/.../descricoes/{id}.txt` ou via
   WebFetch no permalink. Vaga mandada pela pessoa: confira antes se já está no Radar
   (empresa + cargo, inclusive no arquivo). Já está: diga em que estado e pare.
-- Link que redireciona para a página geral da empresa, dá erro ou vem sem texto: a vaga
-  fechou. Avise antes de qualquer outra coisa.
 - Extraia: senioridade real, porta, local e modelo, faixa publicada, requisitos obrigatórios
   e desejáveis, keywords que um ATS leria, sinais de cultura e red flags.
 

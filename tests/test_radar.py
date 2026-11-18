@@ -281,6 +281,16 @@ class TestPainel(ComDados):
         self.assertNotIn("99.999", json.dumps(recorte, ensure_ascii=False))
         self.assertTrue(recorte["pretensao_definida"])
 
+    def test_portas_do_painel_vem_da_config_de_cada_pessoa(self):
+        from radar import config
+        cfg = config.carregar()
+        cfg["objetivo"]["portas"] = [{"id": "analise", "titulo": "Análise", "cargos": ["Data Analyst"]},
+                                     {"titulo": "sem id, fica de fora"}]
+        self.assertEqual(config.para_painel(cfg, {})["portas"], [{"id": "analise", "titulo": "Análise"}])
+        modelo = (RAIZ / "dashboard" / "index.html").read_text(encoding="utf-8")
+        for fixo in ('"lideranca"', '"ic"', "IC sênior"):  # nada de porta de uma pessoa só no código
+            self.assertNotIn(fixo, modelo)
+
 
 def export_linkedin(com_conexoes=True) -> bytes:
     """Um export mínimo do LinkedIn, com um CSV de terceiros que nunca pode ser lido."""
@@ -359,6 +369,129 @@ class TestBuscas(ComDados):
             with self.assertRaises(contexto.ContextoInvalido, msg=posicoes):
                 contexto.salvar({"posicoes": posicoes})
         self.assertFalse((self.pasta / "buscas.json").exists())
+
+
+class TestIdiomaDaBusca(ComDados):
+    """País que pede outra língua: a pessoa sabe antes da varredura que a mesa vai encolher."""
+
+    PERFIL = {"local": "Recife, Pernambuco, Brazil", "idiomas": [
+        {"idioma": "Portuguese", "nivel": "Native or bilingual proficiency"},
+        {"idioma": "English", "nivel": "Full professional proficiency"},
+        {"idioma": "French", "nivel": "Elementary proficiency"}]}
+
+    def busca(self, *locais):
+        return {"grupos": [{"local": local, "palavras_chave": ["Product Designer"]} for local in locais]}
+
+    def test_pais_que_pede_lingua_sem_fluencia_avisa(self):
+        from radar import buscas
+        avisos = buscas.avisos_idioma(self.busca("Paris, Île-de-France, France", "Brazil"), self.PERFIL)
+        self.assertEqual(len(avisos), 1)
+        self.assertIn("francês", avisos[0])
+
+    def test_fluente_regiao_e_pais_anglofono_nao_avisam(self):
+        from radar import buscas
+        fluente = {**self.PERFIL, "idiomas": [{"idioma": "Francês", "nivel": "Proficiência profissional completa"}]}
+        self.assertEqual(buscas.avisos_idioma(self.busca("France"), fluente), [])
+        self.assertEqual(buscas.avisos_idioma(self.busca("European Union", "United Kingdom", "EMEA"), self.PERFIL), [])
+
+    def test_nivel_do_linkedin_em_portugues(self):
+        from radar import buscas
+        limitado = {"idiomas": [{"idioma": "Alemão", "nivel": "Proficiência de trabalho limitada"}]}
+        self.assertEqual(len(buscas.avisos_idioma(self.busca("Alemanha"), limitado)), 1)
+
+    def test_sem_idiomas_no_perfil_so_avisa_fora_do_pais_da_pessoa(self):
+        from radar import buscas
+        sem_idiomas = {"local": "Lyon, Auvergne-Rhône-Alpes, France"}
+        self.assertEqual(buscas.avisos_idioma(self.busca("France"), sem_idiomas), [])
+        avisos = buscas.avisos_idioma(self.busca("Germany"), sem_idiomas)
+        self.assertIn("não lista idiomas", avisos[0])
+
+    def test_aviso_chega_na_tela_e_no_validar(self):
+        from radar import buscas, validar
+        from radar.arquivos import gravar_json
+        gravar_json(self.pasta / "perfil.json", {**self.ler("perfil.json"), **self.PERFIL})
+        gravar_json(self.pasta / "buscas.json", {**buscas.vazio(), "origem": "posicoes", **self.busca("France")})
+        self.assertEqual(len(buscas.resumo(buscas.ler(), self.PERFIL)["avisos"]), 1)
+        self.assertTrue(any("francês" in m for _, m in validar.checar_buscas()))
+
+
+class TestAts(unittest.TestCase):
+    """A vaga direto no quadro público da empresa, sem depender do login no LinkedIn."""
+
+    def test_identificadores_do_nome_da_empresa(self):
+        from radar import ats
+        self.assertEqual(ats.identificadores("Acme Corp S.A."), ["acmecorp", "acme-corp", "acme"])
+        self.assertEqual(ats.identificadores("Figma"), ["figma"])
+
+    def test_acha_a_vaga_no_quadro_e_para_no_primeiro_identificador_que_existe(self):
+        from radar import ats
+        pedidos = []
+
+        def falso(url):
+            pedidos.append(url)
+            if url == ats.QUADROS["Greenhouse"].format("acmecorp"):
+                return {"jobs": [
+                    {"title": "Account Executive", "absolute_url": "https://boards.greenhouse.io/acmecorp/jobs/1"},
+                    {"title": "Senior Product Designer, Payments", "absolute_url": "https://boards.greenhouse.io/acmecorp/jobs/2",
+                     "location": {"name": "Remote"}}]}
+            return None
+
+        r = ats.procurar("Acme Corp", "Senior Product Designer", baixar=falso)
+        self.assertEqual(r["quadros"], [{"ats": "Greenhouse", "slug": "acmecorp", "abertas": 2}])
+        self.assertEqual([v["url"] for v in r["vagas"]], ["https://boards.greenhouse.io/acmecorp/jobs/2"])
+        self.assertFalse(any("acme-corp" in u for u in pedidos))
+
+    def test_sem_quadro_nenhum(self):
+        from radar import ats
+        r = ats.procurar("Ninguém", "Designer", baixar=lambda url: None)
+        self.assertEqual(r, {"quadros": [], "vagas": []})
+
+
+class TestRetornoDeUso(ComDados):
+    """O que quebrou ou atrasou no primeiro uso de outra pessoa."""
+
+    def test_onde_se_candidata(self):
+        from radar import varredura
+        self.assertEqual(varredura._candidatura('<a class="apply-link-offsite x">'), "externa")
+        self.assertEqual(varredura._candidatura('<button class="apply-link-onsite">'), "linkedin")
+        self.assertEqual(varredura._candidatura("<p>sem botão</p>"), "")
+
+    def test_rendimento_por_palavra_chave(self):
+        from radar import varredura
+        coletadas = [{"palavra_chave": "revenue", "titulo": f"Revenue Manager Hotel {i}"} for i in range(5)]
+        coletadas += [{"palavra_chave": "product designer", "titulo": "Senior Product Designer"}]
+        candidatas = coletadas[:2] + coletadas[-1:]
+        r = varredura.por_palavra(coletadas, candidatas)
+        self.assertEqual(list(r), ["revenue", "product designer"])
+        self.assertEqual((r["revenue"]["coletadas"], r["revenue"]["candidatas"]), (5, 2))
+        self.assertIn("Revenue Manager Hotel 0", r["revenue"]["titulos"])
+
+    def test_biblioteca_faltando_vira_comando_que_resolve(self):
+        from unittest import mock
+        from radar import cv
+        erro = OSError("cannot load library 'libgobject-2.0-0': dlopen(libgobject-2.0-0, 0x0002): tried: ...")
+        self.assertIn("glib", cv.diagnostico(erro))
+        importar = __import__
+
+        def sem_glib(nome, *args, **kwargs):
+            if nome == "weasyprint":
+                raise erro
+            return importar(nome, *args, **kwargs)
+
+        with mock.patch("builtins.__import__", side_effect=sem_glib):
+            with self.assertRaises(SystemExit) as saida:
+                cv.motor()
+        self.assertIn("glib", str(saida.exception))
+
+    def test_url_candidatura_tem_que_ser_do_ats(self):
+        from radar import validar
+        base = {"id": "vaga-1", "empresa": "X", "cargo": "Y", "status": "proposto", "fit": 70,
+                "profundidade": "completa", "adicionada_em": "2026-11-10",
+                "url": "https://www.linkedin.com/jobs/view/123"}
+        ruim = {"vagas": [{**base, "url_candidatura": "https://www.linkedin.com/jobs/view/123"}], "pessoas": []}
+        boa = {"vagas": [{**base, "url_candidatura": "https://jobs.lever.co/x/abc"}], "pessoas": []}
+        self.assertTrue(any("url_candidatura" in m for _, m in validar.checar_vagas(ruim)))
+        self.assertFalse(any("url_candidatura" in m for _, m in validar.checar_vagas(boa)))
 
 
 class TestContexto(ComDados):

@@ -175,6 +175,10 @@ alguns ATS derrubam o anexo quando o resto do formulário é preenchido.
 - `url` de vaga: o permalink `linkedin.com/jobs/view/{id}` ou a URL direta do ATS. Nunca a
   busca genérica nem a raiz do site. Sem permalink capturado, vazio (o painel esconde o link
   em vez de apontar para o lugar errado).
+- `url_candidatura`: o link da vaga no ATS da empresa (Greenhouse, Lever, Ashby, Gupy...)
+  quando a candidatura é fora do LinkedIn. Sem login, o anúncio do LinkedIn não mostra esse
+  link: `bin/radar ats "<empresa>" "<cargo>"` procura nos quadros públicos. O `url`
+  continua o permalink, que é o que pega duplicata.
 - `url` de pessoa: sempre `linkedin.com/in/...`.
 - `cv` e `cv_preview` começam com `/cvs/` (é assim que o painel os serve).
 - Ids sequenciais `vaga-N` e `pessoa-N`, sempre pelo `bin/radar proximo-id` (max+1, nunca o

@@ -10,7 +10,8 @@ Comandos:
   varrer coleta [--horas N]     coleta vagas pelo endpoint público
   varrer filtra [--entrada F]   corta título, janela e duplicatas -> candidatas.json
   varrer descricao <id>...      baixa a descrição de cada vaga
-  varrer checa <id>...          confere se a vaga ainda aceita candidaturas
+  varrer checa <id>...          confere se a vaga ainda aceita candidaturas e onde
+  ats "<empresa>" "<cargo>"     acha a vaga no Greenhouse, Lever ou Ashby da empresa
   validar                       confere esquemas e consistência dos dados
   marcar <id> <status>          muda status com trava (proposto, aprovado, executado...)
   proximo-id vaga|pessoa        próximo id livre
@@ -20,6 +21,7 @@ Comandos:
   painel [--porta N]            sobe o painel com botões ao vivo
   cv <conteudo.json> <saida.pdf>
   carta <carta.md> <saida.pdf>
+  ambiente                      gera um PDF de teste e diz o que falta instalar
 
 Variável RADAR_DADOS: aponta para outra pasta de dados (padrão: meus-dados/).
 """
@@ -61,6 +63,11 @@ def main(argv=None) -> int:
     ch.add_argument("ids", nargs="+")
     ch.add_argument("--saida", type=Path)
 
+    at = sub.add_parser("ats")
+    at.add_argument("empresa")
+    at.add_argument("cargo")
+    at.add_argument("--slug", default="")
+
     sub.add_parser("validar")
     m = sub.add_parser("marcar")
     m.add_argument("id")
@@ -78,6 +85,7 @@ def main(argv=None) -> int:
         c = sub.add_parser(nome)
         c.add_argument("entrada", type=Path)
         c.add_argument("saida", type=Path)
+    sub.add_parser("ambiente")
 
     a = p.parse_args(argv)
 
@@ -115,6 +123,9 @@ def main(argv=None) -> int:
             varredura.descricao(a.ids, a.pasta or pasta / "descricoes")
         else:
             varredura.checa(a.ids, a.saida or pasta / "checa.json")
+    elif a.cmd == "ats":
+        from . import ats
+        return ats.main(a.empresa, a.cargo, a.slug)
     elif a.cmd == "validar":
         from . import validar
         return validar.main()
@@ -142,6 +153,9 @@ def main(argv=None) -> int:
     elif a.cmd == "carta":
         from . import carta
         return carta.gerar(a.entrada, a.saida)
+    elif a.cmd == "ambiente":
+        from . import cv
+        return cv.ambiente()
     return 0
 
 

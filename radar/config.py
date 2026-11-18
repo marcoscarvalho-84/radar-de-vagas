@@ -49,7 +49,11 @@ def para_painel(cfg: dict, perfil: dict) -> dict:
     """
     rem = cfg.get("remuneracao", {})
     contatos = (perfil or {}).get("contatos", {})
+    portas = (cfg.get("objetivo") or {}).get("portas") or []
     return {
+        # as portas de cada pessoa viram os filtros e a etiqueta de porta do painel
+        "portas": [{"id": str(p["id"]), "titulo": str(p.get("titulo") or p["id"])}
+                   for p in portas if isinstance(p, dict) and p.get("id")],
         "nome": (perfil or {}).get("nome", ""),
         "links": {"linkedin": contatos.get("linkedin", ""), "portfolio": contatos.get("portfolio", "")},
         "follow_up_dias": cfg["rotina"]["follow_up_dias"],

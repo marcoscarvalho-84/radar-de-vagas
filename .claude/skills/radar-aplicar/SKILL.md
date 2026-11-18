@@ -16,11 +16,15 @@ para que nada saia sem a pessoa ver.
 2. Confira de novo que a vaga não está no histórico como aplicada (`bin/radar validar`).
 3. Confira que a vaga ainda está aberta (`bin/radar varrer checa <id>`). Fechou: marque
    `recusado` com o motivo, registre como Encerrada e siga para a próxima.
+4. Candidatura no site da empresa (`candidatura: "externa"` no checa) e sem
+   `url_candidatura` na vaga: rode `bin/radar ats "<empresa>" "<cargo>"` antes de abrir o
+   LinkedIn. Ir direto ao ATS poupa o login e o redirecionamento, e mostra se a vaga ainda
+   está no quadro da empresa.
 
 ## No formulário (uma vaga por vez, uma ação por vez)
 
-1. Abra o link real da vaga. Login, conta nova, captcha ou verificação: pare e peça para a
-   pessoa fazer essa parte; continue depois.
+1. Abra `url_candidatura` quando houver; senão, o permalink. Login, conta nova, captcha ou
+   verificação: pare e peça para a pessoa fazer essa parte; continue depois.
 2. Preencha:
    - contatos do `perfil.json`;
    - o PDF aprovado (caminho absoluto em `meus-dados/cvs/`). No LinkedIn, troque o CV

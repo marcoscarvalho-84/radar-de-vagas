@@ -176,15 +176,22 @@
     const MOVIMENTO_REDUZIDO = !!(window.matchMedia
       && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-    // fita: o link vira uma faixa tinta com o rótulo em amarelo. O rótulo se
-    // repete em número par porque o marquee anda metade do trilho por volta
+    // fita: o link vira uma faixa tinta com o rótulo em amarelo, na largura toda do
+    // card. O rótulo se repete em número par porque o marquee anda metade do trilho
     const marquee = (url, rotulo) => {
       const href = urlSegura(url);
       if (!href) return "";
       const span = `<span>${esc(rotulo)} ↗</span>`.repeat(10);
-      return `<a class="marquee${rotulo.length <= 3 ? " marquee--curta" : ""}" href="${esc(href)}" target="_blank" rel="noopener">
+      return `<a class="marquee" href="${esc(href)}" target="_blank" rel="noopener">
         <span class="marquee__track" aria-hidden="true">${span}</span>
         <span class="sr-only">${esc(rotulo)} (abre em nova aba)</span></a>`;
+    };
+    // link curto (perfil, "Ver", "CV"): a mesma tinta com amarelo, do tamanho do rótulo,
+    // parado e inteiro, sem trilho cortando o texto
+    const linkFita = (url, rotulo) => {
+      const href = urlSegura(url);
+      if (!href) return "";
+      return `<a class="link-fita" href="${esc(href)}" target="_blank" rel="noopener" aria-label="${esc(rotulo)} (abre em nova aba)">${esc(rotulo)} <span aria-hidden="true">↗</span></a>`;
     };
 
     // ---- identidade: título e rodapé saem da config, nunca do código ----
@@ -393,7 +400,7 @@
               <h3>${esc(v.empresa)} — ${esc(v.cargo)}</h3>
               ${barraFit(v.fit)}
             </div>
-            <p class="apoio">${esc([v.local, v.modelo, v.porta === "lideranca" ? "porta liderança" : v.porta === "ic" ? "porta IC sênior" : ""].filter(Boolean).join(" · "))}</p>
+            <p class="apoio">${esc([v.local, v.modelo, v.porta ? `porta ${tituloPorta(v.porta)}` : ""].filter(Boolean).join(" · "))}</p>
             ${sinais([
               ap ? pillJaAplicada(dataAplicacao(ap)) : selo(v),
               v.cv ? "CV pronto" : "",
@@ -417,6 +424,7 @@
           ${listaCurta("Melhorias que esta vaga sugere", v.melhorias)}
           ${blocoCv(v, "CV sob medida")}
           <p class="apoio">${marquee(v.url, "Ver a vaga")}</p>
+          ${v.url_candidatura ? `<p class="apoio">${linkFita(v.url_candidatura, "Candidatar no site da empresa")}</p>` : ""}
           ${botoesVaga(v, [["aprovar", "✓ Aprovar candidatura"], ["ajustar", "✎ Ajustar"], ["pular", "✕ Descartar"]])}
           ${pessoasDaVaga(v.id)}
         </div>
@@ -506,7 +514,7 @@
           <p class="apoio">${esc([p.cargo, p.empresa].filter(Boolean).join(" · "))}</p>
           ${p.papel ? `<p class="meta papel">${esc(p.papel)}</p>` : ""}
           ${p.porque ? `<div class="campo"><span class="meta">Por que esta pessoa</span><p>${esc(p.porque)}</p></div>` : ""}
-          <p class="apoio">${marquee(p.url, "Abrir o perfil")}</p>
+          <p class="apoio">${linkFita(p.url, "Abrir o perfil")}</p>
           ${botoes(p, [["aprovar", "✓ Vou contatar"], ["pular", "✕ Pular"]])}
         </div>
       </article>`;
@@ -590,6 +598,10 @@
       })[v.radar] || "—";
     };
 
+    // as portas são as de cada pessoa (config.objetivo.portas): um filtro por porta
+    const PORTAS = (Array.isArray(CFG.portas) ? CFG.portas : []).filter((p) => p && p.id);
+    const tituloPorta = (id) => (PORTAS.find((p) => p.id === id) || {}).titulo || id;
+
     const FILTROS = [
       ["todas", "Todas"],
       ["aplicadas", "Aplicadas"],
@@ -597,19 +609,17 @@
       ["aguardando", "Aguardando você"],
       ["completa", "Trabalhadas"],
       ["triagem", "Triagem"],
-      ["lideranca", "Liderança"],
-      ["ic", "IC sênior"],
+      ...PORTAS.map((p) => [`porta:${p.id}`, p.titulo]),
     ];
 
     const passaFiltro = (v, f) => {
+      if (f.startsWith("porta:")) return v.porta === f.slice("porta:".length);
       switch (f) {
         case "aplicadas": return APLICADAS.includes(v.pipeline);
         case "aenviar": return v.radar === "aprovado";
         case "aguardando": return v.radar === "proposto";
         case "completa": return v.profundidade === "completa";
         case "triagem": return v.profundidade === "triagem";
-        case "lideranca": return v.porta === "lideranca";
-        case "ic": return v.porta === "ic";
         default: return true;
       }
     };
@@ -666,6 +676,8 @@
       filtroAtual = localStorage.getItem("radar-filtro") || "todas";
       ordemAtual = localStorage.getItem("radar-ordem") || "fit-desc";
     } catch {}
+    // filtro guardado de uma porta que não existe mais (ou de versão antiga) volta para "todas"
+    if (!FILTROS.some(([k]) => k === filtroAtual)) filtroAtual = "todas";
 
     const ORDENAVEL = { Vaga: "fit-desc", Empresa: "empresa", "Entrou em": "adicionada-desc",
       "Aplicada em": "aplicada-desc", Estado: "estado" };
@@ -912,7 +924,7 @@
               "abrir para a análise completa",
             ]) : ""}
           </div>
-          <div class="acoes">${pillStatus(v.status)}${marquee(v.url, "Ver")}</div>`;
+          <div class="acoes">${pillStatus(v.status)}${linkFita(v.url, "Ver")}</div>`;
       if (!a) return `<article class="linha">${cabeca}</article>`;
       const gente = pessoasDaEmpresa(a, v.empresa);
       return `
@@ -956,8 +968,8 @@
             ${apoio ? `<p>${esc(apoio)}</p>` : ""}
             ${porque ? `<p>${esc(porque)}</p>` : ""}
           </div>
-          <div class="acoes">${pillStatus(it.status)}${marquee(it.url, "Ver")}${
-            it.cv ? marquee(it.cv, "CV") : ""}</div>
+          <div class="acoes">${pillStatus(it.status)}${linkFita(it.url, "Ver")}${
+            it.cv ? linkFita(it.cv, "CV") : ""}</div>
         </article>`;
     };
 

@@ -200,11 +200,67 @@ def preview(pdf: Path) -> Path | None:
     return prefixo.with_suffix(".png")
 
 
-def gerar(entrada: Path, saida: Path) -> int:
+# o nome que aparece no erro do WeasyPrint -> o pacote que resolve
+BIBLIOTECAS = (("gobject", "glib"), ("glib", "glib"), ("pango", "pango"), ("harfbuzz", "harfbuzz"),
+               ("fontconfig", "fontconfig"))
+
+
+def diagnostico(erro: Exception) -> str:
+    """O erro de biblioteca do WeasyPrint em uma frase: o que falta e o comando que resolve."""
+    detalhe = (str(erro).splitlines() or [""])[0][:200]
+    pacote = next((p for nome, p in BIBLIOTECAS if nome in detalhe.lower()), "")
+    if sys.platform == "darwin":
+        alvo = pacote or "pango"
+        como = (f"brew install {alvo} && brew link {alvo} (se o link reclamar de conflito: "
+                f"brew reinstall {alvo}). Rode sempre pelo bin/radar, que diz ao Python onde o "
+                "Homebrew guarda essas bibliotecas")
+    else:
+        como = "sudo apt install libpango-1.0-0 libpangoft2-1.0-0 (ou o equivalente da sua distro)"
+    qual = f"a biblioteca do {pacote}" if pacote else "uma biblioteca do sistema"
+    return f"O WeasyPrint não achou {qual} para gerar o PDF. Resolva com: {como}. Detalhe: {detalhe}"
+
+
+def motor():
+    """A classe HTML do WeasyPrint, ou uma saída que diz o que falta e como resolver."""
+    import contextlib
+    import io
     try:
-        from weasyprint import HTML
+        # o WeasyPrint imprime um aviso longo em inglês antes de levantar o erro: fica de fora
+        with contextlib.redirect_stdout(io.StringIO()):
+            from weasyprint import HTML
     except ImportError:
         raise SystemExit("Falta o weasyprint: rode bin/instalar")
+    except OSError as e:
+        raise SystemExit(diagnostico(e))
+    return HTML
+
+
+def ambiente() -> int:
+    """bin/radar ambiente: gera um PDF de teste de verdade, em vez de só procurar pacotes."""
+    faltas = 0
+    try:
+        HTML = motor()
+        pdf = HTML(string="<p>Radar de Vagas</p>").write_pdf()
+        print(f"ok     PDF do CV: o WeasyPrint gerou um PDF de teste ({len(pdf)} bytes)")
+    except SystemExit as e:
+        print(f"FALTA  PDF do CV: {e}")
+        faltas += 1
+    try:
+        import pypdf  # noqa: F401
+        print("ok     conferência de 1 página (pypdf)")
+    except ImportError:
+        print("FALTA  pypdf, que confere se o CV coube em 1 página: rode bin/instalar")
+        faltas += 1
+    if shutil.which("pdftoppm"):
+        print("ok     preview do CV em PNG (pdftoppm)")
+    else:
+        como = "brew install poppler" if sys.platform == "darwin" else "sudo apt install poppler-utils"
+        print(f"aviso  sem pdftoppm: o CV sai, mas sem o preview em PNG. {como}")
+    return 1 if faltas else 0
+
+
+def gerar(entrada: Path, saida: Path) -> int:
+    HTML = motor()
     perfil = ler_json(caminhos.perfil(), None)
     if not perfil or not perfil.get("nome"):
         raise SystemExit(f"Sem perfil com nome em {caminhos.perfil()}: rode /radar-perfil primeiro")

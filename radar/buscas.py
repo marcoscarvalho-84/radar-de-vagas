@@ -16,6 +16,7 @@ nos dados de alguém é tratada como vazia: a coleta recusa e o passo "Posiçõe
 
 import copy
 import re
+import unicodedata
 
 from . import caminhos
 from .arquivos import editar_json, ler_json
@@ -130,10 +131,97 @@ def atualizar_com_posicoes(posicoes: list[str], perfil: dict) -> bool:
     return True
 
 
-def resumo(buscas: dict) -> dict:
-    """O que a tela mostra: de onde vieram as buscas e o que a varredura vai procurar."""
+# ---------------------------------------------------------------- idioma do país da busca
+# Num país que não fala inglês, a maioria das vagas pede a língua local fluente, e a
+# triagem corta todas essas. Num teste na França, sem francês fluente, sobraram 3 vagas
+# boas em 1.228. A pessoa precisa saber disso ANTES da primeira varredura, não depois.
+
+IDIOMAS = {  # chave -> (nome para a frase, como aparece no perfil do LinkedIn, em en e pt)
+    "fr": ("francês", {"french", "frances", "francais"}),
+    "de": ("alemão", {"german", "alemao", "deutsch"}),
+    "es": ("espanhol", {"spanish", "espanhol", "espanol", "castellano"}),
+    "it": ("italiano", {"italian", "italiano"}),
+    "pt": ("português", {"portuguese", "portugues"}),
+    "nl": ("holandês", {"dutch", "holandes", "neerlandes", "nederlands"}),
+    "ja": ("japonês", {"japanese", "japones"}),
+    "ko": ("coreano", {"korean", "coreano"}),
+    "zh": ("chinês", {"chinese", "mandarin", "chines", "mandarim"}),
+    "pl": ("polonês", {"polish", "polones"}),
+}
+# países onde a vaga costuma exigir a língua local (os nórdicos e a Holanda contratam
+# muito em inglês e ficam de fora para o aviso não virar ruído)
+PAISES = {
+    "france": ("fr",), "franca": ("fr",),
+    "germany": ("de",), "alemanha": ("de",), "austria": ("de",),
+    "switzerland": ("de", "fr", "it"), "suica": ("de", "fr", "it"),
+    "belgium": ("fr", "nl"), "belgica": ("fr", "nl"),
+    "spain": ("es",), "espanha": ("es",), "mexico": ("es",), "argentina": ("es",), "chile": ("es",),
+    "colombia": ("es",), "peru": ("es",), "uruguay": ("es",), "uruguai": ("es",),
+    "italy": ("it",), "italia": ("it",),
+    "portugal": ("pt",), "brazil": ("pt",), "brasil": ("pt",),
+    "japan": ("ja",), "japao": ("ja",),
+    "south korea": ("ko",), "coreia do sul": ("ko",),
+    "china": ("zh",), "taiwan": ("zh",),
+    "poland": ("pl",), "polonia": ("pl",),
+}
+# nível que não sustenta uma entrevista no idioma (LinkedIn em inglês e em português)
+NIVEL_FRACO = ("elementary", "limited", "elementar", "limitada", "basic", "basico", "iniciante")
+
+
+def _norm(texto: str) -> str:
+    s = unicodedata.normalize("NFKD", str(texto or "").casefold()).encode("ascii", "ignore").decode()
+    return " ".join(re.sub(r"[^a-z ]", " ", s).split())
+
+
+def _pais_da_busca(local: str) -> str:
+    """'Paris, Île-de-France, France' -> 'france'; região ('EMEA', 'Europe') -> ''."""
+    ultimo = _norm(str(local).split(",")[-1])
+    return ultimo if ultimo in PAISES else ""
+
+
+def _fala_fluente(perfil: dict, idioma: str) -> bool:
+    nomes = IDIOMAS[idioma][1]
+    for x in perfil.get("idiomas") or []:
+        if _norm(x.get("idioma")) in nomes and not any(f in _norm(x.get("nivel")) for f in NIVEL_FRACO):
+            return True
+    return False
+
+
+def avisos_idioma(buscas: dict, perfil: dict) -> list[str]:
+    """Uma frase por local de busca cujo idioma de trabalho a pessoa não mostra ter fluente."""
+    perfil = perfil or {}
+    pais_da_pessoa = _pais_da_busca(pais(perfil))
+    sabe_idiomas = bool(perfil.get("idiomas"))
+    avisos, vistos = [], set()
+    for g in buscas.get("grupos") or []:
+        local = str(g.get("local") or "")
+        chave = _pais_da_busca(local)
+        if not chave or chave in vistos:
+            continue
+        vistos.add(chave)
+        idiomas = PAISES[chave]
+        if any(_fala_fluente(perfil, i) for i in idiomas):
+            continue
+        if not sabe_idiomas and chave == pais_da_pessoa:
+            continue  # sem idiomas no perfil, quem mora no país provavelmente fala a língua
+        nome = " ou ".join(IDIOMAS[i][0] for i in idiomas)
+        o_perfil = ("o seu perfil não mostra esse idioma em nível de trabalho" if sabe_idiomas
+                    else "o seu perfil não lista idiomas para conferir")
+        avisos.append(
+            f"Busca em {local}: a maioria das vagas lá pede {nome} fluente, e {o_perfil}. "
+            f"A triagem corta essas vagas, e a mesa tende a ficar pequena. Para ampliar, "
+            f"some uma região que contrata em inglês (\"European Union\", \"EMEA\") ou "
+            f"vagas remotas de empresas internacionais.")
+    return avisos
+
+
+def resumo(buscas: dict, perfil: dict | None = None) -> dict:
+    """O que a tela mostra: de onde vieram as buscas, o que a varredura vai procurar e o
+    aviso de idioma quando o país da busca pede uma língua que o perfil não mostra."""
+    exemplo = e_exemplo(buscas)
     return {
-        "origem": "exemplo" if e_exemplo(buscas) else buscas.get("origem") or ("manual" if palavras(buscas) else ""),
-        "palavras_chave": [] if e_exemplo(buscas) else palavras(buscas),
-        "locais": [] if e_exemplo(buscas) else sorted({g.get("local", "") for g in buscas.get("grupos") or [] if g.get("local")}),
+        "origem": "exemplo" if exemplo else buscas.get("origem") or ("manual" if palavras(buscas) else ""),
+        "palavras_chave": [] if exemplo else palavras(buscas),
+        "locais": [] if exemplo else sorted({g.get("local", "") for g in buscas.get("grupos") or [] if g.get("local")}),
+        "avisos": [] if exemplo else avisos_idioma(buscas, perfil or {}),
     }

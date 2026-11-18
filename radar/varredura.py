@@ -202,14 +202,57 @@ def filtra(entrada: Path, saida: Path) -> list:
             candidatas.append(v)
 
     candidatas.sort(key=lambda x: x.get("data", ""), reverse=True)
-    gravar_json(saida, {"entrada": str(entrada), "candidatas": candidatas, "cortes": motivos})
+    rendimento = por_palavra(coletadas, candidatas)
+    gravar_json(saida, {"entrada": str(entrada), "candidatas": candidatas, "cortes": motivos,
+                        "por_palavra": rendimento})
     print(f"{len(coletadas)} coletadas, {len(candidatas)} candidatas -> {saida}")
     for m, n in sorted(motivos.items(), key=lambda x: -x[1]):
         print(f"  {n:4} {m}")
+    if len(rendimento) > 1:
+        print("  por palavra-chave (coletadas -> candidatas):")
+        for kw, r in rendimento.items():
+            print(f"  {r['coletadas']:4} -> {r['candidatas']:<3} {kw}")
     return candidatas
 
 
+def por_palavra(coletadas: list, candidatas: list) -> dict:
+    """Quanto cada palavra-chave trouxe e quanto passou no filtro, com os títulos que passaram.
+
+    É aqui que aparece o termo que pega outra área: "Revenue" traz revenue management de
+    hotel, uma sigla curta casa com o nome de uma empresa. Os títulos de exemplo deixam o
+    padrão visível sem abrir vaga por vaga.
+    """
+    saida = {}
+    for v in coletadas:
+        r = saida.setdefault(v.get("palavra_chave", ""), {"coletadas": 0, "candidatas": 0, "titulos": []})
+        r["coletadas"] += 1
+    for v in candidatas:
+        r = saida.setdefault(v.get("palavra_chave", ""), {"coletadas": 0, "candidatas": 0, "titulos": []})
+        r["candidatas"] += 1
+        if len(r["titulos"]) < 8 and v.get("titulo") and v["titulo"] not in r["titulos"]:
+            r["titulos"].append(v["titulo"])
+    return dict(sorted(saida.items(), key=lambda x: -x[1]["coletadas"]))
+
+
 # ---------------------------------------------------------------- descrição e checagem
+
+# Sem login, o LinkedIn não mostra o link externo de candidatura, mas diz se ela é no site
+# da empresa (botão "offsite") ou no próprio LinkedIn (Easy Apply, "onsite").
+CANDIDATURA = {"externa": "no site da empresa (bin/radar ats acha o link)", "linkedin": "Easy Apply no LinkedIn"}
+
+
+def _fechada(codigo, corpo: str) -> bool:
+    return codigo in (404, 410) or "No longer accepting applications" in corpo
+
+
+def _candidatura(corpo: str) -> str:
+    """'externa', 'linkedin' ou '' (a página não disse)."""
+    if "apply-link-offsite" in corpo:
+        return "externa"
+    if "apply-link-onsite" in corpo:
+        return "linkedin"
+    return ""
+
 
 def descricao(ids, pasta: Path) -> None:
     pasta.mkdir(parents=True, exist_ok=True)
@@ -217,12 +260,14 @@ def descricao(ids, pasta: Path) -> None:
         codigo, corpo = baixar(POSTAGEM.format(i))
         criterios = " | ".join(_txt(r"(.*)", x) for x in
                                re.findall(r"description__job-criteria-text[^>]*>(.*?)</span>", corpo, re.S))
-        fechada = "FECHADA" if (codigo in (404, 410) or "No longer accepting applications" in corpo) else ""
+        fechada = "FECHADA" if _fechada(codigo, corpo) else ""
+        onde = CANDIDATURA.get(_candidatura(corpo), "")
         m = re.search(r"show-more-less-html__markup[^>]*>(.*?)</div>", corpo, re.S)
         texto = html.unescape(re.sub(r"<br\s*/?>|</li>|</p>", "\n", m.group(1) if m else ""))
         texto = re.sub(r"\n\s*\n+", "\n", re.sub(r"<[^>]+>", "", texto)).strip()
-        (pasta / f"{i}.txt").write_text(f"{codigo} {fechada}\nCRITÉRIOS: {criterios}\n{texto}", encoding="utf-8")
-        print(i, codigo, fechada or "aberta", f"{len(texto)} caracteres", flush=True)
+        (pasta / f"{i}.txt").write_text(f"{codigo} {fechada}\nCANDIDATURA: {onde}\nCRITÉRIOS: {criterios}\n{texto}",
+                                        encoding="utf-8")
+        print(i, codigo, fechada or "aberta", f"{len(texto)} caracteres", onde, flush=True)
         _pausa()
 
 
@@ -235,9 +280,11 @@ def checa(ids, saida: Path) -> dict:
         codigo, corpo = baixar(POSTAGEM.format(i))
         resultado[i] = {
             "codigo": codigo,
-            "fechada": (codigo in (404, 410) or "No longer accepting applications" in corpo) if codigo else None,
+            "fechada": _fechada(codigo, corpo) if codigo else None,
             "ha": _txt(r"posted-time-ago__text[^>]*>(.*?)<", corpo),
             "titulo": _txt(r"topcard__title[^>]*>(.*?)<", corpo),
+            "empresa": _txt(r"topcard__org-name-link[^>]*>(.*?)<", corpo),
+            "candidatura": _candidatura(corpo),
         }
         gravar_json(saida, resultado)
         print(i, resultado[i], flush=True)

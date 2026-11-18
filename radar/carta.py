@@ -13,7 +13,7 @@ from pathlib import Path
 
 from . import caminhos
 from .arquivos import ler_json
-from .cv import esc, fontes_css
+from .cv import esc, fontes_css, motor
 
 
 def corpo_da_carta(md: str) -> list[str]:
@@ -53,10 +53,7 @@ p{{font-size:10.6pt;line-height:1.72;margin-bottom:5.2mm;max-width:150mm;}}
 
 
 def gerar(entrada: Path, saida: Path) -> int:
-    try:
-        from weasyprint import HTML
-    except ImportError:
-        raise SystemExit("Falta o weasyprint: rode bin/instalar")
+    HTML = motor()
     perfil = ler_json(caminhos.perfil(), None)
     if not perfil or not perfil.get("nome"):
         raise SystemExit(f"Sem perfil com nome em {caminhos.perfil()}: rode /radar-perfil primeiro")

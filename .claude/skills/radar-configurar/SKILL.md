@@ -52,7 +52,15 @@ conduzir.
   2. local: o país do perfil, mais regiões se a pessoa aceita internacional (Bloco 4);
   3. `filtro_titulo`: `precisa_ter` com os termos-núcleo da área tirados das posições,
      `senioridade` com os marcadores de nível que cabem, `descartar_se_tiver` com funções
-     vizinhas que aparecem na mesma busca mas não são a dela.
+     vizinhas que aparecem na mesma busca mas não são a dela;
+  4. homônimos: para cada termo, pense em que outra área a mesma palavra é cargo e já ponha
+     os marcadores dessa área em `descartar_se_tiver` ("Revenue" também é revenue
+     management de hotel: "hotel", "hospitality", "revenue manager", "distribution"). Sigla
+     curta ("GTM", "CRM", "BI") casa com nome de empresa: prefira a forma por extenso como
+     palavra-chave e deixe a sigla só no `precisa_ter`;
+  5. idioma: local num país que não fala inglês e perfil sem a língua local em nível de
+     trabalho (`bin/radar validar` avisa): diga isso antes de gravar e proponha somar uma
+     região que contrata em inglês ou vagas remotas internacionais.
   Mostre a proposta numa tabela "termo · de onde veio (posição, LinkedIn ou CV)". Ao gravar,
   marque `buscas.json > origem: "questionario"`: a tela de abertura não sobrescreve mais.
   Se `buscas.json` ainda for o exemplo (cargos de design de `exemplos/`), substitua inteiro.

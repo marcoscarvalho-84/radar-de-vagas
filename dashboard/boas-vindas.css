@@ -531,6 +531,16 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
 }
 .posicoes__sugeridas button:hover { background: var(--primary); border-style: solid; }
 .posicoes__busca { font-size: var(--text-small); color: var(--g700); }
+/* lembrete, não alarme: o mesmo amarelo do aviso de config incompleta do painel */
+.posicoes__idioma {
+  width: fit-content;
+  max-width: 62ch;
+  padding: 8px 12px;
+  background: var(--primary);
+  color: var(--ink);
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+}
 
 /* ---- zona de soltar arquivo: arrastando, ela acende em azul ---- */
 .soltar {

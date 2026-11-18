@@ -881,7 +881,6 @@ tr.decidida-ajustar > td { background: var(--g100); }
   text-decoration: none;
   white-space: nowrap;
 }
-.marquee--curta { width: 6rem; }
 .marquee__track { display: inline-flex; }
 .marquee__track > span { padding-inline: 12px; }
 .marquee:hover .marquee__track,
@@ -892,6 +891,28 @@ tr.decidida-ajustar > td { background: var(--g100); }
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+/* link curto: tinta com amarelo do tamanho do rótulo; no hover inverte para amarelo */
+.link-fita {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 8px 14px;
+  vertical-align: middle;
+  background: var(--ink);
+  color: var(--primary);
+  border: var(--fio-forte);
+  font-size: var(--text-micro);
+  line-height: var(--leading-small);
+  font-weight: var(--peso-medio);
+  letter-spacing: var(--tracking-micro);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease-tema), color var(--dur-fast) var(--ease-tema);
+}
+.link-fita:hover,
+.link-fita:focus-visible { background: var(--primary); color: var(--ink); }
 /* dentro do corpo do card a fita atravessa a largura toda */
 .proposta-corpo > .apoio:has(> .marquee) { max-width: none; margin-top: var(--space-xl); }
 .proposta-corpo > .apoio > .marquee {
@@ -938,7 +959,7 @@ tr.decidida-ajustar > td { background: var(--g100); }
 .pessoa h4 a:hover { text-decoration: underline; }
 .pessoa .papel { margin-top: var(--space-xs); color: var(--ink); }
 .pessoa .decisoes { margin-top: var(--space-lg); }
-.pessoa .apoio:has(> .marquee) { margin-top: var(--space-md); }
+.pessoa .apoio:has(> .link-fita) { margin-top: var(--space-md); }
 
 /* iniciais no lugar da foto: círculo amarelo com fio, como o avatar da
    pílula de contato */
