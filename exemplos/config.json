@@ -60,6 +60,7 @@
   },
   "rotina": {
     "horario": "09:00",
+    "fontes": ["linkedin", "gupy", "solides"],
     "janela_horas": 48,
     "follow_up_dias": 7,
     "triagem_expira_dias": 14,

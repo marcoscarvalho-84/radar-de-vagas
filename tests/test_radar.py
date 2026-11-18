@@ -494,6 +494,117 @@ class TestRetornoDeUso(ComDados):
         self.assertFalse(any("url_candidatura" in m for _, m in validar.checar_vagas(boa)))
 
 
+class TestFontes(ComDados):
+    """Gupy e Sólides: o formato que os portais devolviam em nov/2026, sem rede."""
+
+    def _gupy(self, id_, nome, dias=0, modelo="remote", cidade="", tipo="vacancy_type_effective", sub="acme"):
+        quando = (date.today() - timedelta(days=dias)).isoformat()
+        return {"id": id_, "name": nome, "careerPageName": "Acme", "type": tipo, "workplaceType": modelo,
+                "city": cidade, "state": "Santa Catarina" if cidade else "", "publishedDate": quando + "T10:00:00.000Z",
+                "applicationDeadline": "2027-01-01T00:00:00.000Z",
+                "jobUrl": f"https://{sub}.gupy.io/job/eyJqb2JJZCI6MX0=?jobBoardSource=gupy_portal"}
+
+    def _solides(self, id_, titulo, dias=0, modelo="remoto", slug="beta", **extra):
+        return {"id": str(id_), "title": titulo, "companyName": "Beta Ltda", "slug": slug, "jobType": modelo,
+                "city": {"name": "Joinville"}, "state": {"code": "SC"},
+                "createdAt": (date.today() - timedelta(days=dias)).isoformat(), **extra}
+
+    def test_vaga_de_cada_portal_vira_o_formato_da_coleta(self):
+        from radar import fontes
+        g = fontes.vaga_gupy(self._gupy(123, "Senior Product Designer"), "Product Designer", "Brazil")
+        self.assertEqual(g["id"], "gupy-acme-123")
+        self.assertEqual(g["url"], "https://acme.gupy.io/jobs/123")
+        self.assertEqual((g["fonte"], g["modelo"], g["local"]), ("gupy", "remoto", "Remoto"))
+        self.assertEqual(g["data"], date.today().isoformat())
+        self.assertIsNone(fontes.vaga_gupy(self._gupy(9, "Banco", tipo="vacancy_type_talent_pool"), "x", "Brazil"))
+        self.assertIsNone(fontes.vaga_gupy({**self._gupy(9, "X"), "jobUrl": "https://evil.com/x"}, "x", "Brazil"))
+        s = fontes.vaga_solides(self._solides(77, "Product Designer", salary={
+            "showRangeToApplicant": True, "initialRange": 9000, "finalRange": 12000}), "Product Designer", "Brazil")
+        self.assertEqual(s["url"], "https://beta.vagas.solides.com.br/vaga/77")
+        self.assertEqual((s["local"], s["salario"]), ("Joinville, SC", "R$ 9.000 a R$ 12.000"))
+        self.assertIsNone(fontes.vaga_solides(self._solides(78, "X", slug="não vale"), "x", "Brazil"))
+        self.assertIsNone(fontes.vaga_solides(self._solides(79, "X", receivingResume=False), "x", "Brazil"))
+
+    def test_ids_e_links_vao_e_voltam(self):
+        from radar import fontes
+        for id_, url in (("4471678311", "https://www.linkedin.com/jobs/view/4471678311"),
+                         ("gupy-solar-coca-12897336", "https://solar-coca.gupy.io/jobs/12897336"),
+                         ("solides-inchurch-940811", "https://inchurch.vagas.solides.com.br/vaga/940811")):
+            self.assertEqual(fontes.url_do_id(id_), url)
+            self.assertEqual(fontes.id_da_url(url), id_)
+        self.assertEqual(fontes.url_do_id("vaga-301"), "")
+        self.assertEqual(fontes.fonte_do_id("gupy-acme-1"), "gupy")
+
+    def test_coleta_so_no_brasil_para_na_janela_e_respeita_a_cidade(self):
+        from radar import fontes
+        chamadas = []
+        gupy = [self._gupy(i, "Product Designer", dias=0) for i in range(1, 50)] + [self._gupy(50, "Product Designer", dias=5)]
+        gupy[3] = self._gupy(4, "Product Designer", modelo="on-site", cidade="Joinville")
+        gupy[4] = self._gupy(5, "Product Designer", modelo="hybrid", cidade="Curitiba")
+
+        def baixar(url):
+            chamadas.append(url)
+            if "gupy" in url:
+                return 200, json.dumps({"data": gupy if "offset=0" in url else [self._gupy(99, "Velha", dias=9)]})
+            return 200, json.dumps({"data": [self._solides(7, "Product Designer")]})
+
+        grupos = [{"local": "Curitiba, Paraná, Brazil", "palavras_chave": ["Product Designer"]},
+                  {"local": "France", "palavras_chave": ["Product Designer"]},
+                  {"local": "Latin America", "palavras_chave": ["Product Designer"]}]
+        vagas, falhas = fontes.coletar(grupos, 48, ["gupy", "solides"], baixar, lambda: None)
+        self.assertEqual(falhas, [])
+        self.assertTrue(all("portal.gupy.io" in u or "solides" in u for u in chamadas))
+        # uma página só: a primeira já passou da janela de 48h
+        self.assertEqual(sum("gupy" in u for u in chamadas), 1)
+        self.assertIn("gupy-acme-5", vagas)        # híbrida em Curitiba
+        self.assertNotIn("gupy-acme-4", vagas)     # presencial em Joinville
+        self.assertIn("solides-beta-7", vagas)     # remota entra em qualquer cidade
+        sem_gupy, _ = fontes.coletar(grupos, 48, ["solides"], baixar, lambda: None)
+        self.assertTrue(all(v["fonte"] == "solides" for v in sem_gupy.values()))
+
+    def test_portal_fora_do_ar_marca_resultado_incompleto(self):
+        from radar import fontes
+        vagas, falhas = fontes.coletar([{"local": "Brazil", "palavras_chave": ["Designer"]}], 48, ["gupy"],
+                                       lambda url: (0, ""), lambda: None)
+        self.assertEqual((vagas, [f["fonte"] for f in falhas]), ({}, ["gupy"]))
+
+    def test_jobposting_escapado_e_vaga_fechada(self):
+        from radar import fontes
+        ld = json.dumps({"@context": "http://schema.org", "@type": "JobPosting", "title": "Designer",
+                         "datePosted": "2026-11-17", "validThrough": "2099-01-01",
+                         "hiringOrganization": {"@type": "Organization", "name": "Acme"},
+                         "description": "<p>Fazer &amp; medir</p><ul><li>Figma</li></ul>"})
+        escapado = ld.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+        pagina = f'<script type="application/ld+json">{escapado}</script>'
+        url = "https://acme.gupy.io/jobs/1"
+        aberta = fontes.ler_vaga(url, lambda u, com_url: (200, pagina, u))
+        self.assertEqual((aberta["fechada"], aberta["empresa"], aberta["valida_ate"]), (False, "Acme", "2099-01-01"))
+        self.assertIn("Fazer & medir", aberta["descricao"])
+        grafo = f'<script type="application/ld+json">{{"@graph": [{{"@type": "WebPage"}}, {ld}]}}</script>'
+        self.assertEqual(fontes.jobposting(grafo)["title"], "Designer")
+        vencida = pagina.replace("2099-01-01", "2020-01-01")
+        self.assertTrue(fontes.ler_vaga(url, lambda u, com_url: (200, vencida, u))["fechada"])
+        login = fontes.ler_vaga(url, lambda u, com_url: (200, "<html></html>", "https://acme.gupy.io/candidates/signin"))
+        self.assertTrue(login["fechada"])
+        self.assertTrue(fontes.ler_vaga(url, lambda u, com_url: (404, "", u))["fechada"])
+        self.assertIsNone(fontes.ler_vaga(url, lambda u, com_url: (200, "<html>sem dados</html>", u))["fechada"])
+
+    def test_vaga_do_portal_ja_no_radar_e_duplicata(self):
+        from radar import varredura
+        (self.pasta / "vagas.json").write_text(json.dumps({"vagas": [
+            {"id": "vaga-301", "empresa": "Outra", "cargo": "Outro", "url": "https://acme.gupy.io/jobs/123"}]}),
+            encoding="utf-8")
+        ids, _ = varredura._ja_no_radar()
+        self.assertIn("gupy-acme-123", ids)
+
+    def test_fonte_desconhecida_recusa(self):
+        from radar import varredura
+        with self.assertRaises(SystemExit):
+            varredura.escolher_fontes("linkedin,catho")
+        self.assertEqual(varredura.escolher_fontes("Gupy, solides"), ["gupy", "solides"])
+        self.assertEqual(varredura.escolher_fontes(None), ["linkedin", "gupy", "solides"])
+
+
 class TestContexto(ComDados):
     """Os 6 passos da tela de abertura, sem servidor."""
 

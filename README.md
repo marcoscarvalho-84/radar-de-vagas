@@ -3,9 +3,10 @@
 **Aplicar é fácil. Aplicar bem é raro.**
 
 Uma rotina de busca de emprego que roda no seu computador com o [Claude Code](https://claude.com/claude-code).
-Ela varre vagas novas no LinkedIn, dá a cada uma uma nota de fit honesta, aprofunda as
-melhores (empresa, salário com fonte, forças e lacunas), gera um CV sob medida em PDF,
-mapeia quem contatar na empresa e aplica por você, **sempre parando para você aprovar**.
+Ela varre vagas novas no LinkedIn (e, no Brasil, na Gupy e na Sólides), dá a cada uma uma
+nota de fit honesta, aprofunda as melhores (empresa, salário com fonte, forças e lacunas),
+gera um CV sob medida em PDF, mapeia quem contatar na empresa e aplica por você, **sempre
+parando para você aprovar**.
 
 O espírito: industrializar o cuidado, nunca o spam. Cada vaga recebe o tratamento que um bom
 candidato daria em uma tarde, comprimido em minutos, e nada sai sem o seu ok.
@@ -107,6 +108,8 @@ Em seguida, no Claude Code:
 - **[CLAUDE.md](CLAUDE.md)**: a rotina diária, passo a passo.
 - **[docs/esquemas.md](docs/esquemas.md)**: o formato de cada arquivo de dados.
 - **[docs/linkedin-tecnico.md](docs/linkedin-tecnico.md)**: o que aprendemos sobre o LinkedIn na prática.
+- **[docs/fontes-de-vagas.md](docs/fontes-de-vagas.md)**: Gupy e Sólides, como desligar uma
+  fonte e por que os outros sites de vaga ficaram de fora.
 - **[docs/design-system.md](docs/design-system.md)**: o visual do painel.
 
 ## Seus dados
@@ -125,7 +128,8 @@ mensagens e convites nunca são abertos.
   sinal de bloqueio. O Radar nunca resolve captcha, cria conta ou digita senha.
 - **Verdade documental.** O Radar não inventa nem infla fato: tudo sai do que você confirmou.
 - **Use com responsabilidade.** Automatizar o LinkedIn pode contrariar os termos de uso do
-  site. Este projeto foi desenhado para o uso de UMA pessoa procurando emprego, em volume
+  site, e os termos da Gupy para candidatos proíbem agregar vagas da plataforma (cada fonte
+  pode ser desligada em `config.json > rotina > fontes`). Este projeto foi desenhado para o uso de UMA pessoa procurando emprego, em volume
   humano. Você é responsável pelo uso que faz dele.
 
 ## Contribuir
@@ -151,8 +155,9 @@ Licença MIT (código). As fontes seguem a OFL (`templates/fonts/OFL.txt` e
 ## English summary
 
 Radar de Vagas is a local, human-in-the-loop job search routine for Claude Code: it scans
-new LinkedIn postings through the public guest endpoint, scores fit from 0 to 100 with an
-honest one-line rationale, researches the best matches (company, salary with sources,
+new LinkedIn postings through the public guest endpoint (plus the Gupy and Sólides job
+portals for searches in Brazil), scores fit from 0 to 100 with an honest one-line
+rationale, researches the best matches (company, salary with sources,
 strengths and honest gaps), generates a tailored one-page PDF résumé and cover letter, maps
 who to contact at the company (without writing messages), and fills applications in your
 browser, always stopping for your explicit approval before anything goes out. Run `bin/radar`

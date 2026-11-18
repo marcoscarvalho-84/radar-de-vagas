@@ -13,18 +13,22 @@ Antes de qualquer busca ou linha de análise. Vaga boa fecha rápido (num teste,
 combinava fechou em menos de uma semana), e entre a triagem e o "aprofundar" do painel
 passam dias.
 
-    bin/radar varrer checa <id do LinkedIn>
+    bin/radar varrer checa <id da vaga na coleta, ou o link dela>
 
 - `fechada: true`: pare. `bin/radar marcar <vaga-N> recusado --nota "fechou antes de
   aprofundar"`, diga isso em uma linha e siga para a próxima da fila.
-- `candidatura: "externa"`: a candidatura é no site da empresa. Rode
+- `fechada: null`: a página está no ar mas não disse se a vaga vale. Abra o link e confira.
+- Vaga da Gupy ou da Sólides (id `gupy-…`/`solides-…`): o `url` já é o ATS. Grave
+  `url_candidatura` igual a ele, se ainda não estiver, e pule o `bin/radar ats`.
+- `candidatura: "externa"` numa vaga do LinkedIn: a candidatura é no site da empresa. Rode
   `bin/radar ats "<empresa>" "<cargo>"` e, achando a vaga, grave o link em
   `url_candidatura` (o `url` continua o permalink do LinkedIn). Não achou: procure a página
   de carreiras com WebSearch ("<empresa> careers <cargo>"; no Brasil, também gupy.io e
   inhire). Achou lá e não no LinkedIn, ou o contrário, com datas diferentes: confira qual
   está valendo.
-- Vaga sem id do LinkedIn (link de ATS mandado pela pessoa): abra o link. Redirecionou para
-  a página geral de carreiras, deu erro ou veio sem texto: fechou.
+- Vaga com link de ATS mandado pela pessoa: `bin/radar varrer checa <link>` lê o JobPosting
+  da página. Sem resposta clara, abra o link. Redirecionou para a página geral de carreiras,
+  deu erro ou veio sem texto: fechou.
 
 ## 1. Ler a vaga
 

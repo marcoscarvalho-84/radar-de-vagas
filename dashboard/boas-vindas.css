@@ -146,6 +146,26 @@ html { scrollbar-gutter: stable; }
   color: var(--muted);
 }
 
+/* ---- o radar da abertura: grande, sangrando pela borda direita da tela ----
+   25% do prato fica fora da tela. A largura é a coluna mais a margem até a borda, dividida
+   por 0,75: o prato começa na coluna e a borda corta o último quarto. Com o teto, ele
+   continua encostado na borda e só deixa de chegar à coluna. A vaga certa e o selo ficam
+   sempre no que aparece (o radar-3d.js sabe onde a tela acaba). 100vw conta a barra de
+   rolagem quando ela ocupa lugar: o corte fica uns pixels maior, nunca menor. */
+#tela-abertura { overflow-x: clip; }
+.abre .radar {
+  --radar-margem: max(var(--gutter), (100vw - var(--container-max)) / 2);
+  --radar-largura: min(960px, (100% + var(--radar-margem)) / 0.75);
+  width: var(--radar-largura);
+  max-width: none;
+  justify-self: end;
+  margin-right: calc(-1 * var(--radar-margem) - 0.25 * var(--radar-largura));
+}
+/* o SVG de reserva na mesma caixa: o desenho quadrado centrado, sem crescer na altura */
+.abre .radar svg { aspect-ratio: 1.2; }
+/* a dica centrada no que aparece, não no prato inteiro */
+.abre .radar__dica { padding-right: 25%; }
+
 
 /* ---- como funciona: linha do tempo horizontal ----
    Cada passo desenha o próprio nó e o trecho de trilho até o próximo, então a
@@ -698,8 +718,9 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
 
 /* ============ RESPONSIVO ============ */
 @media (max-width: 992px) {
-  .abre { grid-template-columns: 1fr; }
-  .radar { justify-self: start; max-width: 360px; }
+  /* minmax(0, …): o radar mais largo que a coluna não alarga a coluna */
+  .abre { grid-template-columns: minmax(0, 1fr); }
+  .abre .radar { --radar-largura: min(640px, (100% + var(--radar-margem)) / 0.75); }
   .passo { grid-template-columns: 1fr; gap: var(--space-xl); }
   /* a linha do tempo continua horizontal: desliza para o lado, sem empurrar a página */
   .funcoes {
@@ -729,7 +750,6 @@ fieldset.campo legend { margin-bottom: var(--space-xs); }
   .topicos li:first-child { padding-top: 0; }
   .topicos li:last-child { padding-bottom: 0; }
   .abre__acoes > * { flex: 1 1 100%; }
-  .radar { max-width: 300px; justify-self: center; }
   .header .btn-fio { padding: 8px 14px; }
   .soltar { padding: var(--space-lg); }
   .passo__acoes .btn-primario { flex: 1 1 100%; }

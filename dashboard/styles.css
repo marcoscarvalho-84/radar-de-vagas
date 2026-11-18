@@ -398,10 +398,10 @@ body::after {
   transform-origin: 50% 50%;
   animation: varrer 7s linear infinite;
 }
-.radar__cunha { fill: var(--azul); }
+/* o facho some para trás, como no 3D: o degradê gira junto com a cunha */
+.radar__cunha { fill: url(#radar-facho); }
 .radar__ponteiro { stroke: var(--ink); stroke-width: 1.5; }
 .radar__ponto { fill: var(--ink); }
-.radar__ponto--fora { fill: var(--g300); }
 .radar__alvo { fill: var(--primary); stroke: var(--ink); stroke-width: 1.5; }
 .radar__selo rect { fill: var(--ink); }
 .radar__selo text {

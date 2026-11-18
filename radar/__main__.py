@@ -7,10 +7,12 @@ Comandos:
   demo [--porta 8323]           painel com dados fictícios, sem configurar nada
   perfil importar <zip|pasta>   importa o export oficial do LinkedIn
   perfil pdf <arquivo.pdf>      extrai o texto do "Salvar em PDF" do seu perfil
-  varrer coleta [--horas N]     coleta vagas pelo endpoint público
+  varrer coleta [--horas N] [--fontes linkedin,gupy,solides]
+                                coleta vagas no LinkedIn e, nas buscas no Brasil, na
+                                Gupy e na Sólides (padrão: config.rotina.fontes)
   varrer filtra [--entrada F]   corta título, janela e duplicatas -> candidatas.json
-  varrer descricao <id>...      baixa a descrição de cada vaga
-  varrer checa <id>...          confere se a vaga ainda aceita candidaturas e onde
+  varrer descricao <id|link>... baixa a descrição de cada vaga
+  varrer checa <id|link>...     confere se a vaga ainda aceita candidaturas e onde
   ats "<empresa>" "<cargo>"     acha a vaga no Greenhouse, Lever ou Ashby da empresa
   validar                       confere esquemas e consistência dos dados
   marcar <id> <status>          muda status com trava (proposto, aprovado, executado...)
@@ -52,6 +54,7 @@ def main(argv=None) -> int:
     vr = sub.add_parser("varrer").add_subparsers(dest="acao", required=True)
     co = vr.add_parser("coleta")
     co.add_argument("--horas", type=int)
+    co.add_argument("--fontes", help="lista separada por vírgula: linkedin, gupy, solides")
     co.add_argument("--saida", type=Path)
     fi = vr.add_parser("filtra")
     fi.add_argument("--entrada", type=Path)
@@ -116,7 +119,7 @@ def main(argv=None) -> int:
         pasta = varredura.pasta_do_dia()
         if a.acao == "coleta":
             horas = a.horas or config.carregar()["rotina"]["janela_horas"]
-            varredura.coleta(horas, a.saida or pasta / "coleta.json")
+            varredura.coleta(horas, a.saida or pasta / "coleta.json", a.fontes)
         elif a.acao == "filtra":
             varredura.filtra(a.entrada or pasta / "coleta.json", a.saida or pasta / "candidatas.json")
         elif a.acao == "descricao":

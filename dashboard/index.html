@@ -33,6 +33,13 @@
       </div>
       <figure class="radar" role="img" aria-label="Ilustração de um radar varrendo vagas; cada vaga é um pino da altura da sua nota de fit, e a mais alta, em amarelo, tem fit 86">
         <svg viewBox="0 0 400 400" aria-hidden="true">
+          <!-- o facho: forte no ponteiro, some para trás (gira junto com a cunha) -->
+          <defs>
+            <linearGradient id="radar-facho" gradientUnits="userSpaceOnUse" x1="0" y1="200" x2="0" y2="74">
+              <stop offset="0" stop-color="#263AF5" stop-opacity="0.95" />
+              <stop offset="1" stop-color="#263AF5" stop-opacity="0" />
+            </linearGradient>
+          </defs>
           <line class="radar__eixo" x1="4" y1="200" x2="396" y2="200" />
           <line class="radar__eixo" x1="200" y1="4" x2="200" y2="396" />
           <g class="radar__varredura">
@@ -43,9 +50,6 @@
           <circle class="radar__anel" cx="200" cy="200" r="100" />
           <circle class="radar__anel" cx="200" cy="200" r="150" />
           <circle class="radar__anel" cx="200" cy="200" r="196" />
-          <circle class="radar__ponto radar__ponto--fora" cx="64" cy="296" r="4" />
-          <circle class="radar__ponto radar__ponto--fora" cx="338" cy="292" r="4" />
-          <circle class="radar__ponto radar__ponto--fora" cx="96" cy="96" r="4" />
           <circle class="radar__ponto" cx="140" cy="122" r="4" />
           <circle class="radar__ponto" cx="112" cy="248" r="4" />
           <circle class="radar__ponto" cx="296" cy="262" r="4" />
@@ -53,10 +57,10 @@
           <circle class="radar__ponto" cx="322" cy="184" r="4" />
           <circle class="radar__ponto" cx="234" cy="236" r="4" />
           <circle class="radar__ponto" cx="200" cy="200" r="3" />
-          <circle class="radar__alvo" cx="266" cy="140" r="10" />
+          <circle class="radar__alvo" cx="250" cy="150" r="10" />
           <g class="radar__selo">
-            <rect x="284" y="102" width="82" height="28" rx="14" />
-            <text x="325" y="121" text-anchor="middle">FIT 86</text>
+            <rect x="154" y="112" width="82" height="28" rx="14" />
+            <text x="195" y="131" text-anchor="middle">FIT 86</text>
           </g>
         </svg>
       </figure>

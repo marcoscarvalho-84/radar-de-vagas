@@ -1,11 +1,16 @@
-"""Varredura de vagas pelo endpoint público (sem login) do LinkedIn.
+"""Varredura de vagas: o LinkedIn pelo endpoint público (sem login) e, nas buscas no Brasil,
+os portais da Gupy e da Sólides (radar/fontes.py, docs/fontes-de-vagas.md).
 
-    bin/radar varrer coleta  [--horas 48] [--saida arquivo.json]
+    bin/radar varrer coleta  [--horas 48] [--fontes linkedin,gupy,solides] [--saida arquivo.json]
     bin/radar varrer filtra  [--entrada coleta.json] [--saida candidatas.json]
-    bin/radar varrer descricao <id> [<id>...]
-    bin/radar varrer checa   <id> [<id>...]
+    bin/radar varrer descricao <id ou link> [...]
+    bin/radar varrer checa   <id ou link> [...]
 
-Regras aprendidas na prática (detalhes em docs/linkedin-tecnico.md):
+Os ids: o do LinkedIn é o número da vaga; os outros levam a fonte e a empresa no portal
+(`gupy-asaas-12836874`, `solides-inchurch-940811`). Um link de vaga de qualquer ATS também
+serve para descricao e checa: a página é lida pelo JSON-LD JobPosting.
+
+Regras aprendidas na prática no LinkedIn (detalhes em docs/linkedin-tecnico.md):
 - uma palavra-chave por vez: a busca do LinkedIn não respeita OR nem aspas;
 - paginação de 10 em 10 pelo `start`, e a parada é POR PALAVRA-CHAVE (página sem id novo
   para ela), não pelo conjunto global, senão palavras sobrepostas morrem na 2ª página;
@@ -31,7 +36,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from . import buscas as _buscas
-from . import caminhos, config
+from . import caminhos, config, fontes
 from .arquivos import gravar_json, ler_json
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -46,23 +51,27 @@ def _pausa(intervalo=PAUSA):
     time.sleep(random.uniform(*intervalo))
 
 
-def baixar(url: str, tentativas: int = 6) -> tuple[int, str]:
-    """(código HTTP, corpo). Código 0 = desistiu depois de todas as tentativas."""
+def baixar(url: str, tentativas: int = 6, com_url: bool = False) -> tuple:
+    """(código HTTP, corpo). Código 0 = desistiu depois de todas as tentativas.
+
+    Com `com_url`, devolve também o endereço final, depois dos redirecionamentos: a Gupy
+    manda a vaga que sumiu para a tela de login."""
     for t in range(tentativas):
         req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8"})
         try:
             with urllib.request.urlopen(req, timeout=25) as r:
-                return r.status, r.read().decode("utf-8", "replace")
+                corpo = r.read().decode("utf-8", "replace")
+                return (r.status, corpo, r.geturl()) if com_url else (r.status, corpo)
         except urllib.error.HTTPError as e:
             if e.code in (404, 410):
-                return e.code, ""
+                return (e.code, "", url) if com_url else (e.code, "")
             codigo = e.code
         except (urllib.error.URLError, TimeoutError) as e:
             codigo = f"rede ({e})"
         espera = 30 + 30 * t
         print(f"   {codigo}: nova tentativa em {espera}s", file=sys.stderr, flush=True)
         time.sleep(espera)
-    return 0, ""
+    return (0, "", url) if com_url else (0, "")
 
 
 def _txt(padrao: str, corpo: str) -> str:
@@ -89,18 +98,57 @@ def chave(empresa: str, cargo: str) -> tuple[str, str]:
 
 # ---------------------------------------------------------------- coleta
 
-def coleta(horas: int, saida: Path) -> dict:
+def escolher_fontes(pedidas=None) -> list[str]:
+    """As fontes desta coleta: as pedidas na linha de comando ou as de config.rotina.fontes."""
+    lista = pedidas if pedidas is not None else config.carregar()["rotina"].get("fontes")
+    if isinstance(lista, str):
+        lista = lista.split(",")
+    escolhidas = [str(f).strip().lower() for f in lista or [] if str(f).strip()]
+    desconhecidas = [f for f in escolhidas if f not in fontes.FONTES]
+    if desconhecidas:
+        raise SystemExit(f"Fonte desconhecida: {', '.join(desconhecidas)}. Use {', '.join(fontes.FONTES)}.")
+    if not escolhidas:
+        raise SystemExit("Nenhuma fonte de vaga ligada: confira config.json > rotina > fontes.")
+    return escolhidas
+
+
+def coleta(horas: int, saida: Path, quais=None) -> dict:
     buscas = _buscas.ler()
     onde = "diga as posições que você quer no passo Posições (bin/radar, Seu contexto) ou rode /radar-configurar busca"
     if _buscas.e_exemplo(buscas):
         raise SystemExit(f"{caminhos.buscas()} ainda tem as palavras-chave do exemplo, que não são as suas: {onde}")
     if not _buscas.palavras(buscas):
         raise SystemExit(f"Sem palavras-chave em {caminhos.buscas()}: {onde}")
+    ligadas = escolher_fontes(quais)
+    aviso = lambda s: print(s, file=sys.stderr, flush=True)
+    # os portais de ATS primeiro: a mesma vaga no LinkedIn fica como repetida, e a que segue
+    # é a que já tem o link de candidatura direto
+    vagas, falhas = fontes.coletar(buscas["grupos"], horas, ligadas, baixar, lambda: _pausa((2, 4)), aviso)
+    if vagas and "linkedin" in ligadas:
+        _pausa()
+    if "linkedin" in ligadas:
+        _linkedin(buscas, horas, vagas, falhas)
+    contagem = {}
+    for v in vagas.values():
+        contagem[v.get("fonte", "linkedin")] = contagem.get(v.get("fonte", "linkedin"), 0) + 1
+    resultado = {"horas": horas, "em": date.today().isoformat(), "fontes": contagem,
+                 "vagas": list(vagas.values()), "falhas": falhas}
+    gravar_json(saida, resultado)
+    por_fonte = ", ".join(f"{fontes.NOMES[f]} {n}" for f, n in contagem.items())
+    print(f"{len(vagas)} vagas únicas -> {saida}" + (f" ({por_fonte})" if por_fonte else "")
+          + (f" ({len(falhas)} buscas incompletas)" if falhas else ""))
+    return resultado
+
+
+def _linkedin(buscas: dict, horas: int, vagas: dict, falhas: list) -> None:
     tpr = f"r{int(horas) * 3600}"
-    vagas, falhas = {}, []
+    feitas = 0
     for grupo in buscas["grupos"]:
         local = grupo.get("local", "")
         for kw in grupo.get("palavras_chave") or []:
+            if feitas:
+                _pausa((6, 10))  # entre palavras-chave também: o 429 vem rápido
+            feitas += 1
             vistos_kw, start = set(), 0
             for _ in range(PAGINAS_MAX):
                 # sem local, a busca não leva o parâmetro (o LinkedIn usa o mundo todo)
@@ -108,7 +156,7 @@ def coleta(horas: int, saida: Path) -> dict:
                                             "f_TPR": tpr, "start": start})
                 codigo, corpo = baixar(BUSCA + q)
                 if codigo == 0:
-                    falhas.append({"local": local, "palavra_chave": kw, "start": start})
+                    falhas.append({"fonte": "linkedin", "local": local, "palavra_chave": kw, "start": start})
                     print(f"ATENÇÃO: {local} / {kw} parou no start={start} por bloqueio; resultado incompleto",
                           file=sys.stderr, flush=True)
                     break
@@ -123,6 +171,7 @@ def coleta(horas: int, saida: Path) -> dict:
                     data = re.search(r'datetime="([^"]+)"', card)
                     vagas.setdefault(id_, {
                         "id": id_,
+                        "fonte": "linkedin",
                         "titulo": _txt(r"base-search-card__title[^>]*>(.*?)</h3>", card),
                         "empresa": _txt(r"base-search-card__subtitle[^>]*>(.*?)</h4>", card),
                         "local": _txt(r"job-search-card__location[^>]*>(.*?)</span>", card),
@@ -135,23 +184,21 @@ def coleta(horas: int, saida: Path) -> dict:
                     break
                 start += 10
                 _pausa((3, 5))
-            print(f"{local} · {kw}: {len(vistos_kw)}", file=sys.stderr, flush=True)
-    resultado = {"horas": horas, "em": date.today().isoformat(), "vagas": list(vagas.values()), "falhas": falhas}
-    gravar_json(saida, resultado)
-    print(f"{len(vagas)} vagas únicas -> {saida}" + (f" ({len(falhas)} buscas incompletas)" if falhas else ""))
-    return resultado
+            print(f"LinkedIn · {local} · {kw}: {len(vistos_kw)}", file=sys.stderr, flush=True)
 
 
 # ---------------------------------------------------------------- filtra
 
 def _ja_no_radar() -> tuple[set, set]:
-    """Ids do LinkedIn e pares empresa+cargo já vistos: Radar atual, histórico e arquivo."""
+    """Ids de vaga (de qualquer fonte) e pares empresa+cargo já vistos: Radar atual,
+    histórico e arquivo."""
     ids, pares = set(), set()
 
     def anotar(v):
-        m = re.search(r"jobs/view/(\d+)", v.get("url") or "")
-        if m:
-            ids.add(m.group(1))
+        for campo in ("url", "url_candidatura"):
+            id_ = fontes.id_da_url(v.get(campo))
+            if id_:
+                ids.add(id_)
         if v.get("empresa") and v.get("cargo"):
             pares.add(chave(v["empresa"], v["cargo"]))
 
@@ -254,9 +301,38 @@ def _candidatura(corpo: str) -> str:
     return ""
 
 
+def _alvo(item: str) -> tuple[str, str]:
+    """(id, link) de um argumento que pode ser o id do Radar ou o link da vaga."""
+    item = str(item).strip()
+    if item.startswith("http"):
+        id_ = fontes.id_da_url(item)
+        return id_ or re.sub(r"[^a-z0-9]+", "-", item.split("//", 1)[-1].lower()).strip("-")[:80], item
+    url = fontes.url_do_id(item)
+    if not url:
+        raise SystemExit(f"'{item}' não é id de vaga do Radar nem link: use o número do LinkedIn, "
+                         "o id da coleta (gupy-…, solides-…) ou o endereço da vaga")
+    return item, url
+
+
+def _descricao_ats(id_: str, url: str, pasta: Path) -> None:
+    r = fontes.ler_vaga(url, baixar)
+    fechada = "FECHADA" if r["fechada"] else ""
+    criterios = " | ".join(x for x in (r["tipo"], r["local"], r["valida_ate"] and f"inscrições até {r['valida_ate']}") if x)
+    onde = f"no site da empresa, pelo próprio link da vaga: {url}"
+    (pasta / f"{id_}.txt").write_text(f"{r['codigo']} {fechada}\nCANDIDATURA: {onde}\nCRITÉRIOS: {criterios}\n"
+                                      f"{r['descricao']}", encoding="utf-8")
+    estado = "FECHADA" if r["fechada"] else ("aberta" if r["fechada"] is False else "sem dado de vaga na página")
+    print(id_, r["codigo"], estado, f"{len(r['descricao'])} caracteres", flush=True)
+
+
 def descricao(ids, pasta: Path) -> None:
     pasta.mkdir(parents=True, exist_ok=True)
-    for i in ids:
+    for item in ids:
+        i, url = _alvo(item)
+        if fontes.fonte_do_id(i) != "linkedin":
+            _descricao_ats(i, url, pasta)
+            _pausa()
+            continue
         codigo, corpo = baixar(POSTAGEM.format(i))
         criterios = " | ".join(_txt(r"(.*)", x) for x in
                                re.findall(r"description__job-criteria-text[^>]*>(.*?)</span>", corpo, re.S))
@@ -274,8 +350,17 @@ def descricao(ids, pasta: Path) -> None:
 def checa(ids, saida: Path) -> dict:
     """Aberta ou fechada, retomável: o que já está no arquivo de saída não é baixado de novo."""
     resultado = ler_json(saida, {}) or {}
-    for i in ids:
+    for item in ids:
+        i, url = _alvo(item)
         if i in resultado:
+            continue
+        if fontes.fonte_do_id(i) != "linkedin":
+            r = fontes.ler_vaga(url, baixar)
+            resultado[i] = {k: r[k] for k in ("codigo", "fechada", "ha", "valida_ate", "titulo", "empresa", "candidatura")}
+            resultado[i]["url"] = url
+            gravar_json(saida, resultado)
+            print(i, resultado[i], flush=True)
+            _pausa((4, 7))
             continue
         codigo, corpo = baixar(POSTAGEM.format(i))
         resultado[i] = {

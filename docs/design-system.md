@@ -51,14 +51,27 @@ sombra e zero gradiente: o que precisa subir ganha fio, inverte de cor ou troca 
 ## Radar 3D
 
 A tela de abertura e o topo do painel (menor, ao lado da manchete) trocam o radar em SVG
-por um radar em Three.js (`dashboard/radar-3d.js`,
-biblioteca em `dashboard/vendor/`, MIT). Continua chapado: só `MeshBasicMaterial`, sem luz e
-sem sombra; as cores são lidas dos tokens do `:root`. Sem WebGL, ou com o painel aberto por
-duplo clique, o SVG fica.
+por um radar em Three.js (`dashboard/radar-3d.js`, biblioteca em `dashboard/vendor/`, MIT).
+O desenho é o mesmo do SVG e continua chapado: tampo de papel, anéis de tinta, varredura azul,
+vaga certa em amarelo. É a única exceção à regra de zero sombra e zero gradiente, porque é
+ilustração e não interface, e a luz entra só por cima desse desenho. A luz fixa anda com
+quem olha (de cima, um pouco da esquerda): em qualquer giro as sombras caem curtas para trás
+e para a direita, o prato tem espessura, com a lateral mais escura do lado oposto, e deixa
+uma sombra macia na página; os pinos são esferas com brilho e deixam sombra no tampo. A
+varredura é uma lanterna que sai do centro, azul cheio e nítido colado no ponteiro e cada
+vez mais difusa para trás e para a borda. O pino que ela alcança fica azul do lado virado
+para o centro, no mesmo azul e na mesma força do facho naquele ponto, e não muda de
+tamanho. As cores são lidas dos tokens do `:root`.
+
+Na abertura o radar é grande e sangra pela borda direita da tela: 25% do prato fica de fora
+(`boas-vindas.css`). O enquadramento sai da projeção, então o prato sempre encosta nas
+laterais do canvas e o corte é de fato 25% dele. A vaga certa fica a 0,7 do centro e o selo
+FIT troca de lado quando a direita acaba: os dois aparecem em qualquer giro. Sem WebGL, ou
+com o painel aberto por duplo clique, o SVG fica, com o mesmo facho em degradê.
 
 ## Contribuindo com o visual
 
 Tokens novos entram no `:root` de `dashboard/styles.css`. Antes de abrir PR, confira: zero
-`box-shadow`, zero gradiente, pesos só 200/400/500/600/700, nenhum raio fora de
+`box-shadow`, zero gradiente (fora o radar), pesos só 200/400/500/600/700, nenhum raio fora de
 0/8px/pílula/círculo, amarelo nunca como texto sobre papel, nada em tinta sobre o azul,
 contraste AA, e o painel e a abertura a 375px de largura sem rolagem horizontal.

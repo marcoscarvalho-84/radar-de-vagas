@@ -172,13 +172,15 @@ alguns ATS derrubam o anexo quando o resto do formulário é preenchido.
 
 ## 9. Dados e links
 
-- `url` de vaga: o permalink `linkedin.com/jobs/view/{id}` ou a URL direta do ATS. Nunca a
-  busca genérica nem a raiz do site. Sem permalink capturado, vazio (o painel esconde o link
+- `url` de vaga: o permalink `linkedin.com/jobs/view/{id}` ou a URL direta do ATS (vaga que
+  veio da Gupy ou da Sólides já tem: `{empresa}.gupy.io/jobs/{id}`,
+  `{empresa}.vagas.solides.com.br/vaga/{id}`). Nunca a busca genérica nem a raiz do site. Sem permalink capturado, vazio (o painel esconde o link
   em vez de apontar para o lugar errado).
 - `url_candidatura`: o link da vaga no ATS da empresa (Greenhouse, Lever, Ashby, Gupy...)
   quando a candidatura é fora do LinkedIn. Sem login, o anúncio do LinkedIn não mostra esse
   link: `bin/radar ats "<empresa>" "<cargo>"` procura nos quadros públicos. O `url`
-  continua o permalink, que é o que pega duplicata.
+  continua o permalink, que é o que pega duplicata. Vaga da Gupy ou da Sólides: o
+  `url_candidatura` é o próprio `url`.
 - `url` de pessoa: sempre `linkedin.com/in/...`.
 - `cv` e `cv_preview` começam com `/cvs/` (é assim que o painel os serve).
 - Ids sequenciais `vaga-N` e `pessoa-N`, sempre pelo `bin/radar proximo-id` (max+1, nunca o

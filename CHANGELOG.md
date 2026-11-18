@@ -2,6 +2,32 @@
 
 ## Ainda não lançado
 
+Fontes novas de vaga:
+
+- Nas buscas no Brasil, a varredura também lê os portais da Gupy e da Sólides, pelo JSON
+  que a página de busca deles usa, sem login. A vaga já vem com o link de candidatura da
+  empresa, e a mesma vaga no LinkedIn sai como repetida. Busca por cidade fica com as vagas
+  da cidade e as remotas. Cada fonte pode ser desligada em `config.json > rotina > fontes`,
+  e `bin/radar varrer coleta --fontes` escolhe para uma coleta avulsa.
+- `varrer descricao` e `varrer checa` aceitam os ids novos (`gupy-…`, `solides-…`) e o link
+  de uma vaga em qualquer site: a página é lida pelo JobPosting em JSON-LD, que diz se a
+  vaga ainda vale (`validThrough`).
+- No LinkedIn, pausa também entre uma palavra-chave e outra: na pesquisa de fontes, a
+  segunda chamada seguida já voltou com 429.
+- `docs/fontes-de-vagas.md`: como cada fonte é lida, e por que Indeed, Glassdoor, Catho,
+  InfoJobs e os outros sites grandes ficaram de fora.
+
+O radar da abertura:
+
+- O mesmo desenho (papel, tinta, varredura azul), com um pouco de volume e luz: o prato tem
+  espessura e deixa uma sombra macia na página, os pinos são esferas com brilho e sombra no
+  tampo, e a varredura virou lanterna, nítida no ponteiro e cada vez mais difusa para trás.
+  A luz fixa anda com quem olha, então a sombra cai sempre para trás e para a direita, e o
+  pino que o facho alcança fica azul do lado do centro, na força do facho ali.
+- Saíram as bolinhas cinzas deitadas no prato (as vagas cortadas), no 3D e no SVG.
+- Ficou maior e sangra pela borda direita da tela, com 25% do prato de fora. A vaga certa e
+  o selo FIT 86 ficam sempre no que aparece, em qualquer giro.
+
 Do retorno do primeiro teste de ponta a ponta feito por outra pessoa:
 
 - Correção: no Mac, o `bin/radar cv` falhava com erro de `libgobject` quando a glib estava

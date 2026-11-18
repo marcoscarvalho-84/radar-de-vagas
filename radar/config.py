@@ -18,6 +18,8 @@ PADRAO = {
     },
     "pessoas": {"por_vaga": 3},
     "rotina": {
+        # de onde a varredura lê vagas. Gupy e Sólides só entram nas buscas no Brasil
+        "fontes": ["linkedin", "gupy", "solides"],
         "janela_horas": 48,
         "follow_up_dias": 7,
         "triagem_expira_dias": 14,
