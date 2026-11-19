@@ -20,6 +20,10 @@ para que nada saia sem a pessoa ver.
    `url_candidatura` na vaga: rode `bin/radar ats "<empresa>" "<cargo>"` antes de abrir o
    LinkedIn. Ir direto ao ATS poupa o login e o redirecionamento, e mostra se a vaga ainda
    está no quadro da empresa.
+5. Vaga da Gupy ou da Sólides (`url` em `gupy.io` ou `solides.com.br`): o link da vaga já é
+   o da candidatura; pule o `bin/radar ats`. Os dois portais pedem a conta de candidato da
+   pessoa. Se o navegador não estiver logado nela, peça para ela entrar (a senha é dela) e
+   continue depois.
 
 ## No formulário (uma vaga por vez, uma ação por vez)
 
@@ -35,7 +39,13 @@ para que nada saia sem a pessoa ver.
      config: PERGUNTE, nunca chute;
    - `config.formulario.nunca_preencher`: deixe para a pessoa;
    - texto longo: prefira preencher o campo diretamente em vez de digitar caractere a
-     caractere, e confira o comprimento depois (ver docs/linkedin-tecnico.md).
+     caractere, e confira o comprimento depois (ver docs/linkedin-tecnico.md);
+   - Gupy e Sólides trazem campos já preenchidos com o perfil que a pessoa tem no portal
+     (experiências, formação, contatos) e podem oferecer o currículo salvo lá. Anexe o CV
+     da vaga no lugar do salvo, confira os campos pré-preenchidos contra o `perfil.json` e
+     liste no checkpoint o que estiver diferente. Não edite o perfil do portal sem o ok;
+   - teste dentro da candidatura (perfil comportamental, lógica, idioma, fit cultural): é
+     da pessoa. Pare, diga qual teste é e deixe para ela.
 3. **Checkpoint obrigatório:** liste na conversa TODAS as perguntas com as respostas
    exatamente como estão no formulário, mais um screenshot da revisão. Espere o ok. Ajuste
    pedido: edite, reapresente, espere de novo. Easy Apply: checkpoint na última tela.

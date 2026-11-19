@@ -32,7 +32,7 @@ from datetime import datetime, timedelta, timezone
 from html import unescape
 from pathlib import Path
 
-from . import buscas, caminhos
+from . import buscas, caminhos, config, fontes
 from .arquivos import editar_json, gravar_json, ler_json, trava
 
 FUSO = timezone(timedelta(hours=-3))
@@ -464,6 +464,14 @@ def comentar(arquivo: str, comentario: str) -> dict:
 
 # ---------- estado para a tela ----------
 
+def _resumo_buscas(perfil: dict) -> dict:
+    """O resumo das buscas com as fontes que a varredura vai ler (LinkedIn; no Brasil, também
+    Gupy e Sólides, conforme config.rotina.fontes)."""
+    resumo = buscas.resumo(buscas.ler(), perfil)
+    resumo["fontes"] = fontes.para_locais(resumo["locais"], config.carregar()["rotina"].get("fontes"))
+    return resumo
+
+
 def estado() -> dict:
     ctx = ler()
     perfil = ler_json(caminhos.perfil(), {}) or {}
@@ -490,7 +498,7 @@ def estado() -> dict:
         "posicoes": ctx["posicoes"],
         "sugestoes_posicoes": [s for s in buscas.sugerir_posicoes(perfil)
                                if s.casefold() not in {p.casefold() for p in ctx["posicoes"]}],
-        "buscas": buscas.resumo(buscas.ler(), perfil),
+        "buscas": _resumo_buscas(perfil),
         "email": ctx["email"],
         "portfolio": ctx["portfolio"],
         "anexos": ctx["anexos"],

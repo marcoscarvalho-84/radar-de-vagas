@@ -604,6 +604,16 @@ class TestFontes(ComDados):
         self.assertEqual(varredura.escolher_fontes("Gupy, solides"), ["gupy", "solides"])
         self.assertEqual(varredura.escolher_fontes(None), ["linkedin", "gupy", "solides"])
 
+    def test_fontes_por_local_para_a_tela(self):
+        from radar import contexto, fontes
+        tres = ["linkedin", "gupy", "solides"]
+        self.assertEqual(fontes.para_locais(["Curitiba, Paraná, Brazil"], tres), tres)
+        self.assertEqual(fontes.para_locais(["Portugal", "Latin America"], tres), ["linkedin"])
+        self.assertEqual(fontes.para_locais([], "gupy,linkedin"), ["linkedin"])
+        self.assertEqual(fontes.para_locais(["Brasil"], ["solides"]), ["solides"])
+        # a tela de abertura recebe a lista junto com o resumo das buscas
+        self.assertIn("fontes", contexto.estado()["buscas"])
+
 
 class TestContexto(ComDados):
     """Os 6 passos da tela de abertura, sem servidor."""

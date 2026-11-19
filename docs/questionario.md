@@ -18,6 +18,8 @@ Legenda: **→** onde a resposta é gravada · *padrão* o que vale se você nã
    responder sabendo o que cada resposta muda no painel.
 2. Você tem o Claude in Chrome conectado ao seu navegador, logado no LinkedIn?
    Sem ele o Radar ainda coleta, analisa e gera CV; só não aplica nem mapeia pessoas por você.
+   Para se candidatar a vagas da Gupy ou da Sólides, o navegador também precisa estar na sua
+   conta de candidato de cada portal. A busca nos dois não pede conta.
 3. Quanto tempo por dia você consegue dedicar a DECIDIR (aprovar, descartar, ajustar)?
    15 minutos por dia rendem mais que 2 horas por semana: aprovação parada morre na fila.
    → `fit.vagas_trabalhadas_por_dia` (15 min ≈ 2 vagas) · *padrão 2*
@@ -126,6 +128,9 @@ proposto diz de onde veio.
    níveis abaixo, e as áreas onde o seu termo também é cargo: "Revenue" puxa revenue
    management de hotel). A rotina propõe os três a partir das posições e do CV.
    → `buscas.json > filtro_titulo`
+5. Onde procurar: o LinkedIn em toda busca e, nas buscas no Brasil, também os portais da
+   Gupy e da Sólides, onde muita empresa brasileira publica direto. Quer desligar algum?
+   (`docs/fontes-de-vagas.md` explica cada um.) → `config.rotina.fontes` · *padrão os três*
 
 ## Bloco 9 · CV e carta (3 min)
 

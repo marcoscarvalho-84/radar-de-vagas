@@ -2,7 +2,7 @@
   "_leia": "Dados FICTÍCIOS para avaliar o Radar sem configurar nada. Empresas, pessoas e links são inventados. Rode: bin/radar demo",
   "data": "2026-11-10",
   "gerado_em": "2026-11-10T09:40:00-03:00",
-  "resumo_busca": "6 palavras-chave, 212 vagas em 48h, 9 lidas, 3 cortadas na triagem",
+  "resumo_busca": "6 palavras-chave, 212 vagas em 48h (LinkedIn 171, Gupy 29, Sólides 12), 9 lidas, 3 cortadas na triagem",
   "vagas": [
     {
       "id": "vaga-1",
@@ -84,7 +84,8 @@
       "id": "vaga-4",
       "empresa": "Tucano Edtech",
       "cargo": "Lead Product Designer",
-      "url": "https://www.linkedin.com/jobs/view/1000000004",
+      "url": "https://exemplo-tucano.gupy.io/jobs/1000004",
+      "url_candidatura": "https://exemplo-tucano.gupy.io/jobs/1000004",
       "local": "Brasil",
       "modelo": "remoto",
       "profundidade": "triagem",
@@ -98,7 +99,8 @@
       "id": "vaga-5",
       "empresa": "Quasar Seguros",
       "cargo": "Product Designer Especialista",
-      "url": "https://www.linkedin.com/jobs/view/1000000005",
+      "url": "https://exemplo-quasar.vagas.solides.com.br/vaga/1000005",
+      "url_candidatura": "https://exemplo-quasar.vagas.solides.com.br/vaga/1000005",
       "local": "Brasil",
       "modelo": "remoto",
       "profundidade": "triagem",

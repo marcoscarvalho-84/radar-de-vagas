@@ -57,6 +57,14 @@ def no_brasil(local: str) -> bool:
     return any(_norm(p) in ("brazil", "brasil") for p in str(local or "").split(","))
 
 
+def para_locais(locais, ligadas) -> list[str]:
+    """As fontes que a coleta lê para estes locais, na ordem de FONTES: o LinkedIn em
+    qualquer local, a Gupy e a Sólides só quando algum local é no Brasil."""
+    brasil = any(no_brasil(l) for l in locais or [])
+    ligadas = {str(f).strip().lower() for f in (ligadas.split(",") if isinstance(ligadas, str) else ligadas or [])}
+    return [f for f in FONTES if f in ligadas and (f == "linkedin" or brasil)]
+
+
 def cidade_da_busca(local: str) -> str:
     """A cidade de uma busca por cidade, normalizada; '' quando a busca é o país inteiro."""
     partes = [p.strip() for p in str(local or "").split(",") if p.strip()]

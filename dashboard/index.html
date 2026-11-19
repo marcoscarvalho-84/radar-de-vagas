@@ -198,6 +198,24 @@
       return `<a class="link-fita" href="${esc(href)}" target="_blank" rel="noopener" aria-label="${esc(rotulo)} (abre em nova aba)">${esc(rotulo)} <span aria-hidden="true">↗</span></a>`;
     };
 
+    // de onde a vaga veio, pelo link (docs/fontes-de-vagas.md). Na Gupy e na Sólides o
+    // link da vaga já é o da candidatura: um link só, com o nome do portal
+    const FONTES = [[/(^|\.)linkedin\.com$/, "LinkedIn", "no"], [/(^|\.)gupy\.io$/, "Gupy", "na"],
+                    [/(^|\.)solides\.com\.br$/, "Sólides", "na"]];
+    const fonteDe = (url) => {
+      let host = "";
+      try { host = new URL(urlSegura(url)).hostname; } catch { return null; }
+      const f = FONTES.find(([re]) => re.test(host));
+      return f ? { nome: f[1], prep: f[2] } : null;
+    };
+    const viaFonte = (v) => { const f = fonteDe(v.url); return f ? `via ${f.nome}` : ""; };
+    const rotuloVer = (v) => {
+      const f = fonteDe(v.url);
+      return f && f.nome !== "LinkedIn" ? `Ver a vaga ${f.prep} ${f.nome}` : "Ver a vaga";
+    };
+    const candidaturaFora = (v) => v.url_candidatura && v.url_candidatura !== v.url
+      ? `<p class="apoio">${linkFita(v.url_candidatura, "Candidatar no site da empresa")}</p>` : "";
+
     // ---- identidade: título e rodapé saem da config, nunca do código ----
     const NOME = String(CFG.nome || "").trim();
     if (NOME) {
@@ -404,7 +422,7 @@
               <h3>${esc(v.empresa)} — ${esc(v.cargo)}</h3>
               ${barraFit(v.fit)}
             </div>
-            <p class="apoio">${esc([v.local, v.modelo, v.porta ? `porta ${tituloPorta(v.porta)}` : ""].filter(Boolean).join(" · "))}</p>
+            <p class="apoio">${esc([v.local, v.modelo, v.porta ? `porta ${tituloPorta(v.porta)}` : "", viaFonte(v)].filter(Boolean).join(" · "))}</p>
             ${sinais([
               ap ? pillJaAplicada(dataAplicacao(ap)) : selo(v),
               v.cv ? "CV pronto" : "",
@@ -427,8 +445,8 @@
           ${listaCurta("Sobre a empresa", v.empresa_contexto)}
           ${listaCurta("Melhorias que esta vaga sugere", v.melhorias)}
           ${blocoCv(v, "CV sob medida")}
-          <p class="apoio">${marquee(v.url, "Ver a vaga")}</p>
-          ${v.url_candidatura ? `<p class="apoio">${linkFita(v.url_candidatura, "Candidatar no site da empresa")}</p>` : ""}
+          <p class="apoio">${marquee(v.url, rotuloVer(v))}</p>
+          ${candidaturaFora(v)}
           ${botoesVaga(v, [["aprovar", "✓ Aprovar candidatura"], ["ajustar", "✎ Ajustar"], ["pular", "✕ Descartar"]])}
           ${pessoasDaVaga(v.id)}
         </div>
@@ -475,7 +493,7 @@
               <h3>${esc(v.empresa)} — ${esc(v.cargo)}</h3>
               ${barraFit(v.fit)}
             </div>
-            <p class="apoio">${esc([v.local, v.modelo, v.salario].filter(Boolean).join(" · "))}</p>
+            <p class="apoio">${esc([v.local, v.modelo, v.salario, viaFonte(v)].filter(Boolean).join(" · "))}</p>
             ${sinais([ap ? pillJaAplicada(dataAplicacao(ap)) : selo(v), flags ? plural(flags, "red flag", "red flags") : ""])}
             ${marcas([seloEntrada(v)])}
           </div>
@@ -484,7 +502,7 @@
         <div class="proposta-corpo">
           ${v.fit_resumo ? `<p>${esc(v.fit_resumo)}</p>` : ""}
           ${listaCurta("Red flags", v.red_flags)}
-          <p class="apoio">${marquee(v.url, "Ver a vaga")}</p>
+          <p class="apoio">${marquee(v.url, rotuloVer(v))}</p>
           ${botoesVaga(v, [["aprofundar", "↳ Aprofundar"], ["pular", "✕ Descartar"]])}
         </div>
       </details>`;
@@ -919,7 +937,7 @@
               <h3>${esc(v.empresa)} — ${esc(v.cargo)}</h3>
               ${a ? barraFit(a.fit) : ""}
             </div>
-            <p>${esc([v.local, v.modelo, v.salario].filter(Boolean).join(" · "))}</p>
+            <p>${esc([v.local, v.modelo, v.salario, viaFonte(v)].filter(Boolean).join(" · "))}</p>
             ${v.proximo_passo ? `<p>Próximo passo: ${esc(v.proximo_passo)}</p>` : ""}
             ${vencido ? `<p class="alerta">Sem resposta há ${d} dias, follow-up vencido</p>` : ""}
             ${a ? sinais([
@@ -1046,7 +1064,7 @@
           atualizarBarra();
           return;
         }
-        if (!window.confirm("Descartar a triagem do dia e pedir uma nova varredura no LinkedIn?")) return;
+        if (!window.confirm("Descartar a triagem do dia e pedir uma nova varredura?")) return;
         if (MODO_SERVIDOR) {
           btnNova.disabled = true;
           try {
@@ -1175,7 +1193,7 @@
     document.getElementById("btn-copiar").addEventListener("click", async () => {
       const linhas = [...decisoes.entries()].map(([id, d]) => {
         if (d.acao === "nova_busca")
-          return "• Descartar a triagem do dia e rodar uma nova varredura no LinkedIn";
+          return "• Descartar a triagem do dia e rodar uma nova varredura";
         const p = porId.get(id);
         if (!p) return `• ${d.acao}: ${id}`;
         const rotulo = rotuloDe(p);

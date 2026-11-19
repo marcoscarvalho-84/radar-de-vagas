@@ -65,6 +65,11 @@ conduzir.
   marque `buscas.json > origem: "questionario"`: a tela de abertura não sobrescreve mais.
   Se `buscas.json` ainda for o exemplo (cargos de design de `exemplos/`), substitua inteiro.
   Lembre que o LinkedIn não respeita OR nem aspas: uma palavra-chave por busca.
+  6. fontes: cada busca roda no LinkedIn e, quando o local é no Brasil, também na Gupy e na
+     Sólides (`config.json > rotina > fontes`, as três ligadas por padrão). Diga isso e
+     pergunte se quer desligar alguma; `docs/fontes-de-vagas.md` explica cada uma, inclusive
+     o que os termos de uso dizem. Para se candidatar por esses portais, a pessoa precisa da
+     conta de candidato dela em cada um; a busca não precisa de conta.
 - Ritmo de conversa: frases curtas, sem jargão. A pessoa pode estar ansiosa com a busca;
   seja objetivo e gentil.
 

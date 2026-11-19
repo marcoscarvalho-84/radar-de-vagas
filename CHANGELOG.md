@@ -16,6 +16,15 @@ Fontes novas de vaga:
   segunda chamada seguida já voltou com 429.
 - `docs/fontes-de-vagas.md`: como cada fonte é lida, e por que Indeed, Glassdoor, Catho,
   InfoJobs e os outros sites grandes ficaram de fora.
+- Os textos acompanham: a abertura diz onde cada busca roda ("no LinkedIn, na Gupy e na
+  Sólides"), o painel mostra a origem de cada vaga ("via Gupy") e, na vaga de portal, um
+  link só ("Ver a vaga na Gupy"), já que ele é também o da candidatura. A demonstração tem
+  uma vaga de cada portal.
+- Acesso: a busca nos portais não pede conta; a candidatura pede a conta de candidato da
+  pessoa em cada um. README, questionário (blocos 0 e 8), `/radar-configurar` e
+  `/radar-aplicar` dizem isso. No formulário desses portais, o `/radar-aplicar` troca o
+  currículo salvo pelo CV da vaga, confere os campos pré-preenchidos e deixa para a pessoa
+  qualquer teste da candidatura.
 
 O radar da abertura:
 

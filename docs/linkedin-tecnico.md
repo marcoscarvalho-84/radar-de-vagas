@@ -49,8 +49,9 @@ Candidatura externa: `bin/radar ats "<empresa>" "<cargo>"` procura a vaga nos qu
 públicos do Greenhouse (`boards-api.greenhouse.io/v1/boards/{slug}/jobs`), do Lever
 (`api.lever.co/v0/postings/{slug}?mode=json`) e do Ashby
 (`api.ashbyhq.com/posting-api/job-board/{slug}`). Identificador que não existe devolve 404.
-A Gupy não tem um endpoint público equivalente estável: para empresa brasileira, WebSearch
-com "site:gupy.io <empresa>".
+Gupy e Sólides não têm quadro por empresa nesse formato. A varredura já lê os dois
+portais pela busca (`docs/fontes-de-vagas.md`); para uma vaga do LinkedIn que manda para a
+Gupy de uma empresa brasileira, WebSearch com "site:gupy.io <empresa>" acha o link.
 
 ## Busca logada
 

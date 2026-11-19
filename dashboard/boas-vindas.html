@@ -48,7 +48,7 @@
             </svg>
             <div>
               <strong>Varre as vagas</strong>
-              <span>Toda vaga nova ganha uma nota de fit honesta, de 0 a 100.</span>
+              <span>LinkedIn, Gupy e Sólides: toda vaga nova ganha uma nota de fit honesta, de 0 a 100.</span>
             </div>
           </li>
           <li>
@@ -300,7 +300,7 @@
           <span class="passo__num" aria-hidden="true">3</span>
           <h3 id="t-posicoes" tabindex="-1">Posições desejadas</h3>
           <p class="passo__porque">É o que o Radar vai procurar por você. Escreva cada cargo como ele aparece nas vagas que você quer. As sugestões vêm da sua trajetória no LinkedIn.</p>
-          <p class="passo__nota"><span class="meta">Na busca</span>Cada posição vira uma busca no LinkedIn, no país do seu perfil. Depois o /radar-configurar lê o seu LinkedIn e o seu CV e completa com variações em português e inglês e títulos equivalentes.</p>
+          <p class="passo__nota"><span class="meta">Na busca</span>Cada posição vira uma busca no país do seu perfil: no LinkedIn e, se for o Brasil, também na Gupy e na Sólides. Depois o /radar-configurar lê o seu LinkedIn e o seu CV e completa com variações em português e inglês e títulos equivalentes.</p>
         </div>
         <div class="passo__corpo">
           <div class="campo">
@@ -473,6 +473,9 @@
   <script>
   (() => {
     "use strict";
+    // onde a varredura procura (radar/fontes.py), na frase do passo Posições
+    const ONDE = { linkedin: "no LinkedIn", gupy: "na Gupy", solides: "na Sólides" };
+    const emLista = (xs) => xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e ${xs[xs.length - 1]}` : xs.join("");
     const PASSOS = ["linkedin", "cv", "posicoes", "email", "portfolio", "anexos", "pronto"];
     const NOMES = { linkedin: "LinkedIn", cv: "CV", posicoes: "Posições", email: "E-mail", portfolio: "Portfólio", anexos: "Anexos" };
     const TOTAL = PASSOS.length - 1; // o "pronto" não conta
@@ -747,10 +750,11 @@
       $("#posicoes-sugeridas").replaceChildren(...sugeridas.map(s => chip(`+ ${s}`, () => adicionarPosicao(s), `Adicionar ${s}`)));
       const busca = estado.buscas || {};
       const aviso = $("#posicoes-busca");
+      const onde = (busca.fontes || []).map(f => ONDE[f]).filter(Boolean);
       if (busca.origem === "questionario" || busca.origem === "manual") {
         aviso.textContent = "As suas buscas já foram refinadas no questionário. Posição nova entra lá: rode /radar-configurar busca.";
       } else if (busca.origem === "posicoes" && busca.palavras_chave.length) {
-        aviso.textContent = `A varredura procura: ${busca.palavras_chave.join(", ")}${busca.locais.length ? ` · em ${busca.locais.join(", ")}` : " · sem país no perfil, em qualquer lugar"}.`;
+        aviso.textContent = `A varredura procura: ${busca.palavras_chave.join(", ")}${busca.locais.length ? ` · em ${busca.locais.join(", ")}` : " · sem país no perfil, em qualquer lugar"}${onde.length ? ` · ${emLista(onde)}` : ""}.`;
       } else {
         aviso.textContent = "";
       }

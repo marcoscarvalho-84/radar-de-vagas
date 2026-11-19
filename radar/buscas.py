@@ -1,4 +1,5 @@
-"""O que a varredura procura no LinkedIn: as buscas de cada pessoa, nunca as do exemplo.
+"""O que a varredura procura (LinkedIn e, no Brasil, Gupy e Sólides): as buscas de cada
+pessoa, nunca as do exemplo.
 
 O caminho do buscas.json:
 
@@ -26,6 +27,8 @@ MAX_POSICOES = 8
 VAZIO = {
     "_leia": "O que a varredura procura. Nasce das posições que você escreveu na tela de "
              "abertura e é refinado pelo /radar-configurar a partir do seu LinkedIn e CV. "
+             "Cada busca roda no LinkedIn e, com local no Brasil, também na Gupy e na Sólides "
+             "(config.json > rotina > fontes). "
              "Uma palavra-chave por busca: o LinkedIn não respeita OR nem aspas.",
     "origem": "",
     "janela_horas": 48,

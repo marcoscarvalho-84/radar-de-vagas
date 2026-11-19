@@ -18,7 +18,7 @@ candidato daria em uma tarde, comprimido em minutos, e nada sai sem o seu ok.
 ```mermaid
 flowchart LR
     A[Perfil do LinkedIn] --> B[Questionário]
-    B --> C[Varredura diária]
+    B --> C[Varredura diária<br/>LinkedIn, Gupy, Sólides]
     C --> D[Triagem<br/>nota de fit 0 a 100]
     D -->|você decide| E[Análise completa<br/>empresa, salário, ângulo]
     E --> F[CV e carta<br/>sob medida]
@@ -54,7 +54,9 @@ instale as dependências antes (próximo passo).
 ## Instalar
 
 Precisa de: Python 3.10+, [Claude Code](https://claude.com/claude-code), e para aplicar e
-mapear pessoas, a extensão Claude in Chrome logada no seu LinkedIn.
+mapear pessoas, a extensão Claude in Chrome logada no seu LinkedIn. A busca na Gupy e na
+Sólides não pede conta; para se candidatar por elas, entre no navegador com a sua conta de
+candidato de cada portal.
 
 ```bash
 bin/instalar
@@ -124,8 +126,9 @@ mensagens e convites nunca são abertos.
 ## Limites e ética
 
 - **Aprovação humana em toda ação pública.** Não existe modo automático de candidatura.
-- **Ritmo de pessoa.** A coleta usa o endpoint público de vagas com pausas e para ao primeiro
-  sinal de bloqueio. O Radar nunca resolve captcha, cria conta ou digita senha.
+- **Ritmo de pessoa.** A coleta usa as buscas públicas de vagas (LinkedIn, Gupy, Sólides)
+  com pausas e para ao primeiro sinal de bloqueio. O Radar nunca resolve captcha, cria conta
+  ou digita senha.
 - **Verdade documental.** O Radar não inventa nem infla fato: tudo sai do que você confirmou.
 - **Use com responsabilidade.** Automatizar o LinkedIn pode contrariar os termos de uso do
   site, e os termos da Gupy para candidatos proíbem agregar vagas da plataforma (cada fonte
@@ -161,7 +164,7 @@ rationale, researches the best matches (company, salary with sources,
 strengths and honest gaps), generates a tailored one-page PDF résumé and cover letter, maps
 who to contact at the company (without writing messages), and fills applications in your
 browser, always stopping for your explicit approval before anything goes out. Run `bin/radar`
-the first time and a welcome screen walks you through five steps of context (LinkedIn, CV,
-e-mail, portfolio, attachments). All your data stays in `meus-dados/`, which is git-ignored.
+the first time and a welcome screen walks you through six steps of context (LinkedIn, CV,
+desired positions, e-mail, portfolio, attachments). All your data stays in `meus-dados/`, which is git-ignored.
 Try it with `bin/radar demo`. Docs are in
 Portuguese; contributions in English are welcome.
